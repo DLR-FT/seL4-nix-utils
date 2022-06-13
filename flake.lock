@@ -2,39 +2,72 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1652182392,
-        "narHash": "sha256-H9Bmor+kfogrE0X7Fi5sh0gCUWDG4pnmYxedJyIT41A=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "aa2f845096f72dde4ad0c168eeec387cbd2eae04",
+        "lastModified": 1655074553,
+        "narHash": "sha256-Tp6I9qHxb0iPDGZ8PPfdowAJgxuEuK+vfi5WaXSYjt4=",
+        "ref": "nixos-21.11",
+        "rev": "2a9a64710a34334c1a3c82b7d73a3df634dcad7d",
+        "revCount": 337846,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      },
+      "original": {
+        "ref": "nixos-21.11",
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      }
+    },
+    "nur": {
+      "locked": {
+        "lastModified": 1655131605,
+        "narHash": "sha256-RXhzIhbJmpXE1ivp/LGZlGviSVFQGz+HQNnmgfuy62E=",
+        "owner": "nix-community",
+        "repo": "NUR",
+        "rev": "83591717d43867077da466d8a40fd4e4d3cd4701",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
-        "ref": "nixos-21.11",
-        "repo": "nixpkgs",
-        "type": "github"
+        "id": "nur",
+        "type": "indirect"
+      }
+    },
+    "old-nixpkgs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1558254092,
+        "narHash": "sha256-5v6XuO9dOVpB3ZGNyDvLqOvCnzlyyvscTYbNiQouSZo=",
+        "ref": "nixos-18.09",
+        "rev": "a7e559a5504572008567383c3dc8e142fa7a8633",
+        "revCount": 154151,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      },
+      "original": {
+        "ref": "nixos-18.09",
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
       }
     },
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
+        "nur": "nur",
+        "old-nixpkgs": "old-nixpkgs",
         "utils": "utils"
       }
     },
     "utils": {
       "locked": {
-        "lastModified": 1649676176,
-        "narHash": "sha256-OWKJratjt2RW151VUlJPRALb7OU2S5s+f0vLj4o1bHM=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "a4b154ebbdc88c8498a5c7b01589addc9e9cb678",
-        "type": "github"
+        "lastModified": 1653893745,
+        "narHash": "sha256-0jntwV3Z8//YwuOjzhV2sgJJPt+HY6KhU7VZUL0fKZQ=",
+        "ref": "master",
+        "rev": "1ed9fb1935d260de5fe1c2f7ee0ebaae17ed2fa1",
+        "revCount": 58,
+        "type": "git",
+        "url": "https://github.com/numtide/flake-utils"
       },
       "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
+        "type": "git",
+        "url": "https://github.com/numtide/flake-utils"
       }
     }
   },

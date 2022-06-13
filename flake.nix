@@ -1,12 +1,18 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-21.11";
-    utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-21.11";
+    utils.url = "git+https://github.com/numtide/flake-utils";
+    # TODO remove this once https://github.com/seL4/capdl/pull/37 is fixed
+    # as a very old ghc802 is required, we have to propagate the nixos-18.09 branch 
+    # as source to stack, which is internally ran by the seL4 build
+    old-nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-18.09";
+    old-nixpkgs.flake = false;
   };
 
-  outputs = { self, nixpkgs, utils }: utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, utils, nur, ... } @ inputs: utils.lib.eachDefaultSystem (system:
     let
-      pkgs = nixpkgs.legacyPackages."${system}";
+      pkgs = import nixpkgs { inherit system; };
+      # ghc802 = (import inputs.old-nixpkgs { inherit system; }).haskell.compiler.ghc802;
       pythonPackages = pkgs.python39Packages;
     in
     rec {
@@ -132,7 +138,6 @@
           libxml2
           ncurses
           ninja
-          ninja
           protobuf
           qemu_full
           ubootTools
@@ -140,12 +145,13 @@
           gcc-arm-embedded-8
 
           # CAmkES
-          ghc
+          stack
 
           # both
           (python3.withPackages (ps: with ps; [ packages.camkes-deps ]))
         ];
         shellHook = ''
+          export NIX_PATH=nixpkgs=${inputs.old-nixpkgs}:$NIX_PATH
           cat << EOF
           repo init -u https://github.com/seL4/sel4-tutorials-manifest
           repo sync
