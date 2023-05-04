@@ -14,9 +14,10 @@
       mach-nix = inputs.mach-nix.lib.${system};
 
       seL4-configs = {
-        "ARM_HYP_verified" = pkgs.pkgsCross.aarch64-embedded;
-        "ARM_MCS_verified" = pkgs.pkgsCross.aarch64-embedded;
-        "ARM_verified" = pkgs.pkgsCross.aarch64-embedded;
+        "AARCH64_verified" = pkgs.pkgsCross.aarch64-embedded;
+        "ARM_HYP_verified" = pkgs.pkgsCross.arm-embedded;
+        "ARM_MCS_verified" = pkgs.pkgsCross.arm-embedded;
+        "ARM_verified" = pkgs.pkgsCross.arm-embedded;
         "RISCV64_MCS_verified" = pkgs.pkgsCross.riscv64-embedded;
         "RISCV64_verified" = pkgs.pkgsCross.riscv64-embedded;
         "X64_verified" = pkgs;
@@ -29,13 +30,19 @@
         pname = name;
         inherit src version;
         nativeBuildInputs = with pkgs; [
+          pkgsTarget.stdenv.cc
           cmake # build tools
           ninja # build tools
           libxml2 # xmllint
           (python3.withPackages (ps: with ps; [ setuptools six jinja2 future ply ]))
         ];
         patchPhase = "patchShebangs tools"; # fix /bin/bash et al.
-        cmakeFlags = [ "-C../configs/${config}.cmake" ];
+        cmakeFlags = [
+          "-DKernelSel4Arch=arm"
+          "-DCMAKE_MAKE_PROGRAM=ninja"
+          "-DCMAKE_ASM_COMPILER=${pkgsTarget.stdenv.cc.targetPrefix}gcc"
+          "-C../configs/${config}.cmake"
+        ];
         installPhase = ''
           # mkdir -p $out
           cp --recursive -- . $out/
