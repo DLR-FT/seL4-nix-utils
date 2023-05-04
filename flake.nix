@@ -1,8 +1,10 @@
 {
   inputs = {
-    utils.url = "git+https://github.com/numtide/flake-utils";
+    utils.url = "github:numtide/flake-utils";
     mach-nix.url = "github:DavHau/mach-nix";
-    mach-nix.inputs.nixpkgs.follows = "nixpkgs";
+    # mach-nix.inputs.nixpkgs.follows = "nixpkgs";
+    # sel4-src.url = "github:seL4/seL4";
+    # sel4-src.flake = false;
   };
 
   outputs = { self, nixpkgs, utils, ... } @ inputs: utils.lib.eachDefaultSystem (system:
@@ -10,9 +12,38 @@
       pkgs = import nixpkgs { inherit system; };
       pythonPackages = pkgs.python39Packages;
       mach-nix = inputs.mach-nix.lib.${system};
+
+      seL4-configs = {
+        "ARM_HYP_verified" = pkgs.pkgsCross.aarch64-embedded;
+        "ARM_MCS_verified" = pkgs.pkgsCross.aarch64-embedded;
+        "ARM_verified" = pkgs.pkgsCross.aarch64-embedded;
+        "RISCV64_MCS_verified" = pkgs.pkgsCross.riscv64-embedded;
+        "RISCV64_verified" = pkgs.pkgsCross.riscv64-embedded;
+        "X64_verified" = pkgs;
+      };
     in
     rec {
+
+      /* build a kernel */
+      lib.buildKernel = { pkgs, pkgsTarget, name ? "seL4", config, version, src }: pkgsTarget.stdenv.mkDerivation {
+        pname = name;
+        inherit src version;
+        nativeBuildInputs = with pkgs; [
+          cmake # build tools
+          ninja # build tools
+          libxml2 # xmllint
+          (python3.withPackages (ps: with ps; [ setuptools six jinja2 future ply ]))
+        ];
+        patchPhase = "patchShebangs tools"; # fix /bin/bash et al.
+        cmakeFlags = [ "-C../configs/${config}.cmake" ];
+        installPhase = ''
+          # mkdir -p $out
+          cp --recursive -- . $out/
+        '';
+      };
+
       packages = rec {
+        # all-in seL4 + CAmkES python environment
         python-env = mach-nix.mkPython {
           requirements = ''
             camkes-deps
@@ -21,7 +52,21 @@
             setuptools # for `import pkg_resource`
           '';
         };
-      };
+      } // (pkgs.lib.mapAttrs'
+        (config: pkgsTarget: {
+          name = "seL4-${config}";
+          value = lib.buildKernel rec {
+            inherit config pkgs pkgsTarget;
+            version = "12.1.0";
+            src = pkgs.fetchFromGitHub rec {
+              owner = "seL4";
+              repo = owner;
+              rev = version;
+              sha256 = "sha256-3MSX7f6q6YiBG/FcB/KjeRloInnwTsgLg84m47lD/eI=";
+            };
+          };
+        })
+        seL4-configs);
 
       devShell = (pkgs.mkShell.override { stdenv = pkgs.gcc8Stdenv; }) {
         nativeBuildInputs = with pkgs; [
