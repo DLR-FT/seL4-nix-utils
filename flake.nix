@@ -7,7 +7,7 @@
     # sel4-src.flake = false;
   };
 
-  outputs = { self, nixpkgs, utils, ... } @ inputs: utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, utils, ... } @ inputs: utils.lib.eachSystem ["x86_64-linux"] (system:
     let
       pkgs = import nixpkgs { inherit system; };
       pythonPackages = pkgs.python39Packages;
@@ -18,8 +18,8 @@
         "ARM_HYP_verified" = pkgs.pkgsCross.arm-embedded;
         "ARM_MCS_verified" = pkgs.pkgsCross.arm-embedded;
         "ARM_verified" = pkgs.pkgsCross.arm-embedded;
-        "RISCV64_MCS_verified" = pkgs.pkgsCross.riscv64-embedded;
-        "RISCV64_verified" = pkgs.pkgsCross.riscv64-embedded;
+        #"RISCV64_MCS_verified" = pkgs.pkgsCross.riscv64-embedded;
+        #"RISCV64_verified" = pkgs.pkgsCross.riscv64-embedded;
         "X64_verified" = pkgs;
       };
     in
@@ -34,19 +34,21 @@
           cmake # build tools
           ninja # build tools
           libxml2 # xmllint
-          (python3.withPackages (ps: with ps; [ setuptools six jinja2 future ply ]))
+          dtc #
+          self.packages.${system}.python-env
+          #(python3.withPackages (ps: with ps; [ setuptools six jinja2 future ply pyyaml libfdt ]))
         ];
         patchPhase = "patchShebangs tools"; # fix /bin/bash et al.
         cmakeFlags = [
-          "-DKernelSel4Arch=arm"
+          #"-DKernelSel4Arch=arm"
           "-DCMAKE_MAKE_PROGRAM=ninja"
           "-DCMAKE_ASM_COMPILER=${pkgsTarget.stdenv.cc.targetPrefix}gcc"
           "-C../configs/${config}.cmake"
         ];
         installPhase = ''
-          # mkdir -p $out
           cp --recursive -- . $out/
         '';
+        dontFixup = true;
       };
 
       packages = rec {
@@ -66,16 +68,16 @@
             inherit config pkgs pkgsTarget;
             version = "12.1.0";
             src = pkgs.fetchFromGitHub rec {
-              owner = "seL4";
-              repo = owner;
-              rev = version;
-              sha256 = "sha256-3MSX7f6q6YiBG/FcB/KjeRloInnwTsgLg84m47lD/eI=";
+              owner = "moritz-meier"; #"seL4";
+              repo = "seL4";
+              rev = "d90fada";
+              sha256 = "sha256-Scoxxf8iS/oYJJWS8YDtsR7UCmbKLSK25OMWIEgHd6c=";
             };
           };
         })
         seL4-configs);
 
-      devShell = (pkgs.mkShell.override { stdenv = pkgs.gcc8Stdenv; }) {
+      devShells.default = (pkgs.mkShell.override { stdenv = pkgs.gcc8Stdenv; }) {
         nativeBuildInputs = with pkgs; [
           # seL4
           ccache
@@ -116,5 +118,7 @@
           EOF
         '';
       };
+
+      checks = packages;
     });
 }
