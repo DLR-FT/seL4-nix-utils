@@ -35,7 +35,7 @@ in
 # check that the passed seL4 config is known
 assert builtins.elem config (builtins.attrNames seL4-configs);
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "seL4";
   version = "unknown";
 
@@ -48,7 +48,6 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    # targetStdenv'.cc
     cmake # build tools
     ninja # build tools
     libxml2 # xmllint

@@ -21,7 +21,6 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ nose pip ];
 
-
   meta = with lib; {
     description = "Utilities for converting from C/C++ include guards to #pragma once and back again";
     homepage = "https://github.com/cgmb/guardonce";
