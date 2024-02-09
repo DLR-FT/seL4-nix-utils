@@ -1,9 +1,9 @@
 {
   inputs = {
-    utils.url = "github:numtide/flake-utils";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, utils, ... } @ inputs: utils.lib.eachSystem [ "x86_64-linux" ] (system:
+  outputs = { self, nixpkgs, flake-utils, ... } @ inputs: flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
     let
       pkgs = import nixpkgs { inherit system; };
     in
