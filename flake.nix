@@ -114,6 +114,12 @@
             "-DVERIFICATION=FALSE"
           ];
         };
+
+
+        seL4-repo-tool-source = pkgs.callPackage pkgs/repo-tool-fetcher.nix {
+          repoUrl = "https://github.com/seL4/sel4test-manifest.git";
+          hash = "sha256-6i64uyQvrv2gLOKKyNsLhaz0t+DKmhumvtwPcj6EEL8=";
+        };
       };
 
       devShells.default = (pkgs.mkShell.override { stdenv = pkgs.gcc8Stdenv; }) {
