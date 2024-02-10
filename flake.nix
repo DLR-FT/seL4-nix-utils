@@ -115,10 +115,12 @@
           ];
         };
 
+        repoToolFetcher = pkgs.callPackage pkgs/repo-tool-fetcher.nix { };
 
-        seL4-repo-tool-source = pkgs.callPackage pkgs/repo-tool-fetcher.nix {
-          repoUrl = "https://github.com/seL4/sel4test-manifest.git";
-          hash = "sha256-6i64uyQvrv2gLOKKyNsLhaz0t+DKmhumvtwPcj6EEL8=";
+        seL4-test-source = repoToolFetcher {
+          url = "https://github.com/seL4/sel4test-manifest.git";
+          tag = "12.1.0";
+          hash = "sha256-VOkoGM+E0D3OzkvOqGo9nSRp7aUx3YTiqHsDNQAOXo8=";
         };
       };
 

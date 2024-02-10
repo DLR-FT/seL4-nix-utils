@@ -4,35 +4,41 @@
 , git
 , git-repo
 , nukeReferences
-
-  # arguments of interest
-, hash
-, name ? "repo-tool-source"
-, version ? "unknown"
-, repoUrl
 }:
 
-stdenvNoCC.mkDerivation {
-  pname = name;
-  version = "1.0.0";
-  src = ./.;
+lib.makeOverridable (
+  { url
+  , rev ? (if tag != null then "refs/tags/${tag}" else abort "neither rev nor tag is set")
+  , tag ? null
+  , name ? "source"
+  , hash
+  }@args:
 
-  nativeBuildInputs = [ cacert git git-repo nukeReferences ];
+  stdenvNoCC.mkDerivation {
+    inherit name;
+    dontUnpack = true;
+    dontBuild = true;
 
-  installPhase = ''
-    runHook preInstall
-    mkdir -- $out home
-    export HOME="$PWD/home"
-    cd $out
-    repo init --manifest-url ${lib.strings.escapeShellArg repoUrl} --no-repo-verify
-    repo sync
-    rm --force --recursive -- .repo
-    runHook postInstall
-  '';
+    nativeBuildInputs = [ cacert git git-repo nukeReferences ];
 
-  dontFixup = true;
+    installPhase = ''
+      runHook preInstall
+      mkdir -- $out home
+      export HOME="$PWD/home"
+      cd $out
+      repo init \
+        --manifest-url=${lib.strings.escapeShellArg url} \
+        --manifest-branch=${lib.strings.escapeShellArg rev} \
+        --no-repo-verify
+      repo sync
+      rm --force --recursive -- .repo
+      runHook postInstall
+    '';
 
-  outputHashAlgo = "sha256";
-  outputHashMode = "recursive";
-  outputHash = hash;
-}
+    dontFixup = true;
+
+    outputHashAlgo = "sha256";
+    outputHashMode = "recursive";
+    outputHash = hash;
+  }
+)
