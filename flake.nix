@@ -5,7 +5,14 @@
 
   outputs = { self, nixpkgs, flake-utils, ... } @ inputs: flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
     let
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [
+          (final: prev: {
+            inherit (self.packages.${system}) python-seL4-deps repoToolFetcher;
+          })
+        ];
+      };
     in
     rec {
       packages = rec {
@@ -22,32 +29,26 @@
         ### seL4 Kernel Flavours
         #
         seL4-kernel-arm-hyp = pkgs.callPackage pkgs/seL4-kernel.nix {
-          inherit python-seL4-deps;
           config = "ARM_HYP_verified";
         };
 
         seL4-kernel-arm-mcs = pkgs.callPackage pkgs/seL4-kernel.nix {
-          inherit python-seL4-deps;
           config = "ARM_MCS_verified";
         };
 
         seL4-kernel-arm = pkgs.callPackage pkgs/seL4-kernel.nix {
-          inherit python-seL4-deps;
           config = "ARM_verified";
         };
 
         seL4-kernel-riscv64-mcs = pkgs.callPackage pkgs/seL4-kernel.nix {
-          inherit python-seL4-deps;
           config = "RISCV64_MCS_verified";
         };
 
         seL4-kernel-riscv64 = pkgs.callPackage pkgs/seL4-kernel.nix {
-          inherit python-seL4-deps;
           config = "RISCV64_verified";
         };
 
         seL4-kernel-x64 = pkgs.callPackage pkgs/seL4-kernel.nix {
-          inherit python-seL4-deps;
           config = "X64_verified";
         };
 
@@ -55,7 +56,6 @@
         ### seL4 kernel + userspace flavours
         #
         seL4-arm-hyp = pkgs.callPackage pkgs/seL4.nix {
-          inherit python-seL4-deps;
           config = "ARM_HYP_verified";
           extraCmakeFlags = [
             "-DPLATFORM=zynq7000"
@@ -65,7 +65,6 @@
         };
 
         seL4-arm-mcs = pkgs.callPackage pkgs/seL4.nix {
-          inherit python-seL4-deps;
           config = "ARM_MCS_verified";
           extraCmakeFlags = [
             "-DPLATFORM=zynq7000"
@@ -75,7 +74,6 @@
         };
 
         seL4-arm = pkgs.callPackage pkgs/seL4.nix {
-          inherit python-seL4-deps;
           config = "ARM_verified";
           extraCmakeFlags = [
             "-DPLATFORM=zynq7000"
@@ -106,7 +104,6 @@
         # };
 
         seL4-x64 = pkgs.callPackage pkgs/seL4.nix {
-          inherit python-seL4-deps;
           config = "X64_verified";
           extraCmakeFlags = [
             "-DPLATFORM=pc99"
