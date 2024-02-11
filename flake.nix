@@ -101,14 +101,14 @@
           #   ];
           # };
 
-          seL4-moritz-fork-x64 = (pkgs.callPackage pkgs/seL4-moritz-fork.nix {
+          seL4-moritz-fork-x64 = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
             config = "X64_verified";
             extraCmakeFlags = [
               "-DPLATFORM=pc99"
               "-DRELEASE=FALSE"
               "-DVERIFICATION=FALSE"
             ];
-          }).overrideAttrs (_: { src = self.packages.${system}.seL4-test-source; });
+          };
 
 
           seL4-test-source = pkgs.repoToolFetcher {
