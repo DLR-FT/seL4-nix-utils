@@ -13,15 +13,15 @@ jobs:
       - ubuntu-latest
     needs:
       - x86_64-linux---concurrencytest
-      - x86_64-linux---guardonce
       - x86_64-linux---seL4-deps
+      - x86_64-linux---guardonce
       - x86_64-linux---pyfdt
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -33,11 +33,11 @@ jobs:
       - ubuntu-latest
     needs: []
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -49,11 +49,11 @@ jobs:
       - ubuntu-latest
     needs: []
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -65,11 +65,11 @@ jobs:
       - ubuntu-latest
     needs: []
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -83,11 +83,11 @@ jobs:
       - x86_64-linux---guardonce
       - x86_64-linux---pyfdt
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -98,15 +98,15 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
+      - x86_64-linux---seL4-deps
       - x86_64-linux---pyfdt
       - x86_64-linux---guardonce
-      - x86_64-linux---seL4-deps
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -118,14 +118,14 @@ jobs:
       - ubuntu-latest
     needs:
       - x86_64-linux---seL4-deps
-      - x86_64-linux---guardonce
       - x86_64-linux---pyfdt
+      - x86_64-linux---guardonce
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -136,15 +136,15 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
+      - x86_64-linux---seL4-deps
       - x86_64-linux---pyfdt
       - x86_64-linux---guardonce
-      - x86_64-linux---seL4-deps
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -155,15 +155,15 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
+      - x86_64-linux---pyfdt
       - x86_64-linux---guardonce
       - x86_64-linux---seL4-deps
-      - x86_64-linux---pyfdt
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -174,15 +174,15 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
+      - x86_64-linux---guardonce
       - x86_64-linux---seL4-deps
       - x86_64-linux---pyfdt
-      - x86_64-linux---guardonce
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -194,14 +194,14 @@ jobs:
       - ubuntu-latest
     needs:
       - x86_64-linux---seL4-deps
-      - x86_64-linux---guardonce
       - x86_64-linux---pyfdt
+      - x86_64-linux---guardonce
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -212,15 +212,15 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---seL4-deps
       - x86_64-linux---pyfdt
+      - x86_64-linux---seL4-deps
+      - x86_64-linux---guardonce
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -232,15 +232,14 @@ jobs:
       - ubuntu-latest
     needs:
       - x86_64-linux---guardonce
-      - x86_64-linux---seL4-moritz-fork-arm-mcs
-      - x86_64-linux---pyfdt
       - x86_64-linux---seL4-deps
+      - x86_64-linux---pyfdt
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -251,73 +250,35 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---seL4-deps
       - x86_64-linux---pyfdt
+      - x86_64-linux---seL4-deps
       - x86_64-linux---guardonce
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-moritz-fork-arm-mcs --print-build-logs
-  x86_64-linux---seL4-moritz-fork-riscv64:
-    name: Build x86_64-linux.seL4-moritz-fork-riscv64
-    runs-on:
-      - ubuntu-latest
-    needs:
-      - x86_64-linux---pyfdt
-      - x86_64-linux---guardonce
-      - x86_64-linux---seL4-deps
-    steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.seL4-moritz-fork-riscv64 --print-build-logs
-  x86_64-linux---seL4-moritz-fork-riscv64-mcs:
-    name: Build x86_64-linux.seL4-moritz-fork-riscv64-mcs
-    runs-on:
-      - ubuntu-latest
-    needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---seL4-deps
-      - x86_64-linux---pyfdt
-    steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.seL4-moritz-fork-riscv64-mcs --print-build-logs
   x86_64-linux---seL4-moritz-fork-x64:
     name: Build x86_64-linux.seL4-moritz-fork-x64
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---seL4-test-source
-      - x86_64-linux---pyfdt
       - x86_64-linux---seL4-deps
+      - x86_64-linux---pyfdt
       - x86_64-linux---guardonce
+      - x86_64-linux---seL4-test-source
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -329,11 +290,11 @@ jobs:
       - ubuntu-latest
     needs: []
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -344,11 +305,11 @@ jobs:
     runs-on:
       - ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v22
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}

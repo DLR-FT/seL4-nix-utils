@@ -6,7 +6,7 @@ use std log
 cd (git rev-parse --show-toplevel)
 
 # check if a subject depends on a potential dependency
-# TODO this creates cyclic dependencies, why?
+# if subject and maybe_dep yield the same derivation, this still returns true!
 def depends [
     subject:string # package to examine
     maybe_dep:string # maybe a dependency of subject
@@ -62,14 +62,14 @@ mut release_workflow = {
 
 let runner_setup = [
   {
-    uses: "actions/checkout@v3"
+    uses: "actions/checkout@v4"
   }
   {
-    uses: "cachix/install-nix-action@v22",
+    uses: "cachix/install-nix-action@v25",
     with: { nix_path: "nixpkgs=channel:nixos-unstable" }
   }
   {
-    uses: "cachix/cachix-action@v12",
+    uses: "cachix/cachix-action@v14",
     with: {
       name: dlr-ft,
       authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
@@ -161,4 +161,4 @@ $cachix_workflow | to yaml | save --force .github/workflows/nix.yaml
 $release_workflow | to yaml | save --force .github/workflows/release.yaml
 
 log info "prettify generated yaml"
-prettier -w .github/workflows/
+nix run nixpkgs#nodePackages.prettier -- -w .github/workflows/

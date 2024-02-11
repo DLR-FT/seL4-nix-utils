@@ -68,6 +68,7 @@
               "-DPLATFORM=zynq7000"
               "-DRELEASE=FALSE"
               "-DVERIFICATION=FALSE"
+              "-DKernelIsMCS=ON"
             ];
           };
 
@@ -80,23 +81,25 @@
             ];
           };
 
-          seL4-moritz-fork-riscv64-mcs = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
-            config = "RISCV64_MCS_verified";
-            extraCmakeFlags = [
-              "-DPLATFORM=hifive"
-              "-DRELEASE=FALSE"
-              "-DVERIFICATION=FALSE"
-            ];
-          };
+          # These two fails atm
+          # seL4-moritz-fork-riscv64-mcs = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
+          #   config = "RISCV64_MCS_verified";
+          #   extraCmakeFlags = [
+          #     "-DPLATFORM=hifive"
+          #     "-DRELEASE=FALSE"
+          #     "-DVERIFICATION=FALSE"
+          #     "-DKernelIsMCS=ON"
+          #   ];
+          # };
 
-          seL4-moritz-fork-riscv64 = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
-            config = "RISCV64_verified";
-            extraCmakeFlags = [
-              "-DPLATFORM=hifive"
-              "-DRELEASE=FALSE"
-              "-DVERIFICATION=FALSE"
-            ];
-          };
+          # seL4-moritz-fork-riscv64 = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
+          #   config = "RISCV64_verified";
+          #   extraCmakeFlags = [
+          #     "-DPLATFORM=hifive"
+          #     "-DRELEASE=FALSE"
+          #     "-DVERIFICATION=FALSE"
+          #   ];
+          # };
 
           seL4-moritz-fork-x64 = (pkgs.callPackage pkgs/seL4-moritz-fork.nix {
             config = "X64_verified";
