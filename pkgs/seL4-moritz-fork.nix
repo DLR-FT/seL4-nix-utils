@@ -8,7 +8,7 @@
 , libxml2
 , dtc
 , cpio
-, python-seL4-deps
+, python3Packages
 , config
 , extra-seL4-configs ? { }
 , extraCmakeFlags ? [ ]
@@ -53,7 +53,7 @@ stdenv.mkDerivation {
     libxml2 # xmllint
     dtc # device tree compiler
     cpio # cpio archive tool
-    python-seL4-deps # python build deps
+    python3Packages.seL4-deps # python build deps
   ];
 
   # fix /bin/bash et al.
