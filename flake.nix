@@ -110,6 +110,14 @@
             ];
           };
 
+          seL4-test-x64 = pkgs.callPackage pkgs/seL4-test.nix {
+            config = "X64_verified";
+            extraCmakeFlags = [
+              "-DPLATFORM=pc99"
+              "-DRELEASE=FALSE"
+              "-DVERIFICATION=FALSE"
+            ];
+          };
 
           seL4-test-source = pkgs.fetchGoogleRepoTool {
             url = "https://github.com/seL4/sel4test-manifest.git";
