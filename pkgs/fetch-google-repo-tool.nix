@@ -37,7 +37,7 @@ lib.makeOverridable (
       popd
 
       repo sync
-      rm --force --recursive -- .repo
+      rm --force --recursive .repo/{TRACE_FILE,repo,manifests.git/config}
       runHook postInstall
     '';
 
