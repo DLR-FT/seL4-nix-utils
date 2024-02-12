@@ -67,7 +67,11 @@ stdenv.mkDerivation {
     "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
     "-DCMAKE_TOOLCHAIN_FILE=../kernel/gcc.cmake"
     "-DLibSel4FunctionAttributes=public"
-  ] ++ extraCmakeFlags;
+  ]
+  # The Nix provided RISCV compiler defaults to having a double precision FPU. This fixes linker
+  # errors due to soft/hard FPU missmatch.
+  ++ (lib.lists.optional (lib.strings.hasInfix "RISCV64" config) "-DKernelRiscvExtD=true")
+  ++ extraCmakeFlags;
 
   installPhase = ''
     runHook preInstall
