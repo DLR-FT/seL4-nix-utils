@@ -30,6 +30,6 @@ final: prev: {
   python3Packages = final.python3.pkgs;
 
   # add repoTool
-  repoToolFetcher = prev.callPackage pkgs/repo-tool-fetcher.nix { };
+  fetchGoogleRepoTool = prev.callPackage pkgs/fetch-google-repo-tool.nix { };
 }
 
