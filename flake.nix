@@ -111,10 +111,10 @@
           };
 
 
-          seL4-test-source = pkgs.repoToolFetcher {
+          seL4-test-source = pkgs.fetchGoogleRepoTool {
             url = "https://github.com/seL4/sel4test-manifest.git";
-            tag = "12.1.0";
-            hash = "sha256-VOkoGM+E0D3OzkvOqGo9nSRp7aUx3YTiqHsDNQAOXo8=";
+            rev = "12.1.0";
+            hash = "sha256-4wiVywuc0/Y8mtnbcW319ipvlNtssBEKx/ZPhMjLGE8=";
           };
         };
 
