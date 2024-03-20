@@ -38,8 +38,8 @@ lib.makeOverridable (
 
       repo sync
 
-      find -name .git -type l -exec sh -c 'PREV=$(realpath -- "$1") && rm -- "$1" && cp -ar -- "$PREV" "$1"' resolver {} && git gc --prune=all \;
-      rm --force --recursive .repo
+      rm --force --recursive -- .repo
+      find . -xtype l -delete
       runHook postInstall
     '';
 

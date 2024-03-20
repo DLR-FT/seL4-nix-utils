@@ -2,6 +2,7 @@
 { lib
 , stdenvNoLibs
 , fetchGoogleRepoTool
+, writeShellScriptBin
 , cmake
 , nanopb
 , ninja
@@ -21,7 +22,7 @@ stdenvNoLibs.mkDerivation rec {
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/sel4test-manifest.git";
     rev = "12.1.0";
-    hash = "sha256-13Q2BP+WD8JuSZbm7NUu8S1fZiE7KB3Bwew1wxzwIAs=";
+    hash = "sha256-7NA8D65WJYRyr3fx3LvdoAcCvNkhYLBh1FfzEoHJ6LM=";
   };
 
   nativeBuildInputs = [
@@ -37,9 +38,22 @@ stdenvNoLibs.mkDerivation rec {
     python3Packages.protobuf
     python3Packages.seL4-deps
 
-    # weird but ok
-    git
+    # fakegit
+    (writeShellScriptBin "git" ''
+      # Taken from https://git.musl-libc.org/cgit/musl/tree/tools/version.sh
+      if [[ $@ = "git describe --tags --match 'v[0-9]*'" ]]; then
+        echo "${version}"
+      else
+        >&2 echo "Unknown command: $@"
+        exit 1
+      fi
+    '')
   ];
+
+  # fake a git repo for musl
+  postFixup = ''
+    touch projects/musllibc/.git
+  '';
 
   # fix /bin/bash et al.
   postPatch = ''
@@ -48,9 +62,11 @@ stdenvNoLibs.mkDerivation rec {
       --replace 'file_stack[-1]' 'len(file_stack) > 0 and file_stack[-1]'
   '';
 
-  # /build/source/kernel/src/arch/x86/kernel/cmdline.c: In function 'cmdline_parse':
-  # /build/source/kernel/src/arch/x86/kernel/cmdline.c:114:40: error: array subscript 0 is outside array bounds of 'const short unsigned int[0]'
-  env.NIX_CFLAGS_COMPILE = "-Wno-error=array-bounds -fpic";
+  env.NIX_CFLAGS_COMPILE = builtins.concatStringsSep " " ([ ]
+    # Hotfix for:
+    # aarch64-unknown-linux-musl-ld: apps/sel4test-driver/musllibc/build-temp/stage/lib/libc.a(__stdio_exit.o): copy relocation against non-copyable protected symbol `__stdin_used'
+    ++ lib.lists.optional (!stdenvNoLibs.hostPlatform.isx86) "-fpic"
+  );
 
   hardeningDisable = [ "all" ];
 

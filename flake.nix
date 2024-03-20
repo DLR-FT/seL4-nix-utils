@@ -112,7 +112,7 @@
 
 
           #
-          ### Test Suites
+          ### seL4 test suite for various platforms
           #
           seL4-test-aarch64-imx8mq-evk = (import nixpkgs {
             inherit system;
