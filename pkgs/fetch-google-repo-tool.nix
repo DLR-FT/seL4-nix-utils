@@ -37,7 +37,9 @@ lib.makeOverridable (
       popd
 
       repo sync
-      rm --force --recursive .repo/{TRACE_FILE,repo,manifests.git/config}
+
+      find -name .git -type l -exec sh -c 'PREV=$(realpath -- "$1") && rm -- "$1" && cp -ar -- "$PREV" "$1"' resolver {} && git gc --prune=all \;
+      rm --force --recursive .repo
       runHook postInstall
     '';
 
