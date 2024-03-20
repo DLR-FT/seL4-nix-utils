@@ -180,6 +180,19 @@
             { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
 
 
+          seL4-test-riscv64-spike-simulate = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "riscv64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=spike"
+                "-DSIMULATION=1"
+              ];
+            };
+
+
           seL4-test-i686-ia32 = (import nixpkgs {
             inherit system;
             crossSystem.config = "i686-unknown-linux-musl";
