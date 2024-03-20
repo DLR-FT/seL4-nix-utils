@@ -1,8 +1,7 @@
 # builds an seL4 kernel + userland
 { lib
-, targetStdenv ? null
-, pkgsCross ? null
-, repoToolFetcher
+, stdenvNoLibs
+, fetchGoogleRepoTool
 , cmake
 , nanopb
 , ninja
@@ -12,70 +11,34 @@
 , git
 , protobuf
 , python3Packages
-, config
-, extra-seL4-configs ? { }
 , extraCmakeFlags ? [ ]
 }:
 
-let
-  # known seL4 configs and their respective toolchain
-  seL4-configs = {
-    "ARM_HYP_verified" = "armhf-embedded";
-    "ARM_MCS_verified" = "armhf-embedded";
-    "ARM_verified" = "arm-embedded";
-    "RISCV64_MCS_verified" = "riscv64-embedded";
-    "RISCV64_verified" = "riscv64-embedded";
-    "X64_verified" = "x86_64-embedded";
-  } // extra-seL4-configs;
-
-  # stdenv to be used for this build
-  stdenv =
-    if targetStdenv == null then
-      pkgsCross.${seL4-configs.${config}}.stdenv
-    else targetStdenv;
-
-  # interesting flags
-  # see: https://docs.sel4.systems/projects/buildsystem/using.html
-  #
-  # -DAARCH32=TRUE
-  # -DAARCH32HF=TRUE
-  # -DAARCH64=TRUE
-  # -DRISCV32=TRUE
-  # -DRISCV64=TRUE
-in
-
-# check that the passed seL4 config is known
-assert builtins.elem config (builtins.attrNames seL4-configs);
-
-stdenv.mkDerivation rec {
+stdenvNoLibs.mkDerivation rec {
   pname = "seL4";
   version = "unknown";
 
-  src = repoToolFetcher {
+  src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/sel4test-manifest.git";
-    tag = "12.1.0";
-    hash = "sha256-rkQxfw2wRErR5XKFw2Gnx5iV61oPSNCdOyLZkU5Fojs=";
+    rev = "12.1.0";
+    hash = "sha256-13Q2BP+WD8JuSZbm7NUu8S1fZiE7KB3Bwew1wxzwIAs=";
   };
 
-
   nativeBuildInputs = [
-    stdenv.cc
+    stdenvNoLibs.cc
     cmake # build tools
-    ninja # build tools
-    libxml2 # xmllint
-    dtc # device tree compiler
     cpio # cpio archive tool
+    dtc # device tree compiler
+    libxml2 # xmllint
+    nanopb # ser/de
+    ninja # build tools
     protobuf # to generate ser/de stuff
     python3Packages.camkes-deps
-    python3Packages.seL4-deps
     python3Packages.protobuf
+    python3Packages.seL4-deps
 
     # weird but ok
     git
-  ];
-
-  buildInputs = [
-    nanopb # ser/de
   ];
 
   # fix /bin/bash et al.
@@ -87,7 +50,7 @@ stdenv.mkDerivation rec {
 
   # /build/source/kernel/src/arch/x86/kernel/cmdline.c: In function 'cmdline_parse':
   # /build/source/kernel/src/arch/x86/kernel/cmdline.c:114:40: error: array subscript 0 is outside array bounds of 'const short unsigned int[0]'
-  env.NIX_CFLAGS_COMPILE = "-Wno-error=array-bounds";
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=array-bounds -fpic";
 
   hardeningDisable = [ "all" ];
 
@@ -98,14 +61,14 @@ stdenv.mkDerivation rec {
     ../init-build.sh ${lib.strings.escapeShellArgs cmakeFlags}  '';
   cmakeFlags = [
     "-GNinja"
-    "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
+    "-DCROSS_COMPILER_PREFIX=${stdenvNoLibs.cc.targetPrefix}"
     "-DCMAKE_TOOLCHAIN_FILE=../kernel/gcc.cmake"
-    "-DLibSel4FunctionAttributes=public"
-    "-DPLATFORM=pc99"
-    "-DRELEASE=TRUE"
-    "-DSIMULATION=TRUE"
-    "-DVERIFICATION=FALSE"
-  ] ++ extraCmakeFlags;
+  ]
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32) "-DAARCH32=1"
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch64) "-DAARCH64=1"
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV64) "-DRISCV64=1"
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV32) "-DRISCV32=1"
+  ++ extraCmakeFlags;
 
   installPhase = ''
     runHook preInstall
