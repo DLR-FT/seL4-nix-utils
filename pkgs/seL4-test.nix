@@ -16,12 +16,12 @@
 }:
 
 stdenvNoLibs.mkDerivation rec {
-  pname = "seL4";
-  version = "unknown";
+  pname = "seL4test";
+  version = "12.1.0";
 
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/sel4test-manifest.git";
-    rev = "12.1.0";
+    rev = version;
     hash = "sha256-7NA8D65WJYRyr3fx3LvdoAcCvNkhYLBh1FfzEoHJ6LM=";
   };
 
