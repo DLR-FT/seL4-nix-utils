@@ -29,7 +29,9 @@ final: prev: {
 
   python3Packages = final.python3.pkgs;
 
-  # add repoTool
+  # Fetcher that uses Google's repo tool. Kinf of cursed, had some issues with determinism.
+  # Hopefully now it's fully deterministic.
+  # https://android.googlesource.com/tools/repo
   fetchGoogleRepoTool = prev.callPackage pkgs/fetch-google-repo-tool.nix { };
 }
 

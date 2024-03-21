@@ -37,7 +37,9 @@ lib.makeOverridable (
       popd
 
       repo sync
+
       rm --force --recursive -- .repo
+      find . -xtype l -delete
       runHook postInstall
     '';
 

@@ -81,7 +81,6 @@
             ];
           };
 
-          # These two fails atm
           # seL4-moritz-fork-riscv64-mcs = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
           #   config = "RISCV64_MCS_verified";
           #   extraCmakeFlags = [
@@ -111,12 +110,154 @@
           };
 
 
-          seL4-test-source = pkgs.fetchGoogleRepoTool {
-            url = "https://github.com/seL4/sel4test-manifest.git";
-            rev = "12.1.0";
-            hash = "sha256-4wiVywuc0/Y8mtnbcW319ipvlNtssBEKx/ZPhMjLGE8=";
-          };
+          #
+          ### seL4 test suite for various platforms
+          #
+          seL4-test-aarch64-imx8mq-evk = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=imx8mq-evk" ]; };
+
+
+          seL4-test-aarch64-rpi4 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=rpi4"
+                "-DRPI4_MEMORY=1024" # alternative one of 2048 4096 8192
+              ];
+            };
+
+
+          seL4-test-aarch64-zcu102 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=zcu102" ]; };
+
+
+          seL4-test-armv7a-rpi3 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "armv7a-unknown-linux-musleabihf";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=rpi3" ]; };
+
+
+          seL4-test-armv7a-zynq7000 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "armv7a-unknown-linux-musleabihf";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=zynq7000" ]; };
+
+
+          seL4-test-armv7a-zynq7000-simulate = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "armv7a-unknown-linux-musleabihf";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=zynq7000"
+                "-DSIMULATION=1"
+              ];
+            };
+
+
+          # seL4-test-riscv32-spike = (import nixpkgs {
+          #   inherit system;
+          #   crossSystem.config = "riscv32-unknown-linux-gnu";
+          #   overlays = [ self.overlays.default ];
+          # }).callPackage pkgs/seL4-test.nix
+          #   { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
+
+
+          # seL4-test-riscv32-spike-simulate = (import nixpkgs {
+          #   inherit system;
+          #   crossSystem.config = "riscv32-unknown-linux-gnu";
+          #   overlays = [ self.overlays.default ];
+          # }).callPackage pkgs/seL4-test.nix
+          #   {
+          #     extraCmakeFlags = [
+          #       "-DPLATFORM=spike"
+          #       "-DSIMULATION=1"
+          #     ];
+          #   };
+
+
+          # seL4-test-riscv64-spike = (import nixpkgs {
+          #   inherit system;
+          #   crossSystem.config = "riscv64-unknown-linux-musl";
+          #   overlays = [ self.overlays.default ];
+          # }).callPackage pkgs/seL4-test.nix
+          #   { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
+
+
+          # seL4-test-riscv64-spike-simulate = (import nixpkgs {
+          #   inherit system;
+          #   crossSystem.config = "riscv64-unknown-linux-musl";
+          #   overlays = [ self.overlays.default ];
+          # }).callPackage pkgs/seL4-test.nix
+          #   {
+          #     extraCmakeFlags = [
+          #       "-DPLATFORM=spike"
+          #       "-DSIMULATION=1"
+          #     ];
+          #   };
+
+
+          seL4-test-i686-ia32 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "i686-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=ia32" ]; };
+
+
+          seL4-test-i686-ia32-simulate = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "i686-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=ia32"
+                "-DSIMULATION=TRUE"
+              ];
+            };
+
+
+          seL4-test-x86_64-x86_64 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "x86_64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=x86_64" ]; };
+
+
+          seL4-test-x86_64-x86_64-simulate = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "x86_64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=x86_64"
+                "-DSIMULATION=TRUE"
+              ];
+            };
         };
+
+        #
+        ### DevShell
+        #
 
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
