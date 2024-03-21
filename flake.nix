@@ -171,6 +171,27 @@
             };
 
 
+          seL4-test-riscv32-spike = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "riscv32-unknown-linux-gnu";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
+
+
+          seL4-test-riscv32-spike-simulate = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "riscv32-unknown-linux-gnu";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=spike"
+                "-DSIMULATION=1"
+              ];
+            };
+
+
           seL4-test-riscv64-spike = (import nixpkgs {
             inherit system;
             crossSystem.config = "riscv64-unknown-linux-musl";
