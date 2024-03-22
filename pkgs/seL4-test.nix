@@ -4,12 +4,11 @@
 , fetchGoogleRepoTool
 , writeShellScriptBin
 , cmake
+, cpio
+, dtc
+, libxml2
 , nanopb
 , ninja
-, libxml2
-, dtc
-, cpio
-, git
 , protobuf
 , python3Packages
 , extraCmakeFlags ? [ ]
@@ -26,6 +25,7 @@ stdenvNoLibs.mkDerivation rec {
   };
 
   nativeBuildInputs = [
+    # leak cross compiler into eventual devShell, if one uses this drv with inputsFrom
     stdenvNoLibs.cc
     cmake # build tools
     cpio # cpio archive tool
@@ -34,9 +34,7 @@ stdenvNoLibs.mkDerivation rec {
     nanopb # ser/de
     ninja # build tools
     protobuf # to generate ser/de stuff
-    python3Packages.camkes-deps
-    python3Packages.protobuf
-    python3Packages.seL4-deps
+    python3Packages.seL4-deps # python deps for seL4
 
     # fakegit
     (writeShellScriptBin "git" ''
@@ -58,8 +56,6 @@ stdenvNoLibs.mkDerivation rec {
   # fix /bin/bash et al.
   postPatch = ''
     patchShebangs .
-    substituteInPlace kernel/tools/circular_includes.py \
-      --replace 'file_stack[-1]' 'len(file_stack) > 0 and file_stack[-1]'
   '';
 
   env.NIX_CFLAGS_COMPILE = builtins.concatStringsSep " " ([ ]
@@ -68,13 +64,15 @@ stdenvNoLibs.mkDerivation rec {
     ++ lib.lists.optional (!stdenvNoLibs.hostPlatform.isx86) "-fpic"
   );
 
+  # prevent Nix from injecting any flags meant to harden the build
   hardeningDisable = [ "all" ];
 
   dontUseCmakeConfigure = true;
   preConfigure = ''
     mkdir build
     cd build
-    ../init-build.sh ${lib.strings.escapeShellArgs cmakeFlags}  '';
+    ../init-build.sh ${lib.strings.escapeShellArgs cmakeFlags}
+  '';
   cmakeFlags = [
     "-GNinja"
     "-DCROSS_COMPILER_PREFIX=${stdenvNoLibs.cc.targetPrefix}"
