@@ -253,12 +253,37 @@
                 "-DSIMULATION=TRUE"
               ];
             };
+
+
+          #
+          ### seL4 CAmkES VM Examples
+          #
+          seL4-camkes-vm-examples-aarch64-qemu-arm-virt =
+            let
+              pkgsCross = (import nixpkgs {
+                inherit system;
+                crossSystem.config = "aarch64-unknown-linux-musl";
+                overlays = [ self.overlays.default ];
+              });
+
+            in
+            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix
+              {
+                stdenvNoLibs = pkgs.overrideCC pkgs.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
+                extraCmakeFlags = [
+                  "-DPLATFORM=qemu-arm-virt"
+                  "-DCAMKES_VM_APP=vm_minimal"
+                  "-DAARCH64=1"
+                ];
+              };
+
+
         };
+
 
         #
         ### DevShell
         #
-
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             # seL4
