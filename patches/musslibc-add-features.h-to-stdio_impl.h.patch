@@ -1,0 +1,12 @@
+diff --git a/src/internal/stdio_impl.h b/src/internal/stdio_impl.h
+index 7cdf729d..ef1516ea 100644
+--- a/src/internal/stdio_impl.h
++++ b/src/internal/stdio_impl.h
+@@ -4,6 +4,7 @@
+ #include <stdio.h>
+ #include "syscall.h"
+ #include "libc.h"
++#include "../include/features.h"
+ 
+ #define UNGET 8
+ 
