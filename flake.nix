@@ -2,9 +2,13 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... } @ inputs: flake-utils.lib.eachSystem [ "x86_64-linux" ]
+  outputs = { self, nixpkgs, flake-utils, treefmt-nix, ... } @ inputs: flake-utils.lib.eachSystem [ "x86_64-linux" ]
     (system:
       let
         pkgs = import nixpkgs {
@@ -319,6 +323,11 @@
 
             # both
             python3Packages.camkes-deps # includes seL4-deps
+
+            # Nix flake related tooling
+            treefmt # formatting orchestrator
+            nixpkgs-fmt # formatting nix files
+            nodePackages.prettier # prettifier for MarkDown and YAML
           ];
           shellHook = ''
             export NIX_PATH=nixpkgs=${inputs.nixpkgs}:$NIX_PATH
@@ -337,12 +346,19 @@
         };
 
         # always check these
-        checks = {
-          nixpkgs-fmt = pkgs.runCommand "nixpkgs-fmt"
-            {
-              nativeBuildInputs = [ pkgs.nixpkgs-fmt ];
-            } "nixpkgs-fmt --check ${./.}; touch $out";
-        };
+        checks.treefmt =
+          let
+            treefmtModule = {
+              projectRootFile = "flake.nix";
+              settings = with builtins; (fromTOML (readFile ./treefmt.toml));
+            };
+            evaluatedModule = (treefmt-nix.lib.evalModule pkgs treefmtModule).config.build.check self;
+            overridenModule = evaluatedModule.overrideAttrs (prev: {
+              buildInputs = prev.buildInputs
+                ++ self.devShells.${system}.default.nativeBuildInputs;
+            });
+          in
+          overridenModule;
 
         # instructions for the CI server
         hydraJobs =
