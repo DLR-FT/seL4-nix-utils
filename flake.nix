@@ -121,7 +121,7 @@
             { extraCmakeFlags = [ "-DPLATFORM=imx8mq-evk" ]; };
 
 
-          seL4-test-aarch64-rpi4 = (import nixpkgs {
+          seL4-test-aarch64-rpi4-1GB = (import nixpkgs {
             inherit system;
             crossSystem.config = "aarch64-unknown-linux-musl";
             overlays = [ self.overlays.default ];
@@ -129,10 +129,45 @@
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
-                "-DRPI4_MEMORY=1024" # alternative one of 2048 4096 8192
+                "-DRPI4_MEMORY=1024" # one of 1024 2048 4096 8192
               ];
             };
 
+          seL4-test-aarch64-rpi4-2GB = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=rpi4"
+                "-DRPI4_MEMORY=2048" # one of 1024 2048 4096 8192
+              ];
+            };
+
+          seL4-test-aarch64-rpi4-4GB = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=rpi4"
+                "-DRPI4_MEMORY=4096" # one of 1024 2048 4096 8192
+              ];
+            };
+
+          seL4-test-aarch64-rpi4-8GB = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=rpi4"
+                "-DRPI4_MEMORY=8192" # one of 1024 2048 4096 8192
+              ];
+            };
 
           seL4-test-aarch64-zcu102 = (import nixpkgs {
             inherit system;
