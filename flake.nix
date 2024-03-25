@@ -2,9 +2,13 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... } @ inputs: flake-utils.lib.eachSystem [ "x86_64-linux" ]
+  outputs = { self, nixpkgs, flake-utils, treefmt-nix, ... } @ inputs: flake-utils.lib.eachSystem [ "x86_64-linux" ]
     (system:
       let
         pkgs = import nixpkgs {
@@ -121,7 +125,7 @@
             { extraCmakeFlags = [ "-DPLATFORM=imx8mq-evk" ]; };
 
 
-          seL4-test-aarch64-rpi4 = (import nixpkgs {
+          seL4-test-aarch64-rpi4-1GB = (import nixpkgs {
             inherit system;
             crossSystem.config = "aarch64-unknown-linux-musl";
             overlays = [ self.overlays.default ];
@@ -129,10 +133,45 @@
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
-                "-DRPI4_MEMORY=1024" # alternative one of 2048 4096 8192
+                "-DRPI4_MEMORY=1024" # one of 1024 2048 4096 8192
               ];
             };
 
+          seL4-test-aarch64-rpi4-2GB = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=rpi4"
+                "-DRPI4_MEMORY=2048" # one of 1024 2048 4096 8192
+              ];
+            };
+
+          seL4-test-aarch64-rpi4-4GB = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=rpi4"
+                "-DRPI4_MEMORY=4096" # one of 1024 2048 4096 8192
+              ];
+            };
+
+          seL4-test-aarch64-rpi4-8GB = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=rpi4"
+                "-DRPI4_MEMORY=8192" # one of 1024 2048 4096 8192
+              ];
+            };
 
           seL4-test-aarch64-zcu102 = (import nixpkgs {
             inherit system;
@@ -284,30 +323,28 @@
 
             # both
             python3Packages.camkes-deps # includes seL4-deps
+
+            # Nix flake related tooling
+            treefmt # formatting orchestrator
+            nixpkgs-fmt # formatting nix files
+            nodePackages.prettier # prettifier for MarkDown and YAML
           ];
-          shellHook = ''
-            export NIX_PATH=nixpkgs=${inputs.nixpkgs}:$NIX_PATH
-            cat << EOF
-            repo init -u https://github.com/seL4/sel4-tutorials-manifest
-            repo sync
-            rm -rf tutorial*
-            mkdir tutorial
-            cd tutorial
-            ../init --tut hello-world
-            cd ../tutorial_build
-            ninja
-            ./check
-            EOF
-          '';
         };
 
         # always check these
-        checks = {
-          nixpkgs-fmt = pkgs.runCommand "nixpkgs-fmt"
-            {
-              nativeBuildInputs = [ pkgs.nixpkgs-fmt ];
-            } "nixpkgs-fmt --check ${./.}; touch $out";
-        };
+        checks.treefmt =
+          let
+            treefmtModule = {
+              projectRootFile = "flake.nix";
+              settings = with builtins; (fromTOML (readFile ./treefmt.toml));
+            };
+            evaluatedModule = (treefmt-nix.lib.evalModule pkgs treefmtModule).config.build.check self;
+            overridenModule = evaluatedModule.overrideAttrs (prev: {
+              buildInputs = prev.buildInputs
+                ++ self.devShells.${system}.default.nativeBuildInputs;
+            });
+          in
+          overridenModule;
 
         # instructions for the CI server
         hydraJobs =
