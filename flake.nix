@@ -329,20 +329,6 @@
             nixpkgs-fmt # formatting nix files
             nodePackages.prettier # prettifier for MarkDown and YAML
           ];
-          shellHook = ''
-            export NIX_PATH=nixpkgs=${inputs.nixpkgs}:$NIX_PATH
-            cat << EOF
-            repo init -u https://github.com/seL4/sel4-tutorials-manifest
-            repo sync
-            rm -rf tutorial*
-            mkdir tutorial
-            cd tutorial
-            ../init --tut hello-world
-            cd ../tutorial_build
-            ninja
-            ./check
-            EOF
-          '';
         };
 
         # always check these
