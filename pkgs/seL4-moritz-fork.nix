@@ -28,7 +28,7 @@ let
   # stdenv to be used for this build
   stdenv =
     if targetStdenv == null then
-      pkgsCross.${seL4-configs.${config}}.stdenv
+      pkgsCross.${seL4-configs.${config}}.stdenvNoLibs
     else targetStdenv;
 in
 
@@ -42,8 +42,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "moritz-meier";
     repo = "sel4-rs";
-    rev = "be86b59";
-    hash = "sha256-cUI+/cGOaNIjJtbUHoTJnMmL7z3m7XJrWmU8i5Td5ZE=";
+    rev = "326f255";
+    hash = "sha256-xoBv642Z8c07V/jUW0su8/Jjc0EhkljIhED9E6VNdO4=";
     fetchSubmodules = true;
   };
 

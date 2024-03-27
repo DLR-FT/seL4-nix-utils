@@ -27,7 +27,7 @@ let
   # stdenv to be used for this build
   stdenv =
     if targetStdenv == null then
-      pkgsCross.${seL4-configs.${config}}.stdenv
+      pkgsCross.${seL4-configs.${config}}.stdenvNoLibs
     else targetStdenv;
 in
 
