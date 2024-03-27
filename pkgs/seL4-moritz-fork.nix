@@ -42,8 +42,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "moritz-meier";
     repo = "sel4-rs";
-    rev = "be86b59";
-    hash = "sha256-cUI+/cGOaNIjJtbUHoTJnMmL7z3m7XJrWmU8i5Td5ZE=";
+    rev = "326f255";
+    hash = "sha256-xoBv642Z8c07V/jUW0su8/Jjc0EhkljIhED9E6VNdO4=";
     fetchSubmodules = true;
   };
 
