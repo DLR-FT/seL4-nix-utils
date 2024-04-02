@@ -111,7 +111,7 @@ for system in ($targets | columns) {
     )
 
     mut new_job = {
-      name: $"Build ($name)",
+      name: $"($name)",
       "runs-on": $runs_on,
       needs: $needs,
       steps: ($runner_setup | append [
@@ -126,7 +126,7 @@ for system in ($targets | columns) {
 
   # add check job
   $cachix_workflow.jobs = ($cachix_workflow.jobs | insert $"($system)---check" {
-    name: $"Run Nix checks on ($system)",
+    name: $"Check on ($system)",
     "runs-on": $runs_on,
     steps: ($runner_setup | append {
       name: Check,
