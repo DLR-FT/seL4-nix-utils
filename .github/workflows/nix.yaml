@@ -413,8 +413,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-zcu102 --print-build-logs
-  x86_64-linux---seL4-test-armv7a-rpi3:
-    name: Build x86_64-linux.seL4-test-armv7a-rpi3
+  x86_64-linux---seL4-test-armv7l-rpi3:
+    name: Build x86_64-linux.seL4-test-armv7l-rpi3
     runs-on:
       - ubuntu-latest
     needs:
@@ -431,9 +431,9 @@ jobs:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
-        run: nix build .#packages.x86_64-linux.seL4-test-armv7a-rpi3 --print-build-logs
-  x86_64-linux---seL4-test-armv7a-zynq7000:
-    name: Build x86_64-linux.seL4-test-armv7a-zynq7000
+        run: nix build .#packages.x86_64-linux.seL4-test-armv7l-rpi3 --print-build-logs
+  x86_64-linux---seL4-test-armv7l-zynq7000:
+    name: Build x86_64-linux.seL4-test-armv7l-zynq7000
     runs-on:
       - ubuntu-latest
     needs:
@@ -450,9 +450,9 @@ jobs:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
-        run: nix build .#packages.x86_64-linux.seL4-test-armv7a-zynq7000 --print-build-logs
-  x86_64-linux---seL4-test-armv7a-zynq7000-simulate:
-    name: Build x86_64-linux.seL4-test-armv7a-zynq7000-simulate
+        run: nix build .#packages.x86_64-linux.seL4-test-armv7l-zynq7000 --print-build-logs
+  x86_64-linux---seL4-test-armv7l-zynq7000-simulate:
+    name: Build x86_64-linux.seL4-test-armv7l-zynq7000-simulate
     runs-on:
       - ubuntu-latest
     needs:
@@ -469,7 +469,7 @@ jobs:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
-        run: nix build .#packages.x86_64-linux.seL4-test-armv7a-zynq7000-simulate --print-build-logs
+        run: nix build .#packages.x86_64-linux.seL4-test-armv7l-zynq7000-simulate --print-build-logs
   x86_64-linux---seL4-test-i686-ia32:
     name: Build x86_64-linux.seL4-test-i686-ia32
     runs-on:
