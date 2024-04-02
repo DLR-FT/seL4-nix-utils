@@ -199,25 +199,25 @@
             { extraCmakeFlags = [ "-DPLATFORM=zcu102" ]; };
 
 
-          seL4-test-armv7a-rpi3 = (import nixpkgs {
+          seL4-test-armv7l-rpi3 = (import nixpkgs {
             inherit system;
-            crossSystem.config = "armv7a-unknown-linux-musleabihf";
+            crossSystem.config = "armv7l-unknown-linux-musleabihf";
             overlays = [ self.overlays.default ];
           }).callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=rpi3" ]; };
 
 
-          seL4-test-armv7a-zynq7000 = (import nixpkgs {
+          seL4-test-armv7l-zynq7000 = (import nixpkgs {
             inherit system;
-            crossSystem.config = "armv7a-unknown-linux-musleabihf";
+            crossSystem.config = "armv7l-unknown-linux-musleabihf";
             overlays = [ self.overlays.default ];
           }).callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=zynq7000" ]; };
 
 
-          seL4-test-armv7a-zynq7000-simulate = (import nixpkgs {
+          seL4-test-armv7l-zynq7000-simulate = (import nixpkgs {
             inherit system;
-            crossSystem.config = "armv7a-unknown-linux-musleabihf";
+            crossSystem.config = "armv7l-unknown-linux-musleabihf";
             overlays = [ self.overlays.default ];
           }).callPackage pkgs/seL4-test.nix
             {
@@ -310,6 +310,31 @@
                 "-DSIMULATION=TRUE"
               ];
             };
+
+
+          #
+          ### UBoot with specific patches
+          #
+
+          # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
+          uboot-armv7l-zynq-zc702 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "armv7l-unknown-linux-musleabihf";
+            overlays = [ self.overlays.default ];
+          }).buildUBoot rec {
+            extraMeta.platforms = [ "armv7l-linux" ];
+            defconfig = "xilinx_zynq_virt_defconfig";
+            env.DEVICE_TREE = "zynq-zc702";
+            filesToInstall = [ "spl/boot.bin" "u-boot.img" ];
+            version = "xilinx-v2023.2";
+            src = pkgs.fetchFromGitHub {
+              owner = "Xilinx";
+              repo = "u-boot-xlnx";
+              rev = version;
+              hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
+            };
+          };
+
         };
 
         #
