@@ -310,6 +310,31 @@
                 "-DSIMULATION=TRUE"
               ];
             };
+
+
+          #
+          ### UBoot with specific patches
+          #
+
+          # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
+          uboot-armv7l-zynq-zc702 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "armv7l-unknown-linux-musleabihf";
+            overlays = [ self.overlays.default ];
+          }).buildUBoot rec {
+            extraMeta.platforms = [ "armv7l-linux" ];
+            defconfig = "xilinx_zynq_virt_defconfig";
+            env.DEVICE_TREE = "zynq-zc702";
+            filesToInstall = [ "spl/boot.bin" "u-boot.img" ];
+            version = "xilinx-v2023.2";
+            src = pkgs.fetchFromGitHub {
+              owner = "Xilinx";
+              repo = "u-boot-xlnx";
+              rev = version;
+              hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
+            };
+          };
+
         };
 
         #
