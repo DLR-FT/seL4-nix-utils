@@ -315,6 +315,12 @@
           #
           ### UBoot with specific patches
           #
+          uboot-aarch64-rpi4 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-musl";
+            overlays = [ self.overlays.default ];
+          }).ubootRaspberryPi4_64bit;
+
 
           # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
           uboot-armv7l-zynq-zc702 = (import nixpkgs {
@@ -335,6 +341,39 @@
             };
           };
 
+
+          #
+          ### SD Card
+          #
+          sd-aarch64-rpi4 =
+            let
+              inherit (pkgs) lib;
+              # Reference: https://www.raspberrypi.com/documentation/computers/config_txt.html
+              # Default: https://github.com/RPi-Distro/pi-gen/blob/master/stage1/00-boot-files/files/config.txt
+              config = {
+                arm_boost = 1;
+                arm_64bit = 1;
+                kernel = "u-boot.bin";
+                dtoverlay = "disable-bt";
+                enable_uart = 1;
+                uart_2ndstage = 1;
+              };
+              config_txt = pkgs.writeText "config.txt" (lib.generators.toKeyValue { } config);
+            in
+            pkgs.runCommand "assemble-sd" { } ''
+              mkdir -- $out
+
+              # copy firmware stuff
+              pushd ${pkgs.raspberrypifw}/share/raspberrypi/boot
+              cp --recursive -- bootcode.bin start4.elf bcm2711-rpi-4-b.dtb overlays $out/
+              popd
+
+              # copy u-boot
+              cp ${self.packages.${system}.uboot-aarch64-rpi4}/u-boot.bin $out/
+
+              # config.txt
+              cp ${config_txt} $out/config.txt
+            '';
         };
 
         #
