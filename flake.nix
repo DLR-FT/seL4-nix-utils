@@ -354,7 +354,6 @@
                 arm_boost = 1;
                 arm_64bit = 1;
                 kernel = "u-boot.bin";
-                dtoverlay = "disable-bt";
                 enable_uart = 1;
                 uart_2ndstage = 1;
               };
@@ -365,7 +364,7 @@
 
               # copy firmware stuff
               pushd ${pkgs.raspberrypifw}/share/raspberrypi/boot
-              cp --recursive -- bootcode.bin start4.elf bcm2711-rpi-4-b.dtb overlays $out/
+              cp --recursive -- start4.elf fixup4.dat bcm2711-rpi-4-b.dtb overlays $out/
               popd
 
               # copy u-boot
