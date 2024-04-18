@@ -46,6 +46,11 @@
             hsPkgs.callPackage pkgs/capDL-tool.nix { };
 
           #
+          ### microkit(-sdk)
+          #
+          microkit-sdk-bin = pkgs.microkit-sdk-bin;
+
+          #
           ### seL4 Kernel Flavours
           #
           seL4-kernel-arm-hyp = pkgs.callPackage pkgs/seL4-kernel.nix {
@@ -377,7 +382,7 @@
         };
 
         #
-        ### DevShell
+        ### DevShells
         #
 
         devShells.default = pkgs.mkShell {
@@ -413,7 +418,27 @@
           ];
         };
 
-        # always check these
+        devShells.microkit = pkgs.mkShell.override { stdenv = pkgs.stdenvNoCC; } {
+          nativeBuildInputs = with pkgs; [
+            pkgsCross.aarch64-multiplatform.stdenv.cc
+            pkgsCross.aarch64-multiplatform.stdenv.cc.bintools
+            bear
+            gnumake
+          ];
+
+          # mitigates the following errors:
+          # undefined reference to `__stack_chk_guard'
+          # undefined reference to `__stack_chk_fail'
+          hardeningDisable = [ "all" ];
+          env.MICROKIT_SDK = pkgs.microkit-sdk-bin;
+        };
+
+
+        #
+        ### Checks & CI
+        #
+
+        # checks the formatting of stuff
         checks.treefmt =
           let
             treefmtModule = {

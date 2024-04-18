@@ -1,4 +1,8 @@
 final: prev: {
+  # microkit
+  microkit-sdk-bin = prev.callPackage pkgs/microkit-sdk-bin.nix { };
+
+
   # overlay python packages
   pythonPackagesOverlays = (prev.pythonPackagesOverlays or [ ]) ++ [
     (python-final: python-prev: {
