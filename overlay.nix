@@ -2,6 +2,10 @@ final: prev: {
   # microkit
   microkit-sdk-bin = prev.callPackage pkgs/microkit-sdk-bin.nix { };
 
+  pyoxidizer = prev.callPackage pkgs/pyoxidizer.nix {
+    pythonPackages = prev.python3Packages;
+  };
+
 
   # overlay python packages
   pythonPackagesOverlays = (prev.pythonPackagesOverlays or [ ]) ++ [
@@ -9,6 +13,10 @@ final: prev: {
       guardonce = python-final.callPackage pkgs/guardonce.nix { };
 
       pyfdt = python-final.callPackage pkgs/pyfdt.nix { };
+
+      pyoxidizer = python-prev.toPythonModule (final.pyoxidizer.override {
+        pythonPackages = python-prev;
+      });
 
       concurrencytest = python-final.callPackage pkgs/concurrencytest.nix { };
 
@@ -38,4 +46,3 @@ final: prev: {
   # https://android.googlesource.com/tools/repo
   fetchGoogleRepoTool = prev.callPackage pkgs/fetch-google-repo-tool.nix { };
 }
-
