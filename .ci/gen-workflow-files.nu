@@ -6,17 +6,29 @@ use std log
 cd (git rev-parse --show-toplevel)
 
 # check if a subject depends on a potential dependency
-# if subject and maybe_dep yield the same derivation, this still returns true!
 def depends [
     subject:string # package to examine
     maybe_dep:string # maybe a dependency of subject
   ] {
-  not ( nix why-depends --quiet --derivation $subject $maybe_dep | is-empty ) 
+  let depends_on = not ( nix why-depends --quiet --derivation $subject $maybe_dep
+    | is-empty )
+
+  if $depends_on {
+    let subject_drv = (nix eval --raw $"($subject).drvPath")
+    let maybe_dep_drv = (nix eval --raw $"($maybe_dep).drvPath")
+    let first = ( [$subject, $maybe_dep] | sort | first )
+
+    # this is a self-dependency, we must ignore it one way to avoid cycles
+    if $subject_drv == $maybe_dep_drv and $first == $subject {
+      return false
+    }
+  }
+  return $depends_on
 }
 
 # get attribute names of the attribute set
 def get-attr-names [
-    expr: # nix expression to get attrNames of 
+    expr: # nix expression to get attrNames of
   ] {
   nix eval --json $expr --apply builtins.attrNames | from json
 }
@@ -32,7 +44,7 @@ def job-id [
 let systems_map = {
   # aarch64-darwin
   # aarch64-linux
-  
+
   i686-linux: ubuntu-latest,
   x86_64-darwin: macos-13,
   x86_64-linux: ubuntu-latest
