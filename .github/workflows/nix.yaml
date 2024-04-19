@@ -107,6 +107,40 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.pyfdt --print-build-logs
+  x86_64-linux---pyoxidizer:
+    name: x86_64-linux.pyoxidizer
+    runs-on:
+      - ubuntu-latest
+    needs:
+      - x86_64-linux---python-pyoxidizer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.pyoxidizer --print-build-logs
+  x86_64-linux---python-pyoxidizer:
+    name: x86_64-linux.python-pyoxidizer
+    runs-on:
+      - ubuntu-latest
+    needs:
+      - x86_64-linux---pyoxidizer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.python-pyoxidizer --print-build-logs
   x86_64-linux---sd-aarch64-rpi4:
     name: x86_64-linux.sd-aarch64-rpi4
     runs-on:
