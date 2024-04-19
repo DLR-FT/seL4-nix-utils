@@ -18,6 +18,7 @@
       in
       {
         packages = {
+          capDL-tool = pkgs.capDL-tool;
           pyoxidizer = pkgs.pyoxidizer;
 
           # python dependencies for seL4
@@ -30,23 +31,6 @@
           seL4-deps = pkgs.python3Packages.seL4-deps;
           camkes-deps = pkgs.python3Packages.camkes-deps;
 
-          # generated using
-          #
-          # nix run nixpkgs#cabal2nix -- --maintainer wucke13 --subpath capDL-tool --dont-fetch-submodules https://github.com/seL4/capdl.git > pkgs/capdl.nix
-          capDL-tool =
-            let
-              hsPkgs = pkgs.haskellPackages.override {
-                overrides = final: prev: {
-                  MissingH = pkgs.haskell.lib.overrideCabal prev.MissingH {
-                    version = "1.5.0.1";
-                    sha256 = "sha256-yy+kpipgnsa8+i6raubTTG9b+6Uj/tjcDAVbMXZzIjE=";
-                    revision = "1";
-                    editedCabalFile = "sha256-9mLTXlTu5Va/bxqOxDGXKJhUMmiehE5hGwLpWBN7UaI=";
-                  };
-                };
-              };
-            in
-            hsPkgs.callPackage pkgs/capDL-tool.nix { };
 
           #
           ### microkit(-sdk)
@@ -320,6 +304,36 @@
             };
 
 
+          ### seL4 CAmkES VM Examples
+          #
+          seL4-camkes-vm-examples-aarch64-qemu-arm-virt =
+            let
+              pkgsCross = (import nixpkgs {
+                inherit system;
+                crossSystem.config = "aarch64-unknown-linux-gnu";
+                overlays = [
+                  self.overlays.default
+                  # seL4's musllibc fork can't stand modern gcc because its too old.
+                  (final: prev: {
+                    bintools = prev.wrapBintoolsWith {
+                      bintools = prev.binutils-unwrapped_2_38;
+                      libc = prev.stdenv.cc.libc;
+                    };
+                  })
+                ];
+              });
+            in
+            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix
+              {
+                stdenvNoLibs = pkgs.overrideCC pkgs.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
+                extraCmakeFlags = [
+                  "-DPLATFORM=qemu-arm-virt"
+                  "-DCAMKES_VM_APP=vm_minimal"
+                  "-DAARCH64=1"
+                ];
+              };
+
+
           #
           ### UBoot with specific patches
           #
@@ -384,10 +398,10 @@
             '';
         };
 
+
         #
         ### DevShells
         #
-
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             # seL4

@@ -49,11 +49,6 @@ stdenvNoLibs.mkDerivation rec {
     '')
   ];
 
-  # fake a git repo for musl
-  postFixup = ''
-    touch projects/musllibc/.git
-  '';
-
   # fix /bin/bash et al.
   postPatch = ''
     patchShebangs .
