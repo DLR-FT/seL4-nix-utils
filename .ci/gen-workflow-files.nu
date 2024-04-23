@@ -28,16 +28,24 @@ def depends [
 
 # get attribute names of the attribute set
 def get-attr-names [
-    expr: # nix expression to get attrNames of
+    exprs: # nix expressions to get attrNames of
   ] {
-  nix eval --json $expr --apply builtins.attrNames | from json
+  $exprs 
+    | par-each {
+        |expr| nix eval --json $expr --apply builtins.attrNames 
+        | from json 
+      } 
+    | flatten 
+    | uniq 
+    | sort
 }
 
 def job-id [
-  system:string,
   derivation:string,
   ] {
-  $"($system)---($derivation)"
+  $derivation 
+    | parse '.#{type}.{system}.{name}' 
+    | $"($in.system.0)---($in.type.0)---($in.name.0)"
 }
 
 # map from nixos system to github runner type
@@ -50,8 +58,16 @@ let systems_map = {
   x86_64-linux: ubuntu-latest
 }
 
-let targets = (get-attr-names ".#packages"
-  | par-each {|system| { $system : (get-attr-names $".#packages.($system)") } }
+let categories = [".#packages" ".#devShells" ".#checks"]
+let targets = (get-attr-names $categories
+  | par-each {|system| { $system : (
+      $categories 
+        | par-each {
+            |cat| get-attr-names [$"($cat).($system)"] 
+            | each { $"($cat).($system).($in)" } 
+          } 
+        | flatten
+    ) } }
   | reduce {|it, acc| $acc | merge $it }
 )
 
@@ -103,22 +119,22 @@ for system in ($targets | columns) {
   for derivation in $derivations {
 
     # job_id for GH-Actions
-    let id = ( job-id $system $derivation )
+    let id = ( job-id $derivation )
 
     # name displayed
-    let name = $"($system).($derivation)"
+    let name = ( job-id $derivation )
 
     # collection of dependencies
     # TODO currently only considers dependencies on the same $system
     let needs = ($derivations
-      | filter {|it| $it != $derivation and $it != "default" } # filter out self and default
+      | filter {|it| $it != $derivation } # filter out self
       | par-each {|it| {
         name: $it, # the other derivation
         # does self depend on $it?
-        needed: (depends $".#packages.($system).($derivation)" $".#packages.($system).($it)")
+        needed: (depends $derivation $it)
       } }
       | filter {|it| $it.needed}
-      | each {|it| job-id $system $it.name}
+      | each {|it| job-id $it.name}
       | sort
     )
 
@@ -129,17 +145,22 @@ for system in ($targets | columns) {
       steps: ($runner_setup | append [
         {
           name: Build,
-          run: $"nix build .#packages.($system).($derivation) --print-build-logs"
+          run: $"nix build ($derivation) --print-build-logs"
         }
       ])
     }
     $cachix_workflow.jobs = ($cachix_workflow.jobs | insert $id $new_job )
   }
 
+  let checks = $derivations 
+    | filter { $in | str contains $'.#checks.($system)' } 
+    | each { job-id $in }
+
   # add check job
   $cachix_workflow.jobs = ($cachix_workflow.jobs | insert $"($system)---check" {
     name: $"Check on ($system)",
     "runs-on": $runs_on,
+    needs: $checks,
     steps: ($runner_setup | append {
       name: Check,
       run: "nix flake check . --print-build-logs"
