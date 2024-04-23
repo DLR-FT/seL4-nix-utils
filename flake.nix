@@ -441,6 +441,7 @@
             pkgsCross.aarch64-multiplatform.stdenv.cc.bintools
             bear
             gnumake
+            qemu
           ];
 
           # mitigates the following errors:
