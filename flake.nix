@@ -442,15 +442,40 @@
           #
           uboot-aarch64-rpi4 = (import nixpkgs {
             inherit system;
-            crossSystem.config = "aarch64-unknown-linux-musl";
+            crossSystem.config = "aarch64-unknown-linux-gnu";
             overlays = [ self.overlays.default ];
           }).ubootRaspberryPi4_64bit;
+
+
+          # For more information on compiling the Xilinx U-Boot fork see
+          # https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841973/Build+U-Boot
+          uboot-aarch64-zcu102 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-gnu";
+            overlays = [ self.overlays.default ];
+          }).buildUBoot rec {
+            extraMeta.platforms = [ "aarch64-linux" ];
+            defconfig = "xilinx_zynqmp_virt_defconfig";
+            # The `DEVICE_TREE` environment variable must only be propagated __after__ the initial
+            # `make xilinx_zynqmp_virt_defconfig` call.
+            preInstall = ''
+              export DEVICE_TREE="zynqmp-zcu102-rev1.0"
+            '';
+            filesToInstall = [ "spl/boot.bin" "u-boot.img" ];
+            version = "xilinx-v2023.2";
+            src = pkgs.fetchFromGitHub {
+              owner = "Xilinx";
+              repo = "u-boot-xlnx";
+              rev = version;
+              hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
+            };
+          };
 
 
           # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
           uboot-armv7l-zynq-zc702 = (import nixpkgs {
             inherit system;
-            crossSystem.config = "armv7l-unknown-linux-musleabihf";
+            crossSystem.config = "armv7l-unknown-linux-gnueabi";
             overlays = [ self.overlays.default ];
           }).buildUBoot rec {
             extraMeta.platforms = [ "armv7l-linux" ];
