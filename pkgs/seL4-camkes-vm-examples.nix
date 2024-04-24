@@ -15,6 +15,7 @@
 , protobuf
 , python3
 , qemu
+, ubootTools
 , extraCmakeFlags ? [ ]
 , stack
 }:
@@ -46,8 +47,8 @@ stdenvNoLibs.mkDerivation rec {
     nanopb # ser/de
     ninja # build tools
     protobuf # to generate ser/de stuff
+    ubootTools # for mkimage
     (python3.withPackages (ps: with ps; [ camkes-deps protobuf seL4-deps ]))
-    stack
 
     # fakegit
     (writeShellScriptBin "git" ''
