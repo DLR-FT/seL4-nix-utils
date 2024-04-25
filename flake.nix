@@ -304,16 +304,17 @@
             };
 
 
+          #
           ### seL4 CAmkES VM Examples
           #
-          seL4-camkes-vm-examples-aarch64-qemu-arm-virt =
+          seL4-camkes-vm-examples-aarch64-tx1 =
             let
               pkgsCross = (import nixpkgs {
                 inherit system;
                 crossSystem.config = "aarch64-unknown-linux-gnu";
                 overlays = [
                   self.overlays.default
-                  # seL4's musllibc fork can't stand modern gcc because its too old.
+                  # seL4's musllibc fork can't stand modern bintools because its too old.
                   (final: prev: {
                     bintools = prev.wrapBintoolsWith {
                       bintools = prev.binutils-unwrapped_2_38;
@@ -323,15 +324,117 @@
                 ];
               });
             in
-            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix
-              {
-                stdenvNoLibs = pkgs.overrideCC pkgs.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
-                extraCmakeFlags = [
-                  "-DPLATFORM=qemu-arm-virt"
-                  "-DCAMKES_VM_APP=vm_minimal"
-                  "-DAARCH64=1"
+            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
+              extraCmakeFlags = [
+                "-DPLATFORM=tx1"
+                "-DCAMKES_VM_APP=vm_minimal"
+              ];
+            };
+
+
+          seL4-camkes-vm-examples-aarch64-tx2 =
+            let
+              pkgsCross = (import nixpkgs {
+                inherit system;
+                crossSystem.config = "aarch64-unknown-linux-gnu";
+                overlays = [
+                  self.overlays.default
+                  # seL4's musllibc fork can't stand modern bintools because its too old.
+                  (final: prev: {
+                    bintools = prev.wrapBintoolsWith {
+                      bintools = prev.binutils-unwrapped_2_38;
+                      libc = prev.stdenv.cc.libc;
+                    };
+                  })
                 ];
-              };
+              });
+            in
+            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
+              extraCmakeFlags = [
+                "-DPLATFORM=tx2"
+                "-DCAMKES_VM_APP=vm_minimal"
+              ];
+            };
+
+
+          seL4-camkes-vm-examples-aarch64-qemu-arm-virt =
+            let
+              pkgsCross = (import nixpkgs {
+                inherit system;
+                crossSystem.config = "aarch64-unknown-linux-gnu";
+                overlays = [
+                  self.overlays.default
+                  # seL4's musllibc fork can't stand modern bintools because its too old.
+                  (final: prev: {
+                    bintools = prev.wrapBintoolsWith {
+                      bintools = prev.binutils-unwrapped_2_38;
+                      libc = prev.stdenv.cc.libc;
+                    };
+                  })
+                ];
+              });
+            in
+            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
+              extraCmakeFlags = [
+                "-DPLATFORM=qemu-arm-virt"
+                "-DCAMKES_VM_APP=vm_minimal"
+              ];
+            };
+
+
+          seL4-camkes-vm-examples-aarch64-zcu102 =
+            let
+              pkgsCross = (import nixpkgs {
+                inherit system;
+                crossSystem.config = "aarch64-unknown-linux-gnu";
+                overlays = [
+                  self.overlays.default
+                  # seL4's musllibc fork can't stand modern bintools because its too old.
+                  (final: prev: {
+                    bintools = prev.wrapBintoolsWith {
+                      bintools = prev.binutils-unwrapped_2_38;
+                      libc = prev.stdenv.cc.libc;
+                    };
+                  })
+                ];
+              });
+            in
+            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
+              extraCmakeFlags = [
+                "-DPLATFORM=zcu102"
+                "-DCAMKES_VM_APP=vm_minimal"
+              ];
+            };
+
+
+          seL4-camkes-vm-examples-armv7l-exynos5422 =
+            let
+              pkgsCross = (import nixpkgs {
+                inherit system;
+                crossSystem.config = "armv7l-unknown-linux-gnueabi";
+                overlays = [
+                  self.overlays.default
+                  # seL4's musllibc fork can't stand modern bintools because its too old.
+                  (final: prev: {
+                    bintools = prev.wrapBintoolsWith {
+                      bintools = prev.binutils-unwrapped_2_38;
+                      libc = prev.stdenv.cc.libc;
+                    };
+                  })
+                ];
+              });
+            in
+            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
+              extraCmakeFlags = [
+                "-DPLATFORM=exynos5422"
+                "-DCAMKES_VM_APP=vm_minimal"
+              ];
+            };
 
 
           #
@@ -339,15 +442,40 @@
           #
           uboot-aarch64-rpi4 = (import nixpkgs {
             inherit system;
-            crossSystem.config = "aarch64-unknown-linux-musl";
+            crossSystem.config = "aarch64-unknown-linux-gnu";
             overlays = [ self.overlays.default ];
           }).ubootRaspberryPi4_64bit;
+
+
+          # For more information on compiling the Xilinx U-Boot fork see
+          # https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841973/Build+U-Boot
+          uboot-aarch64-zcu102 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-gnu";
+            overlays = [ self.overlays.default ];
+          }).buildUBoot rec {
+            extraMeta.platforms = [ "aarch64-linux" ];
+            defconfig = "xilinx_zynqmp_virt_defconfig";
+            # The `DEVICE_TREE` environment variable must only be propagated __after__ the initial
+            # `make xilinx_zynqmp_virt_defconfig` call.
+            preInstall = ''
+              export DEVICE_TREE="zynqmp-zcu102-rev1.0"
+            '';
+            filesToInstall = [ "spl/boot.bin" "u-boot.img" ];
+            version = "xilinx-v2023.2";
+            src = pkgs.fetchFromGitHub {
+              owner = "Xilinx";
+              repo = "u-boot-xlnx";
+              rev = version;
+              hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
+            };
+          };
 
 
           # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
           uboot-armv7l-zynq-zc702 = (import nixpkgs {
             inherit system;
-            crossSystem.config = "armv7l-unknown-linux-musleabihf";
+            crossSystem.config = "armv7l-unknown-linux-gnueabi";
             overlays = [ self.overlays.default ];
           }).buildUBoot rec {
             extraMeta.platforms = [ "armv7l-linux" ];
