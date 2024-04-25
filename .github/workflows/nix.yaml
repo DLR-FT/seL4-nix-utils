@@ -7,15 +7,15 @@ on:
     branches:
       - main
 jobs:
-  x86_64-linux---camkes-deps:
-    name: x86_64-linux.camkes-deps
+  x86_64-linux---packages---camkes-deps:
+    name: x86_64-linux---packages---camkes-deps
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---concurrencytest
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---concurrencytest
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -27,8 +27,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.camkes-deps --print-build-logs
-  x86_64-linux---capDL-tool:
-    name: x86_64-linux.capDL-tool
+  x86_64-linux---packages---capDL-tool:
+    name: x86_64-linux---packages---capDL-tool
     runs-on:
       - ubuntu-latest
     needs: []
@@ -43,8 +43,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.capDL-tool --print-build-logs
-  x86_64-linux---concurrencytest:
-    name: x86_64-linux.concurrencytest
+  x86_64-linux---packages---concurrencytest:
+    name: x86_64-linux---packages---concurrencytest
     runs-on:
       - ubuntu-latest
     needs: []
@@ -59,8 +59,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.concurrencytest --print-build-logs
-  x86_64-linux---guardonce:
-    name: x86_64-linux.guardonce
+  x86_64-linux---packages---guardonce:
+    name: x86_64-linux---packages---guardonce
     runs-on:
       - ubuntu-latest
     needs: []
@@ -75,8 +75,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.guardonce --print-build-logs
-  x86_64-linux---microkit-sdk-bin:
-    name: x86_64-linux.microkit-sdk-bin
+  x86_64-linux---packages---microkit-sdk-bin:
+    name: x86_64-linux---packages---microkit-sdk-bin
     runs-on:
       - ubuntu-latest
     needs: []
@@ -91,8 +91,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.microkit-sdk-bin --print-build-logs
-  x86_64-linux---pyfdt:
-    name: x86_64-linux.pyfdt
+  x86_64-linux---packages---pyfdt:
+    name: x86_64-linux---packages---pyfdt
     runs-on:
       - ubuntu-latest
     needs: []
@@ -107,8 +107,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.pyfdt --print-build-logs
-  x86_64-linux---pyoxidizer:
-    name: x86_64-linux.pyoxidizer
+  x86_64-linux---packages---pyoxidizer:
+    name: x86_64-linux---packages---pyoxidizer
     runs-on:
       - ubuntu-latest
     needs: []
@@ -123,12 +123,12 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.pyoxidizer --print-build-logs
-  x86_64-linux---python-pyoxidizer:
-    name: x86_64-linux.python-pyoxidizer
+  x86_64-linux---packages---python-pyoxidizer:
+    name: x86_64-linux---packages---python-pyoxidizer
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---pyoxidizer
+      - x86_64-linux---packages---pyoxidizer
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -140,12 +140,12 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.python-pyoxidizer --print-build-logs
-  x86_64-linux---sd-aarch64-rpi4:
-    name: x86_64-linux.sd-aarch64-rpi4
+  x86_64-linux---packages---sd-aarch64-rpi4:
+    name: x86_64-linux---packages---sd-aarch64-rpi4
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---uboot-aarch64-rpi4
+      - x86_64-linux---packages---uboot-aarch64-rpi4
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -157,17 +157,17 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.sd-aarch64-rpi4 --print-build-logs
-  x86_64-linux---seL4-camkes-vm-examples-aarch64-qemu-arm-virt:
-    name: x86_64-linux.seL4-camkes-vm-examples-aarch64-qemu-arm-virt
+  x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-qemu-arm-virt:
+    name: x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-qemu-arm-virt
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---camkes-deps
-      - x86_64-linux---capDL-tool
-      - x86_64-linux---concurrencytest
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---camkes-deps
+      - x86_64-linux---packages---capDL-tool
+      - x86_64-linux---packages---concurrencytest
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -179,13 +179,13 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-camkes-vm-examples-aarch64-qemu-arm-virt --print-build-logs
-  x86_64-linux---seL4-deps:
-    name: x86_64-linux.seL4-deps
+  x86_64-linux---packages---seL4-deps:
+    name: x86_64-linux---packages---seL4-deps
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -197,14 +197,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-deps --print-build-logs
-  x86_64-linux---seL4-kernel-arm:
-    name: x86_64-linux.seL4-kernel-arm
+  x86_64-linux---packages---seL4-kernel-arm:
+    name: x86_64-linux---packages---seL4-kernel-arm
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -216,14 +216,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm --print-build-logs
-  x86_64-linux---seL4-kernel-arm-hyp:
-    name: x86_64-linux.seL4-kernel-arm-hyp
+  x86_64-linux---packages---seL4-kernel-arm-hyp:
+    name: x86_64-linux---packages---seL4-kernel-arm-hyp
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -235,14 +235,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm-hyp --print-build-logs
-  x86_64-linux---seL4-kernel-arm-mcs:
-    name: x86_64-linux.seL4-kernel-arm-mcs
+  x86_64-linux---packages---seL4-kernel-arm-mcs:
+    name: x86_64-linux---packages---seL4-kernel-arm-mcs
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -254,14 +254,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm-mcs --print-build-logs
-  x86_64-linux---seL4-kernel-riscv64:
-    name: x86_64-linux.seL4-kernel-riscv64
+  x86_64-linux---packages---seL4-kernel-riscv64:
+    name: x86_64-linux---packages---seL4-kernel-riscv64
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -273,14 +273,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-riscv64 --print-build-logs
-  x86_64-linux---seL4-kernel-riscv64-mcs:
-    name: x86_64-linux.seL4-kernel-riscv64-mcs
+  x86_64-linux---packages---seL4-kernel-riscv64-mcs:
+    name: x86_64-linux---packages---seL4-kernel-riscv64-mcs
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -292,14 +292,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-riscv64-mcs --print-build-logs
-  x86_64-linux---seL4-kernel-x64:
-    name: x86_64-linux.seL4-kernel-x64
+  x86_64-linux---packages---seL4-kernel-x64:
+    name: x86_64-linux---packages---seL4-kernel-x64
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -311,14 +311,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-x64 --print-build-logs
-  x86_64-linux---seL4-moritz-fork-arm:
-    name: x86_64-linux.seL4-moritz-fork-arm
+  x86_64-linux---packages---seL4-moritz-fork-arm:
+    name: x86_64-linux---packages---seL4-moritz-fork-arm
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -330,14 +330,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-moritz-fork-arm --print-build-logs
-  x86_64-linux---seL4-moritz-fork-arm-hyp:
-    name: x86_64-linux.seL4-moritz-fork-arm-hyp
+  x86_64-linux---packages---seL4-moritz-fork-arm-hyp:
+    name: x86_64-linux---packages---seL4-moritz-fork-arm-hyp
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -349,14 +349,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-moritz-fork-arm-hyp --print-build-logs
-  x86_64-linux---seL4-moritz-fork-arm-mcs:
-    name: x86_64-linux.seL4-moritz-fork-arm-mcs
+  x86_64-linux---packages---seL4-moritz-fork-arm-mcs:
+    name: x86_64-linux---packages---seL4-moritz-fork-arm-mcs
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -368,14 +368,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-moritz-fork-arm-mcs --print-build-logs
-  x86_64-linux---seL4-moritz-fork-x64:
-    name: x86_64-linux.seL4-moritz-fork-x64
+  x86_64-linux---packages---seL4-moritz-fork-x64:
+    name: x86_64-linux---packages---seL4-moritz-fork-x64
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -387,14 +387,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-moritz-fork-x64 --print-build-logs
-  x86_64-linux---seL4-test-aarch64-imx8mq-evk:
-    name: x86_64-linux.seL4-test-aarch64-imx8mq-evk
+  x86_64-linux---packages---seL4-test-aarch64-imx8mq-evk:
+    name: x86_64-linux---packages---seL4-test-aarch64-imx8mq-evk
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -406,14 +406,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-imx8mq-evk --print-build-logs
-  x86_64-linux---seL4-test-aarch64-rpi4-1GB:
-    name: x86_64-linux.seL4-test-aarch64-rpi4-1GB
+  x86_64-linux---packages---seL4-test-aarch64-rpi4-1GB:
+    name: x86_64-linux---packages---seL4-test-aarch64-rpi4-1GB
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -425,14 +425,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-rpi4-1GB --print-build-logs
-  x86_64-linux---seL4-test-aarch64-rpi4-2GB:
-    name: x86_64-linux.seL4-test-aarch64-rpi4-2GB
+  x86_64-linux---packages---seL4-test-aarch64-rpi4-2GB:
+    name: x86_64-linux---packages---seL4-test-aarch64-rpi4-2GB
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -444,14 +444,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-rpi4-2GB --print-build-logs
-  x86_64-linux---seL4-test-aarch64-rpi4-4GB:
-    name: x86_64-linux.seL4-test-aarch64-rpi4-4GB
+  x86_64-linux---packages---seL4-test-aarch64-rpi4-4GB:
+    name: x86_64-linux---packages---seL4-test-aarch64-rpi4-4GB
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -463,14 +463,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-rpi4-4GB --print-build-logs
-  x86_64-linux---seL4-test-aarch64-rpi4-8GB:
-    name: x86_64-linux.seL4-test-aarch64-rpi4-8GB
+  x86_64-linux---packages---seL4-test-aarch64-rpi4-8GB:
+    name: x86_64-linux---packages---seL4-test-aarch64-rpi4-8GB
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -482,14 +482,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-rpi4-8GB --print-build-logs
-  x86_64-linux---seL4-test-aarch64-zcu102:
-    name: x86_64-linux.seL4-test-aarch64-zcu102
+  x86_64-linux---packages---seL4-test-aarch64-zcu102:
+    name: x86_64-linux---packages---seL4-test-aarch64-zcu102
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -501,14 +501,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-zcu102 --print-build-logs
-  x86_64-linux---seL4-test-armv7l-rpi3:
-    name: x86_64-linux.seL4-test-armv7l-rpi3
+  x86_64-linux---packages---seL4-test-armv7l-rpi3:
+    name: x86_64-linux---packages---seL4-test-armv7l-rpi3
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -520,14 +520,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-armv7l-rpi3 --print-build-logs
-  x86_64-linux---seL4-test-armv7l-zynq7000:
-    name: x86_64-linux.seL4-test-armv7l-zynq7000
+  x86_64-linux---packages---seL4-test-armv7l-zynq7000:
+    name: x86_64-linux---packages---seL4-test-armv7l-zynq7000
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -539,14 +539,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-armv7l-zynq7000 --print-build-logs
-  x86_64-linux---seL4-test-armv7l-zynq7000-simulate:
-    name: x86_64-linux.seL4-test-armv7l-zynq7000-simulate
+  x86_64-linux---packages---seL4-test-armv7l-zynq7000-simulate:
+    name: x86_64-linux---packages---seL4-test-armv7l-zynq7000-simulate
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -558,14 +558,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-armv7l-zynq7000-simulate --print-build-logs
-  x86_64-linux---seL4-test-i686-ia32:
-    name: x86_64-linux.seL4-test-i686-ia32
+  x86_64-linux---packages---seL4-test-i686-ia32:
+    name: x86_64-linux---packages---seL4-test-i686-ia32
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -577,14 +577,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-i686-ia32 --print-build-logs
-  x86_64-linux---seL4-test-i686-ia32-simulate:
-    name: x86_64-linux.seL4-test-i686-ia32-simulate
+  x86_64-linux---packages---seL4-test-i686-ia32-simulate:
+    name: x86_64-linux---packages---seL4-test-i686-ia32-simulate
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -596,14 +596,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-i686-ia32-simulate --print-build-logs
-  x86_64-linux---seL4-test-x86_64-x86_64:
-    name: x86_64-linux.seL4-test-x86_64-x86_64
+  x86_64-linux---packages---seL4-test-x86_64-x86_64:
+    name: x86_64-linux---packages---seL4-test-x86_64-x86_64
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -615,14 +615,14 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-x86_64-x86_64 --print-build-logs
-  x86_64-linux---seL4-test-x86_64-x86_64-simulate:
-    name: x86_64-linux.seL4-test-x86_64-x86_64-simulate
+  x86_64-linux---packages---seL4-test-x86_64-x86_64-simulate:
+    name: x86_64-linux---packages---seL4-test-x86_64-x86_64-simulate
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---guardonce
-      - x86_64-linux---pyfdt
-      - x86_64-linux---seL4-deps
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -634,8 +634,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-x86_64-x86_64-simulate --print-build-logs
-  x86_64-linux---uboot-aarch64-rpi4:
-    name: x86_64-linux.uboot-aarch64-rpi4
+  x86_64-linux---packages---uboot-aarch64-rpi4:
+    name: x86_64-linux---packages---uboot-aarch64-rpi4
     runs-on:
       - ubuntu-latest
     needs: []
@@ -650,8 +650,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.uboot-aarch64-rpi4 --print-build-logs
-  x86_64-linux---uboot-armv7l-zynq-zc702:
-    name: x86_64-linux.uboot-armv7l-zynq-zc702
+  x86_64-linux---packages---uboot-armv7l-zynq-zc702:
+    name: x86_64-linux---packages---uboot-armv7l-zynq-zc702
     runs-on:
       - ubuntu-latest
     needs: []
@@ -666,10 +666,71 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.uboot-armv7l-zynq-zc702 --print-build-logs
+  x86_64-linux---devShells---default:
+    name: x86_64-linux---devShells---default
+    runs-on:
+      - ubuntu-latest
+    needs:
+      - x86_64-linux---packages---camkes-deps
+      - x86_64-linux---packages---concurrencytest
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#devShells.x86_64-linux.default --print-build-logs
+  x86_64-linux---devShells---microkit:
+    name: x86_64-linux---devShells---microkit
+    runs-on:
+      - ubuntu-latest
+    needs:
+      - x86_64-linux---packages---microkit-sdk-bin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#devShells.x86_64-linux.microkit --print-build-logs
+  x86_64-linux---checks---treefmt:
+    name: x86_64-linux---checks---treefmt
+    runs-on:
+      - ubuntu-latest
+    needs:
+      - x86_64-linux---packages---camkes-deps
+      - x86_64-linux---packages---concurrencytest
+      - x86_64-linux---packages---guardonce
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#checks.x86_64-linux.treefmt --print-build-logs
   x86_64-linux---check:
     name: Check on x86_64-linux
     runs-on:
       - ubuntu-latest
+    needs:
+      - x86_64-linux---checks---treefmt
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
