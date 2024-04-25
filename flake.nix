@@ -437,6 +437,28 @@
 
 
           #
+          ### Arm Trusted Firmware
+          #
+          atf-aarch64-zcu102 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "aarch64-unknown-linux-gnu";
+            overlays = [ self.overlays.default ];
+          }).buildArmTrustedFirmware rec {
+            platform = "zynqmp";
+            extraMeta.platforms = [ "aarch64-linux" ];
+            extraMakeFlags = [ "RESET_TO_BL31=1" ];
+            filesToInstall = [ "build/${platform}/release/bl31.bin" ];
+            version = "xilinx-v2023.2";
+            src = pkgs.fetchFromGitHub {
+              owner = "Xilinx";
+              repo = "arm-trusted-firmware";
+              rev = version;
+              hash = "sha256-RvdBsskiSgquwnDf0g0dU8P6v4QxK4OqhtkF5K7lfyI=";
+            };
+          };
+
+
+          #
           ### UBoot with specific patches
           #
           uboot-aarch64-rpi4 = (import nixpkgs {
