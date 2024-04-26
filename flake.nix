@@ -459,6 +459,17 @@
 
 
           #
+          ### Firmware
+          #
+          pmufw-mblaze-zcu102 = (import nixpkgs {
+            inherit system;
+            crossSystem.config = "microblazeel-none-elf";
+            overlays = [ self.overlays.default ];
+          }).callPackage ./pkgs/xilinx-pmufw.nix
+            { };
+
+
+          #
           ### UBoot with specific patches
           #
           uboot-aarch64-rpi4 = (import nixpkgs {
