@@ -21,7 +21,7 @@ stdenvNoLibs.mkDerivation rec {
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/sel4test-manifest.git";
     rev = version;
-    hash = "sha256-aPMSys7KgQ3J0MkHfD9Gxbg1GRBXv7UcoPYCP1py6bw=";
+    hash = "sha256-s0VBUX6dX4GJJ2wU/8yCD1Vksr8aFm98xC+jt1uWM84=";
     latestCommitTimestamp = "2024-03-25";
   };
 
