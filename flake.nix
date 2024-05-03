@@ -15,9 +15,48 @@
           inherit system;
           overlays = [ self.overlays.default ];
         };
+
+        #
+        ### Custom cross-compilation Environments
+        #
+        pkgsCrossArmv7l = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "armv7l-unknown-linux-gnueabihf";
+          overlays = [ self.overlays.default ];
+        });
+
+        pkgsCrossAarch64 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "aarch64-unknown-linux-gnu";
+          overlays = [ self.overlays.default ];
+        });
+
+        pkgsCrossi686 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "i686-unknown-linux-gnu";
+          overlays = [ self.overlays.default ];
+        });
+
+        pkgsCrossx86_64 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "x86_64-unknown-linux-musl";
+          overlays = [ self.overlays.default ];
+        });
       in
       {
         packages = {
+          #
+          ### Re-export toolchains to cause proper cashing
+          #
+          crossStdenvAarch64 = pkgsCrossAarch64.stdenvNoLibs;
+          crossStdenvArmv7l = pkgsCrossArmv7l.stdenvNoLibs;
+          crossStdenvi686 = pkgsCrossi686.stdenvNoLibs;
+          crossStdenvx86_64 = pkgsCrossx86_64.stdenvNoLibs;
+
+
+          #
+          ### seL4 related tools and dependencies
+          #
           capDL-tool = pkgs.capDL-tool;
 
           # python dependencies for seL4
@@ -126,19 +165,11 @@
           #
           ### seL4 test suite for various platforms
           #
-          seL4-test-aarch64-imx8mq-evk = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-imx8mq-evk = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=imx8mq-evk" ]; };
 
 
-          seL4-test-aarch64-rpi4-1GB = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-rpi4-1GB = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
@@ -146,11 +177,7 @@
               ];
             };
 
-          seL4-test-aarch64-rpi4-2GB = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-rpi4-2GB = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
@@ -158,11 +185,7 @@
               ];
             };
 
-          seL4-test-aarch64-rpi4-4GB = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-rpi4-4GB = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
@@ -170,11 +193,7 @@
               ];
             };
 
-          seL4-test-aarch64-rpi4-8GB = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-rpi4-8GB = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
@@ -182,35 +201,19 @@
               ];
             };
 
-          seL4-test-aarch64-zcu102 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-zcu102 = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=zcu102" ]; };
 
 
-          seL4-test-armv7l-rpi3 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "armv7l-unknown-linux-musleabihf";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-armv7l-rpi3 = pkgsCrossArmv7l.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=rpi3" ]; };
 
 
-          seL4-test-armv7l-zynq7000 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "armv7l-unknown-linux-musleabihf";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-armv7l-zynq7000 = pkgsCrossArmv7l.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=zynq7000" ]; };
 
 
-          seL4-test-armv7l-zynq7000-simulate = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "armv7l-unknown-linux-musleabihf";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-armv7l-zynq7000-simulate = pkgsCrossArmv7l.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=zynq7000"
@@ -261,19 +264,11 @@
           #   };
 
 
-          seL4-test-i686-ia32 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "i686-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-i686-ia32 = pkgsCrossi686.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=ia32" ]; };
 
 
-          seL4-test-i686-ia32-simulate = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "i686-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-i686-ia32-simulate = pkgsCrossi686.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=ia32"
@@ -282,19 +277,11 @@
             };
 
 
-          seL4-test-x86_64-x86_64 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "x86_64-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-x86_64-x86_64 = pkgsCrossx86_64.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=x86_64" ]; };
 
 
-          seL4-test-x86_64-x86_64-simulate = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "x86_64-unknown-linux-musl";
-            overlays = [ self.overlays.default ];
-          }).callPackage pkgs/seL4-test.nix
+          seL4-test-x86_64-x86_64-simulate = pkgsCrossx86_64.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=x86_64"
@@ -439,11 +426,7 @@
           #
           ### Arm Trusted Firmware
           #
-          atf-aarch64-zcu102 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-gnu";
-            overlays = [ self.overlays.default ];
-          }).buildArmTrustedFirmware rec {
+          atf-aarch64-zcu102 = pkgsCrossAarch64.buildArmTrustedFirmware rec {
             platform = "zynqmp";
             extraMeta.platforms = [ "aarch64-linux" ];
             extraMakeFlags = [ "RESET_TO_BL31=1" ];
@@ -472,20 +455,12 @@
           #
           ### UBoot with specific patches
           #
-          uboot-aarch64-rpi4 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-gnu";
-            overlays = [ self.overlays.default ];
-          }).ubootRaspberryPi4_64bit;
+          uboot-aarch64-rpi4 = pkgsCrossAarch64.ubootRaspberryPi4_64bit;
 
 
           # For more information on compiling the Xilinx U-Boot fork see
           # https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841973/Build+U-Boot
-          uboot-aarch64-zcu102 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "aarch64-unknown-linux-gnu";
-            overlays = [ self.overlays.default ];
-          }).buildUBoot rec {
+          uboot-aarch64-zcu102 = pkgsCrossAarch64.buildUBoot rec {
             extraMeta.platforms = [ "aarch64-linux" ];
             defconfig = "xilinx_zynqmp_virt_defconfig";
             # The `DEVICE_TREE` environment variable must only be propagated __after__ the initial
@@ -514,11 +489,7 @@
 
 
           # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
-          uboot-armv7l-zynq-zc702 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "armv7l-unknown-linux-gnueabi";
-            overlays = [ self.overlays.default ];
-          }).buildUBoot rec {
+          uboot-armv7l-zynq-zc702 = pkgsCrossArmv7l.buildUBoot rec {
             extraMeta.platforms = [ "armv7l-linux" ];
             defconfig = "xilinx_zynq_virt_defconfig";
             env.DEVICE_TREE = "zynq-zc702";
