@@ -94,9 +94,11 @@
           #
           ### seL4 Kernel Flavours
           #
-          seL4-kernel-aarch64 = pkgsCrossAarch64.callPackage pkgs/seL4-kernel.nix {
-            config = "AARCH64_verified";
-          };
+
+          # not part of 12.1.0, but will be added once a new release is out
+          #seL4-kernel-aarch64 = pkgsCrossAarch64.callPackage pkgs/seL4-kernel.nix {
+          #  config = "AARCH64_verified";
+          #};
 
           seL4-kernel-armv7l = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
             config = "ARM_verified";
