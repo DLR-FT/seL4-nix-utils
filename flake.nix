@@ -33,13 +33,15 @@
 
         pkgsCrossRiscv32 = (import nixpkgs {
           inherit system;
-          crossSystem.config = "riscv32-unknown-linux-gnu";
+          crossSystem.config = "riscv32-unknown-none-elf";
+          gcc.abi = "ilp32";
           overlays = [ self.overlays.default ];
         });
 
         pkgsCrossRiscv64 = (import nixpkgs {
           inherit system;
-          crossSystem.config = "riscv64-unknown-linux-gnu";
+          crossSystem.config = "riscv64-unknown-none-elf";
+          gcc.abi = "lp64";
           overlays = [ self.overlays.default ];
         });
 
