@@ -25,6 +25,7 @@ final: prev: {
 
 
   # microkit
+  microkit-sdk = prev.callPackage pkgs/microkit-sdk.nix { };
   microkit-sdk-bin = prev.callPackage pkgs/microkit-sdk-bin.nix { };
 
 

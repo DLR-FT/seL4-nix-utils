@@ -35,6 +35,7 @@
           #
           ### microkit(-sdk)
           #
+          microkit-sdk = pkgs.microkit-sdk;
           microkit-sdk-bin = pkgs.microkit-sdk-bin;
 
           #
