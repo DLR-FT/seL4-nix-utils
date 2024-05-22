@@ -75,6 +75,25 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.guardonce --print-build-logs
+  x86_64-linux---packages---microkit-sdk:
+    name: x86_64-linux---packages---microkit-sdk
+    runs-on:
+      - ubuntu-latest
+    needs:
+      - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---pyoxidizer
+      - x86_64-linux---packages---python-pyoxidizer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.microkit-sdk --print-build-logs
   x86_64-linux---packages---microkit-sdk-bin:
     name: x86_64-linux---packages---microkit-sdk-bin
     runs-on:
@@ -127,8 +146,7 @@ jobs:
     name: x86_64-linux---packages---python-pyoxidizer
     runs-on:
       - ubuntu-latest
-    needs:
-      - x86_64-linux---packages---pyoxidizer
+    needs: []
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
