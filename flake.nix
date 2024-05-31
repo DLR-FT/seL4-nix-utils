@@ -19,14 +19,12 @@
       {
         packages = {
           capDL-tool = pkgs.capDL-tool;
-          pyoxidizer = pkgs.pyoxidizer;
 
           # python dependencies for seL4
           # these are not actually part of the nixpkgs, but provided over the default overlay of
           # this flake
           guardonce = pkgs.python3Packages.guardonce;
           pyfdt = pkgs.python3Packages.pyfdt;
-          python-pyoxidizer = pkgs.python3Packages.pyoxidizer;
           concurrencytest = pkgs.python3Packages.concurrencytest;
           seL4-deps = pkgs.python3Packages.seL4-deps;
           camkes-deps = pkgs.python3Packages.camkes-deps;
