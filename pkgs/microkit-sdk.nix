@@ -39,8 +39,10 @@ stdenv.mkDerivation rec {
   };
 
   cargoRoot = "tool/microkit/";
-  cargoDeps = rustPlatform.importCargoLock {
-    lockFile = src + "/" + cargoRoot + "Cargo.lock";
+  cargoDeps = rustPlatform.fetchCargoTarball {
+    inherit src;
+    sourceRoot = "source/" + cargoRoot;
+    hash = "sha256-hATdZ0CGQBLa6Ml+c/ctE9WGpeiDsAisfWkMDbHb8hw=";
   };
 
   nativeBuildInputs = [
