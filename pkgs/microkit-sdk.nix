@@ -34,8 +34,8 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
-    rev = "6f7cafc9563d23aa18fb5776d4acb087873a9d28";
-    hash = "sha256-zAKjXLCdCbwC5H32mXKfuAtHvXSe466q+m19wnK0gys=";
+    rev = "9b4e73f5e1cb2dc18c94ceb40453552a0c2e2e69";
+    hash = "sha256-iUUrrNBbNT9uVEBzwvBim4aCMYxCzIoiis+NK5Vu84U=";
   };
 
   cargoRoot = "tool/microkit/";
