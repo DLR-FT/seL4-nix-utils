@@ -460,8 +460,17 @@
             preInstall = ''
               export DEVICE_TREE="zynqmp-zcu102-rev1.0"
             '';
-            filesToInstall = [ "spl/boot.bin" "u-boot.img" ];
+            filesToInstall = [ "spl/boot.bin" "u-boot.elf" "u-boot.img" ];
             version = "xilinx-v2023.2";
+
+            # u-boot-xlnx ignores the CONFIG_ARMV8_SWITCH_TO_EL1 macro, and always unconditionally
+            # boots into EL1 when doing `go`. This little patch changes that behavior to stay in
+            # EL2, so that seL4 can happily boot even in hypervisor mode.
+            prePatch = ''
+              substituteInPlace board/xilinx/zynqmp/zynqmp.c \
+                --replace armv8_switch_to_el1 armv8_switch_to_el2
+            '';
+
             src = pkgs.fetchFromGitHub {
               owner = "Xilinx";
               repo = "u-boot-xlnx";
@@ -480,7 +489,7 @@
             extraMeta.platforms = [ "armv7l-linux" ];
             defconfig = "xilinx_zynq_virt_defconfig";
             env.DEVICE_TREE = "zynq-zc702";
-            filesToInstall = [ "spl/boot.bin" "u-boot.img" ];
+            filesToInstall = [ "spl/boot.bin" "u-boot.elf" "u-boot.img" ];
             version = "xilinx-v2023.2";
             src = pkgs.fetchFromGitHub {
               owner = "Xilinx";
