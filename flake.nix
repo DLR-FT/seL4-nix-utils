@@ -471,7 +471,7 @@
 
           # For more information on compiling the Xilinx U-Boot fork see
           # https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841973/Build+U-Boot
-          uboot-aarch64-zcu102 = pkgsCrossAarch64.buildUBoot rec {
+          uboot-aarch64-zcu102 = (pkgsCrossAarch64.buildUBoot rec {
             extraMeta.platforms = [ "aarch64-linux" ];
             defconfig = "xilinx_zynqmp_virt_defconfig";
             # The `DEVICE_TREE` environment variable must only be propagated __after__ the initial
@@ -496,11 +496,14 @@
               rev = version;
               hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
             };
+          }).override {
+            # default upstream uboot apply a patch for RPI that conflicts with xilinx fork
+            patches = [ ];
           };
 
 
           # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
-          uboot-armv7l-zynq-zc702 = pkgsCrossArmv7l.buildUBoot rec {
+          uboot-armv7l-zynq-zc702 = (pkgsCrossArmv7l.buildUBoot rec {
             extraMeta.platforms = [ "armv7l-linux" ];
             defconfig = "xilinx_zynq_virt_defconfig";
             env.DEVICE_TREE = "zynq-zc702";
@@ -512,6 +515,9 @@
               rev = version;
               hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
             };
+          }).override {
+            # default upstream uboot apply a patch for RPI that conflicts with xilinx fork
+            patches = [ ];
           };
 
 
