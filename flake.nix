@@ -39,6 +39,7 @@
 
             # seL4's musllibc fork can't stand modern bintools because its too old.
             (final: prev: {
+              capDL-tool = pkgs-23-11.capDL-tool;
               bintools = prev.wrapBintoolsWith {
                 bintools = prev.binutils-unwrapped_2_38;
                 libc = prev.stdenv.cc.libc;
@@ -61,8 +62,7 @@
 
             # seL4's musllibc fork can't stand modern bintools because its too old.
             (final: prev: {
-              # writeShellScriptBin would use targetPlatform's bash, but there is not bare-metal bash
-              writeShellScriptBin = pkgs.writeShellScriptBin;
+              capDL-tool = pkgs-23-11.capDL-tool;
 
               bintools = prev.wrapBintoolsWith {
                 bintools = prev.binutils-unwrapped_2_38;
@@ -88,6 +88,8 @@
 
             # seL4's musllibc fork can't stand modern bintools because its too old.
             (final: prev: {
+              capDL-tool = pkgs-23-11.capDL-tool;
+
               # writeShellScriptBin would use targetPlatform's bash, but there is not bare-metal bash
               writeShellScriptBin = pkgs.writeShellScriptBin;
 
@@ -115,6 +117,8 @@
 
             # seL4's musllibc fork can't stand modern bintools because its too old.
             (final: prev: {
+              capDL-tool = pkgs-23-11.capDL-tool;
+
               # writeShellScriptBin would use targetPlatform's bash, but there is not bare-metal bash
               writeShellScriptBin = pkgs.writeShellScriptBin;
 
