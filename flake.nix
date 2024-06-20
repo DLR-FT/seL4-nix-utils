@@ -22,112 +22,72 @@
           overlays = [ self.overlays.default ];
         };
 
+        # an overlay to apply general patches
+        patchOverlay = final: prev: {
+          capDL-tool = pkgs-23-11.capDL-tool;
+        };
+
+        # seL4's stable release musllibc fork can't stand modern bintools because its too old
+        oldBintoolsOverlay = final: prev: {
+          bintools = prev.wrapBintoolsWith {
+            bintools = prev.binutils-unwrapped_2_38;
+            libc = prev.stdenv.cc.libc;
+          };
+        };
+
         #
         ### Custom cross-compilation Environments
         #
         pkgsCrossArmv7l = (import nixpkgs {
           inherit system;
           crossSystem.config = "armv7l-unknown-linux-gnueabihf";
-          overlays = [ self.overlays.default ];
+          overlays = [ patchOverlay self.overlays.default ];
         });
 
         pkgsCrossArmv7lOldBintools = (import nixpkgs {
           inherit system;
           crossSystem.config = "armv7l-unknown-linux-gnueabihf";
-          overlays = [
-            self.overlays.default
-
-            # seL4's musllibc fork can't stand modern bintools because its too old.
-            (final: prev: {
-              capDL-tool = pkgs-23-11.capDL-tool;
-              bintools = prev.wrapBintoolsWith {
-                bintools = prev.binutils-unwrapped_2_38;
-                libc = prev.stdenv.cc.libc;
-              };
-            })
-          ];
+          overlays = [ patchOverlay oldBintoolsOverlay self.overlays.default ];
         });
 
         pkgsCrossAarch64 = (import nixpkgs {
           inherit system;
           crossSystem.config = "aarch64-unknown-linux-gnu";
-          overlays = [ self.overlays.default ];
+          overlays = [ patchOverlay self.overlays.default ];
         });
 
         pkgsCrossAarch64OldBintools = (import nixpkgs {
           inherit system;
           crossSystem.config = "aarch64-unknown-linux-gnu";
-          overlays = [
-            self.overlays.default
-
-            # seL4's musllibc fork can't stand modern bintools because its too old.
-            (final: prev: {
-              capDL-tool = pkgs-23-11.capDL-tool;
-
-              bintools = prev.wrapBintoolsWith {
-                bintools = prev.binutils-unwrapped_2_38;
-                libc = prev.stdenv.cc.libc;
-              };
-            })
-          ];
+          overlays = [ patchOverlay oldBintoolsOverlay self.overlays.default ];
         });
 
         pkgsCrossRiscv32 = (import nixpkgs {
           inherit system;
           crossSystem.config = "riscv32-unknown-none-elf";
           gcc.abi = "ilp32";
-          overlays = [ self.overlays.default ];
+          overlays = [ patchOverlay self.overlays.default ];
         });
 
         pkgsCrossRiscv32OldBintools = (import nixpkgs {
           inherit system;
           crossSystem.config = "riscv32-unknown-none-elf";
           gcc.abi = "ilp32";
-          overlays = [
-            self.overlays.default
-
-            # seL4's musllibc fork can't stand modern bintools because its too old.
-            (final: prev: {
-              capDL-tool = pkgs-23-11.capDL-tool;
-
-              # writeShellScriptBin would use targetPlatform's bash, but there is not bare-metal bash
-              writeShellScriptBin = pkgs.writeShellScriptBin;
-
-              bintools = prev.wrapBintoolsWith {
-                bintools = prev.binutils-unwrapped_2_38;
-                libc = prev.stdenv.cc.libc;
-              };
-            })
-          ];
+          overlays = [ patchOverlay oldBintoolsOverlay self.overlays.default ];
         });
 
         pkgsCrossRiscv64 = (import nixpkgs {
           inherit system;
           crossSystem.config = "riscv64-unknown-none-elf";
           gcc.abi = "lp64";
-          overlays = [ self.overlays.default ];
+          overlays = [ patchOverlay self.overlays.default ];
         });
 
         pkgsCrossRiscv64OldBintools = (import nixpkgs {
           inherit system;
           crossSystem.config = "riscv64-unknown-none-elf";
           gcc.abi = "lp64";
-          overlays = [
-            self.overlays.default
-
-            # seL4's musllibc fork can't stand modern bintools because its too old.
-            (final: prev: {
-              capDL-tool = pkgs-23-11.capDL-tool;
-
-              # writeShellScriptBin would use targetPlatform's bash, but there is not bare-metal bash
-              writeShellScriptBin = pkgs.writeShellScriptBin;
-
-              bintools = prev.wrapBintoolsWith {
-                bintools = prev.binutils-unwrapped_2_38;
-                libc = prev.stdenv.cc.libc;
-              };
-            })
-          ];
+          overlays = [ patchOverlay oldBintoolsOverlay self.overlays.default ];
         });
 
         pkgsCrossi686 = (import nixpkgs {
