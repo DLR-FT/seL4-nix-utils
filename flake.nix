@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs-23-11.url = "github:NixOS/nixpkgs/nixos-23.11"; # TODO remove once we can update capDL
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -12,6 +13,11 @@
     (system:
       let
         pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ self.overlays.default ];
+        };
+
+        pkgs-23-11 = import inputs.nixpkgs-23-11 {
           inherit system;
           overlays = [ self.overlays.default ];
         };
@@ -143,7 +149,7 @@
           #
           ### seL4 related tools and dependencies
           #
-          capDL-tool = pkgs.capDL-tool;
+          capDL-tool = pkgs-23-11.capDL-tool;
 
           # python dependencies for seL4
           # these are not actually part of the nixpkgs, but provided over the default overlay of
