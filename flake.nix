@@ -1,6 +1,7 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs-23-11.url = "github:NixOS/nixpkgs/nixos-23.11"; # TODO remove once we can update capDL
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -16,19 +17,77 @@
           overlays = [ self.overlays.default ];
         };
 
+        pkgs-23-11 = import inputs.nixpkgs-23-11 {
+          inherit system;
+          overlays = [ self.overlays.default ];
+        };
+
+        # an overlay to apply general patches
+        patchOverlay = final: prev: {
+          capDL-tool = pkgs-23-11.capDL-tool;
+        };
+
+        # seL4's stable release musllibc fork can't stand modern bintools because its too old
+        oldBintoolsOverlay = final: prev: {
+          bintools = prev.wrapBintoolsWith {
+            bintools = prev.binutils-unwrapped_2_38;
+            libc = prev.stdenv.cc.libc;
+          };
+        };
+
         #
         ### Custom cross-compilation Environments
         #
         pkgsCrossArmv7l = (import nixpkgs {
           inherit system;
           crossSystem.config = "armv7l-unknown-linux-gnueabihf";
-          overlays = [ self.overlays.default ];
+          overlays = [ patchOverlay self.overlays.default ];
+        });
+
+        pkgsCrossArmv7lOldBintools = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "armv7l-unknown-linux-gnueabihf";
+          overlays = [ patchOverlay oldBintoolsOverlay self.overlays.default ];
         });
 
         pkgsCrossAarch64 = (import nixpkgs {
           inherit system;
           crossSystem.config = "aarch64-unknown-linux-gnu";
-          overlays = [ self.overlays.default ];
+          overlays = [ patchOverlay self.overlays.default ];
+        });
+
+        pkgsCrossAarch64OldBintools = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "aarch64-unknown-linux-gnu";
+          overlays = [ patchOverlay oldBintoolsOverlay self.overlays.default ];
+        });
+
+        pkgsCrossRiscv32 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "riscv32-unknown-none-elf";
+          gcc.abi = "ilp32";
+          overlays = [ patchOverlay self.overlays.default ];
+        });
+
+        pkgsCrossRiscv32OldBintools = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "riscv32-unknown-none-elf";
+          gcc.abi = "ilp32";
+          overlays = [ patchOverlay oldBintoolsOverlay self.overlays.default ];
+        });
+
+        pkgsCrossRiscv64 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "riscv64-unknown-none-elf";
+          gcc.abi = "lp64";
+          overlays = [ patchOverlay self.overlays.default ];
+        });
+
+        pkgsCrossRiscv64OldBintools = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "riscv64-unknown-none-elf";
+          gcc.abi = "lp64";
+          overlays = [ patchOverlay oldBintoolsOverlay self.overlays.default ];
         });
 
         pkgsCrossi686 = (import nixpkgs {
@@ -39,7 +98,7 @@
 
         pkgsCrossx86_64 = (import nixpkgs {
           inherit system;
-          crossSystem.config = "x86_64-unknown-linux-musl";
+          crossSystem.config = "x86_64-unknown-linux-gnu";
           overlays = [ self.overlays.default ];
         });
       in
@@ -49,7 +108,13 @@
           ### Re-export toolchains to cause proper cashing
           #
           crossStdenvAarch64 = pkgsCrossAarch64.stdenvNoLibs;
+          crossStdenvAarch64OldBintools = pkgsCrossAarch64OldBintools.stdenvNoLibs;
           crossStdenvArmv7l = pkgsCrossArmv7l.stdenvNoLibs;
+          crossStdenvArmv7lOldBintools = pkgsCrossArmv7lOldBintools.stdenvNoLibs;
+          crossStdenvRiscv32 = pkgsCrossRiscv32.stdenvNoLibs;
+          crossStdenvRiscv32OldBintools = pkgsCrossRiscv32OldBintools.stdenvNoLibs;
+          crossStdenvRiscv64 = pkgsCrossRiscv64.stdenvNoLibs;
+          crossStdenvRiscv64OldBintools = pkgsCrossRiscv64OldBintools.stdenvNoLibs;
           crossStdenvi686 = pkgsCrossi686.stdenvNoLibs;
           crossStdenvx86_64 = pkgsCrossx86_64.stdenvNoLibs;
 
@@ -57,7 +122,7 @@
           #
           ### seL4 related tools and dependencies
           #
-          capDL-tool = pkgs.capDL-tool;
+          capDL-tool = pkgs-23-11.capDL-tool;
 
           # python dependencies for seL4
           # these are not actually part of the nixpkgs, but provided over the default overlay of
@@ -78,27 +143,33 @@
           #
           ### seL4 Kernel Flavours
           #
-          seL4-kernel-arm-hyp = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "ARM_HYP_verified";
-          };
 
-          seL4-kernel-arm-mcs = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "ARM_MCS_verified";
-          };
+          # not part of 12.1.0, but will be added once a new release is out
+          #seL4-kernel-aarch64 = pkgsCrossAarch64.callPackage pkgs/seL4-kernel.nix {
+          #  config = "AARCH64_verified";
+          #};
 
-          seL4-kernel-arm = pkgs.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-armv7l = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
             config = "ARM_verified";
           };
 
-          seL4-kernel-riscv64-mcs = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "RISCV64_MCS_verified";
+          seL4-kernel-armv7l-hyp = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+            config = "ARM_HYP_verified";
           };
 
-          seL4-kernel-riscv64 = pkgs.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-armv7l-mcs = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+            config = "ARM_MCS_verified";
+          };
+
+          seL4-kernel-riscv64 = pkgsCrossRiscv64.callPackage pkgs/seL4-kernel.nix {
             config = "RISCV64_verified";
           };
 
-          seL4-kernel-x64 = pkgs.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-riscv64-mcs = pkgsCrossRiscv64.callPackage pkgs/seL4-kernel.nix {
+            config = "RISCV64_MCS_verified";
+          };
+
+          seL4-kernel-x64 = pkgsCrossx86_64.callPackage pkgs/seL4-kernel.nix {
             config = "X64_verified";
           };
 
@@ -222,46 +293,30 @@
             };
 
 
-          # seL4-test-riscv32-spike = (import nixpkgs {
-          #   inherit system;
-          #   crossSystem.config = "riscv32-unknown-linux-gnu";
-          #   overlays = [ self.overlays.default ];
-          # }).callPackage pkgs/seL4-test.nix
-          #   { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
+          seL4-test-riscv32-spike = pkgsCrossRiscv32OldBintools.callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
 
 
-          # seL4-test-riscv32-spike-simulate = (import nixpkgs {
-          #   inherit system;
-          #   crossSystem.config = "riscv32-unknown-linux-gnu";
-          #   overlays = [ self.overlays.default ];
-          # }).callPackage pkgs/seL4-test.nix
-          #   {
-          #     extraCmakeFlags = [
-          #       "-DPLATFORM=spike"
-          #       "-DSIMULATION=1"
-          #     ];
-          #   };
+          seL4-test-riscv32-spike-simulate = pkgsCrossRiscv32OldBintools.callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=spike"
+                "-DSIMULATION=1"
+              ];
+            };
 
 
-          # seL4-test-riscv64-spike = (import nixpkgs {
-          #   inherit system;
-          #   crossSystem.config = "riscv64-unknown-linux-musl";
-          #   overlays = [ self.overlays.default ];
-          # }).callPackage pkgs/seL4-test.nix
-          #   { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
+          seL4-test-riscv64-spike = pkgsCrossRiscv64OldBintools.callPackage pkgs/seL4-test.nix
+            { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
 
 
-          # seL4-test-riscv64-spike-simulate = (import nixpkgs {
-          #   inherit system;
-          #   crossSystem.config = "riscv64-unknown-linux-musl";
-          #   overlays = [ self.overlays.default ];
-          # }).callPackage pkgs/seL4-test.nix
-          #   {
-          #     extraCmakeFlags = [
-          #       "-DPLATFORM=spike"
-          #       "-DSIMULATION=1"
-          #     ];
-          #   };
+          seL4-test-riscv64-spike-simulate = pkgsCrossRiscv64OldBintools.callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=spike"
+                "-DSIMULATION=1"
+              ];
+            };
 
 
           seL4-test-i686-ia32 = pkgsCrossi686.callPackage pkgs/seL4-test.nix
@@ -295,20 +350,7 @@
           #
           seL4-camkes-vm-examples-aarch64-tx1 =
             let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
+              pkgsCross = pkgsCrossAarch64OldBintools;
             in
             pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
               stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
@@ -321,20 +363,7 @@
 
           seL4-camkes-vm-examples-aarch64-tx2 =
             let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
+              pkgsCross = pkgsCrossAarch64OldBintools;
             in
             pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
               stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
@@ -347,20 +376,7 @@
 
           seL4-camkes-vm-examples-aarch64-qemu-arm-virt =
             let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
+              pkgsCross = pkgsCrossAarch64OldBintools;
             in
             pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
               stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
@@ -373,20 +389,7 @@
 
           seL4-camkes-vm-examples-aarch64-zcu102 =
             let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
+              pkgsCross = pkgsCrossAarch64OldBintools;
             in
             pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
               stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
@@ -399,20 +402,7 @@
 
           seL4-camkes-vm-examples-armv7l-exynos5422 =
             let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "armv7l-unknown-linux-gnueabi";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
+              pkgsCross = pkgsCrossArmv7lOldBintools;
             in
             pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
               stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
@@ -460,7 +450,7 @@
 
           # For more information on compiling the Xilinx U-Boot fork see
           # https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841973/Build+U-Boot
-          uboot-aarch64-zcu102 = pkgsCrossAarch64.buildUBoot rec {
+          uboot-aarch64-zcu102 = (pkgsCrossAarch64.buildUBoot rec {
             extraMeta.platforms = [ "aarch64-linux" ];
             defconfig = "xilinx_zynqmp_virt_defconfig";
             # The `DEVICE_TREE` environment variable must only be propagated __after__ the initial
@@ -485,11 +475,14 @@
               rev = version;
               hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
             };
+          }).override {
+            # default upstream uboot apply a patch for RPI that conflicts with xilinx fork
+            patches = [ ];
           };
 
 
           # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
-          uboot-armv7l-zynq-zc702 = pkgsCrossArmv7l.buildUBoot rec {
+          uboot-armv7l-zynq-zc702 = (pkgsCrossArmv7l.buildUBoot rec {
             extraMeta.platforms = [ "armv7l-linux" ];
             defconfig = "xilinx_zynq_virt_defconfig";
             env.DEVICE_TREE = "zynq-zc702";
@@ -501,6 +494,9 @@
               rev = version;
               hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
             };
+          }).override {
+            # default upstream uboot apply a patch for RPI that conflicts with xilinx fork
+            patches = [ ];
           };
 
 

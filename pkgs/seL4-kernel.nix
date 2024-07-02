@@ -1,6 +1,6 @@
 # builds an seL4 kernel
-{ targetStdenv ? null
-, pkgsCross ? null
+{ lib
+, stdenvNoLibs
 , fetchFromGitHub
 , cmake
 , ninja
@@ -8,33 +8,14 @@
 , dtc
 , cpio
 , python3Packages
-, config
-, extra-seL4-configs ? { }
+, config ? null
+, extraCmakeFlags ? [ ]
 }:
 
-
 let
-  # known seL4 configs and their respective toolchain
-  seL4-configs = {
-    "ARM_HYP_verified" = "armhf-embedded";
-    "ARM_MCS_verified" = "armhf-embedded";
-    "ARM_verified" = "arm-embedded";
-    "RISCV64_MCS_verified" = "riscv64-embedded";
-    "RISCV64_verified" = "riscv64-embedded";
-    "X64_verified" = "x86_64-embedded";
-  } // extra-seL4-configs;
-
-  # stdenv to be used for this build
-  stdenv =
-    if targetStdenv == null then
-      pkgsCross.${seL4-configs.${config}}.stdenvNoLibs
-    else targetStdenv;
+  softFloat = stdenvNoLibs.hostPlatform.gcc.float or (stdenvNoLibs.hostPlatform.parsed.abi.float or "hard") == "soft";
 in
-
-# check that the passed seL4 config is known
-assert builtins.elem config (builtins.attrNames seL4-configs);
-
-stdenv.mkDerivation rec {
+stdenvNoLibs.mkDerivation rec {
   pname = "seL4";
   version = "12.1.0";
 
@@ -46,7 +27,7 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    # targetStdenv'.cc
+    stdenvNoLibs.cc
     cmake # build tools
     ninja # build tools
     libxml2 # xmllint
@@ -62,10 +43,16 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = [
     "-GNinja"
-    "-C../configs/${config}.cmake"
-    "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
+    "-DCROSS_COMPILER_PREFIX=${stdenvNoLibs.cc.targetPrefix}"
     "-DCMAKE_TOOLCHAIN_FILE=../gcc.cmake"
-  ];
+  ]
+  ++ lib.lists.optional (config != null) "-C../configs/${config}.cmake"
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32 && softFloat) "-DAARCH32=1"
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32 && !softFloat) "-DAARCH32HF=1"
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch64) "-DAARCH64=1"
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV64) "-DRISCV64=1"
+  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV32) "-DRISCV32=1"
+  ++ extraCmakeFlags;
 
   installPhase = ''
     runHook preInstall
