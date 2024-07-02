@@ -44,21 +44,21 @@ let
       titlesec;
   });
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
   version = "1.3.0";
 
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-gIGlLPAEZ+eJ9TU8B8POAeS2gf/C+R+MjT24zN57R0k=";
   };
 
   cargoRoot = "tool/microkit/";
   cargoDeps = rustPlatform.fetchCargoTarball {
-    inherit src;
-    sourceRoot = "source/" + cargoRoot;
+    inherit (finalAttrs) src;
+    sourceRoot = "source/" + finalAttrs.cargoRoot;
     hash = "sha256-+IfOFMGz9dz4L1uE4zJ+K2/nW9Q7+prJqYCZSN9P2ZY=";
   };
 
@@ -125,4 +125,4 @@ stdenv.mkDerivation rec {
     maintainers = with lib.maintainers; [ wucke13 ];
     platforms = with lib.platforms; unix;
   };
-}
+})
