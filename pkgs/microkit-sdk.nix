@@ -19,30 +19,46 @@ let
   seL4-src = fetchFromGitHub {
     owner = "seL4";
     repo = "seL4";
-    # bespoke commit from microkit README, taken on 2024-05-30
-    rev = "57975d485397ce1744f7163644dd530560d0b7ec";
-    hash = "sha256-s+dU0Lo28CHdFhkvKwb56RNJrnsMVIKzglllCzYm5Ww=";
+    # bespoke commit from microkit README, taken on 2024-07-02
+    # https://github.com/seL4/microkit/tree/1.3.0?tab=readme-ov-file#sel4-version
+    rev = "0cdbffec9cf6b4c7c9c57971cbee5a24a70c8fd0";
+    hash = "sha256-avBeo3kwv08b263umMf6kMtiWgpieT0+vOTGjvnqQgk=";
   };
 
-  # microkit docs themselve use only the `titlesec` package. The rest of the dependencies come from pandoc.
-  tex = (texlive.combine { inherit (texlive) scheme-gust titlesec; });
+  # To debug the required TeX packages:
+  #
+  # nix-shell --pure --packages '(texlive.combine { inherit (texlive) enumitem environ fontaxes isodate roboto pdfcol scheme-medium sfmath substr tcolorbox titlesec; })' --packages pandoc --run "TEXINPUTS=$(nix eval --raw .\#microkit-sdk.src)/docs/style/: pandoc $(nix eval --raw .\#microkit-sdk.src)/docs/manual.md -o manual.pdf"
+  tex = (texlive.combine {
+    inherit (texlive)
+      enumitem
+      environ
+      fontaxes
+      isodate
+      pdfcol
+      roboto
+      scheme-medium
+      sfmath
+      substr
+      tcolorbox
+      titlesec;
+  });
 in
 stdenv.mkDerivation rec {
   pname = "microkit-sdk";
-  version = "unstable-2024-05-30";
+  version = "1.3.0";
 
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
-    rev = "9b4e73f5e1cb2dc18c94ceb40453552a0c2e2e69";
-    hash = "sha256-iUUrrNBbNT9uVEBzwvBim4aCMYxCzIoiis+NK5Vu84U=";
+    rev = version;
+    hash = "sha256-gIGlLPAEZ+eJ9TU8B8POAeS2gf/C+R+MjT24zN57R0k=";
   };
 
   cargoRoot = "tool/microkit/";
   cargoDeps = rustPlatform.fetchCargoTarball {
     inherit src;
     sourceRoot = "source/" + cargoRoot;
-    hash = "sha256-hATdZ0CGQBLa6Ml+c/ctE9WGpeiDsAisfWkMDbHb8hw=";
+    hash = "sha256-+IfOFMGz9dz4L1uE4zJ+K2/nW9Q7+prJqYCZSN9P2ZY=";
   };
 
   nativeBuildInputs = [
