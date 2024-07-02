@@ -1,4 +1,5 @@
-{ stdenv
+{ lib
+, stdenv
 , fetchFromGitHub
 , rustPlatform
 , pkgsCross
@@ -116,4 +117,12 @@ stdenv.mkDerivation rec {
     mv release/microkit-sdk*/ $out/
     runHook postInstall
   '';
+
+  meta = {
+    description = "An SDK to enable system designers to create static software systems based on the seL4 microkernel";
+    homepage = "https://trustworthy.systems/projects/microkit/";
+    license = lib.licenses.bsd2;
+    maintainers = with lib.maintainers; [ wucke13 ];
+    platforms = with lib.platforms; unix;
+  };
 }
