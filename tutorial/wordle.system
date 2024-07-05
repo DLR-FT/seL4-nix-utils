@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system>
+    <memory_region name="uart" size="0x4000" phys_addr="0x9000000" />
+    <memory_region name="user_input" size="0x1000" />
+    <memory_region name="game_output" size="0x1000" />
+
+    <protection_domain name="serial_server" priority="10">
+        <program_image path="serial_server.elf" />
+        <map mr="uart" vaddr="0x20000000" perms="rw" cached="false" setvar_vaddr="uart_base_vaddr" />
+        <map mr="user_input" vaddr="0x30000000" perms="rw" setvar_vaddr="user_input_vaddr" />
+        <map mr="game_output" vaddr="0x40000000" perms="r" setvar_vaddr="game_output_vaddr" />
+        <irq id="0" irq="33" />
+    </protection_domain>
+
+    <protection_domain name="client" priority="5">
+        <program_image path="client.elf" />
+        <map mr="user_input" vaddr="0x20000000" perms="r" setvar_vaddr="user_input_vaddr" />
+        <map mr="game_output" vaddr="0x30000000" perms="rw" setvar_vaddr="game_output_vaddr" />
+    </protection_domain>
+
+    <channel>
+        <end pd="serial_server" id="1" />
+        <end pd="client" id="1" />
+    </channel>
+</system>

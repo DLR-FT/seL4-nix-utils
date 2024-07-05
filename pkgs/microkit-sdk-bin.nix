@@ -2,11 +2,11 @@
 
 stdenvNoCC.mkDerivation {
   pname = "microkit-sdk";
-  version = "unstable-2024-04-18";
+  version = "1.3.0";
 
   src = fetchurl {
-    url = "https://trustworthy.systems/Downloads/microkit_tutorial/sdk-linux-x64.tar.gz";
-    hash = "sha256-IBVOiEzbgkAFiAvDjwODfEYsLxMPxrKAHtp4MPLPsl8=";
+    url = "https://github.com/seL4/microkit/releases/download/1.3.0/microkit-sdk-1.3.0-linux-x86-64.tar.gz";
+    hash = "sha256-irFoxXcBYHiqNM8CqoIpSgJy0C/fVIDgAaoOJ52Fr2I=";
   };
 
   installPhase = ''

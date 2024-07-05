@@ -6,6 +6,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    fenix = {
+      url = "git+https://github.com/nix-community/fenix.git?ref=main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, flake-utils, treefmt-nix, ... } @ inputs: flake-utils.lib.eachSystem [ "x86_64-linux" ]
@@ -14,6 +18,15 @@
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ self.overlays.default ];
+        };
+
+        # rust target name of the `system`
+        rust-target = pkgs.rust.toRustTarget pkgs.pkgsStatic.targetPlatform;
+
+        # Rust distribution for our hostSystem
+        rust-toolchain = inputs.fenix.packages.${system}.fromToolchainFile {
+          file = ./rust-toolchain.toml;
+          sha256 = "sha256-6lRcCTSUmWOh0GheLMTZkY7JC273pWLp2s98Bb2REJQ=";
         };
       in
       {
@@ -578,13 +591,19 @@
             bear
             gnumake
             qemu
+            rust-toolchain
+            rust-analyzer
+            cargo-watch
           ];
 
           # mitigates the following errors:
           # undefined reference to `__stack_chk_guard'
           # undefined reference to `__stack_chk_fail'
           hardeningDisable = [ "all" ];
-          env.MICROKIT_SDK = pkgs.microkit-sdk-bin;
+          env.MICROKIT_SDK = pkgs.microkit-sdk;
+          env.SEL4_PREFIX = self.packages.${system}.seL4-kernel-arm;
+          env.SEL4_INCLUDE_DIRS = "${pkgs.microkit-sdk}/board/qemu_virt_aarch64/debug/include";
+          env.LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
         };
 
 

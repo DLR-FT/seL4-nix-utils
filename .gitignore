@@ -1,2 +1,4 @@
 .direnv/
 result
+tutorial/target
+tutorial/build

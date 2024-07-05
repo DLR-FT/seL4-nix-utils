@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+
+members = [ 
+  "client",
+  "serial_server", 
+  "wordle",
+]
+
+[workspace.dependencies]
+anyhow = { version = "1.0", default-features = false }
+log = "0"
+sel4-microkit = { git = "https://github.com/seL4/rust-sel4", default-features = false }
+sel4-microkit-driver-adapters = { git = "https://github.com/seL4/rust-sel4" }
+sel4-microkit-message = { git = "https://github.com/seL4/rust-sel4" }
+sel4-externally-shared = { git = "https://github.com/seL4/rust-sel4", features = ["unstable"] }
+wordle.path = "wordle"
+# sel4-pl011-driver = { git = "https://github.com/seL4/rust-sel4", optional = true }

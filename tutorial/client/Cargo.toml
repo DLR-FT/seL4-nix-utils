@@ -1,0 +1,13 @@
+[package]
+name = "client"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow.workspace = true
+log.workspace = true
+sel4-microkit.workspace = true
+sel4-microkit-driver-adapters.workspace = true
+sel4-microkit-message.workspace = true
+sel4-externally-shared.workspace = true
+wordle.workspace = true
