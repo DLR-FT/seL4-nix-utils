@@ -16,13 +16,13 @@
 
 stdenvNoLibs.mkDerivation rec {
   pname = "seL4test";
-  version = "12.1.0";
+  version = "13.0.0";
 
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/sel4test-manifest.git";
     rev = version;
-    hash = "sha256-s0VBUX6dX4GJJ2wU/8yCD1Vksr8aFm98xC+jt1uWM84=";
-    latestCommitTimestamp = "2024-03-25";
+    hash = "sha256-/SexWcq6GYaAomqsRpwSsyYY40l0qUedVg+dhkJFHao=";
+    latestCommitTimestamp = "2024-07-08";
   };
 
   nativeBuildInputs = [
