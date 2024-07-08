@@ -293,30 +293,13 @@
           #
           ### seL4 CAmkES VM Examples
           #
-          seL4-camkes-vm-examples-aarch64-tx1 =
-            let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
-            in
-            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
-              extraCmakeFlags = [
-                "-DPLATFORM=tx1"
-                "-DCAMKES_VM_APP=vm_minimal"
-              ];
-            };
+          seL4-camkes-vm-examples-aarch64-tx1 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+            stdenvNoLibs = pkgsCrossAarch64.overrideCC pkgsCrossAarch64.stdenvNoLibs pkgsCrossAarch64.stdenvNoLibs.cc;
+            extraCmakeFlags = [
+              "-DPLATFORM=tx1"
+              "-DCAMKES_VM_APP=vm_minimal"
+            ];
+          };
 
 
           seL4-camkes-vm-examples-aarch64-tx2 =
