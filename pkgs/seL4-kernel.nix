@@ -36,13 +36,13 @@ assert builtins.elem config (builtins.attrNames seL4-configs);
 
 stdenv.mkDerivation rec {
   pname = "seL4";
-  version = "12.1.0";
+  version = "13.0.0";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
     rev = version;
-    hash = "sha256-3MSX7f6q6YiBG/FcB/KjeRloInnwTsgLg84m47lD/eI=";
+    hash = "sha256-sFmOFoXwe1AsG0JLI2+QKEitmecxik9lxXUqf4QRysk=";
   };
 
   nativeBuildInputs = [
