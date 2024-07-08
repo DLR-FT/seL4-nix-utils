@@ -30,12 +30,12 @@ in
 
 stdenvNoLibs.mkDerivation rec {
   pname = "seL4-camkes-vm-examples.";
-  version = "2024-03-20";
+  version = "camkes-3.11.0";
 
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/camkes-vm-examples-manifest.git";
-    rev = "9c0888e";
-    hash = "sha256-72ChKOOU9RX1OqVWOQd4ekVn7WmR/urpToCe3Kih90I=";
+    rev = "camkes-3.11.0";
+    hash = "sha256-DTQDk3/xBiK78s+tQrXyDOPzXHADjj3cKM872yxIRJU=";
   };
 
   nativeBuildInputs = [
