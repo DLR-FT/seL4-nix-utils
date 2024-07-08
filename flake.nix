@@ -31,6 +31,18 @@
           overlays = [ self.overlays.default ];
         });
 
+        pkgsCrossArmv7lOldBintools = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "armv7l-unknown-linux-gnueabihf";
+          overlays = [ self.overlays.default self.overlays.oldBintools ];
+        });
+
+        pkgsCrossAarch64OldBintools = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "aarch64-unknown-linux-gnu";
+          overlays = [ self.overlays.default self.overlays.oldBintools ];
+        });
+
         pkgsCrossi686 = (import nixpkgs {
           inherit system;
           crossSystem.config = "i686-unknown-linux-gnu";
@@ -50,6 +62,8 @@
           #
           crossStdenvAarch64 = pkgsCrossAarch64.stdenvNoLibs;
           crossStdenvArmv7l = pkgsCrossArmv7l.stdenvNoLibs;
+          crossStdenvAarch64OldBintools = pkgsCrossAarch64OldBintools.stdenvNoLibs;
+          crossStdenvArmv7lOldBintools = pkgsCrossArmv7lOldBintools.stdenvNoLibs;
           crossStdenvi686 = pkgsCrossi686.stdenvNoLibs;
           crossStdenvx86_64 = pkgsCrossx86_64.stdenvNoLibs;
 
@@ -293,134 +307,49 @@
           #
           ### seL4 CAmkES VM Examples
           #
-          seL4-camkes-vm-examples-aarch64-tx1 =
-            let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
-            in
-            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
-              extraCmakeFlags = [
-                "-DPLATFORM=tx1"
-                "-DCAMKES_VM_APP=vm_minimal"
-              ];
-            };
+          seL4-camkes-vm-examples-aarch64-tx1 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+            stdenvNoLibs = pkgsCrossAarch64OldBintools.overrideCC pkgsCrossAarch64OldBintools.stdenvNoLibs pkgsCrossAarch64OldBintools.stdenvNoLibs.cc;
+            extraCmakeFlags = [
+              "-DPLATFORM=tx1"
+              "-DCAMKES_VM_APP=vm_minimal"
+            ];
+          };
 
 
-          seL4-camkes-vm-examples-aarch64-tx2 =
-            let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
-            in
-            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
-              extraCmakeFlags = [
-                "-DPLATFORM=tx2"
-                "-DCAMKES_VM_APP=vm_minimal"
-              ];
-            };
+          seL4-camkes-vm-examples-aarch64-tx2 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+            stdenvNoLibs = pkgsCrossAarch64OldBintools.overrideCC pkgsCrossAarch64OldBintools.stdenvNoLibs pkgsCrossAarch64OldBintools.stdenvNoLibs.cc;
+            extraCmakeFlags = [
+              "-DPLATFORM=tx2"
+              "-DCAMKES_VM_APP=vm_minimal"
+            ];
+          };
 
 
-          seL4-camkes-vm-examples-aarch64-qemu-arm-virt =
-            let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
-            in
-            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
-              extraCmakeFlags = [
-                "-DPLATFORM=qemu-arm-virt"
-                "-DCAMKES_VM_APP=vm_minimal"
-              ];
-            };
+          seL4-camkes-vm-examples-aarch64-qemu-arm-virt = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+            stdenvNoLibs = pkgsCrossAarch64OldBintools.overrideCC pkgsCrossAarch64OldBintools.stdenvNoLibs pkgsCrossAarch64OldBintools.stdenvNoLibs.cc;
+            extraCmakeFlags = [
+              "-DPLATFORM=qemu-arm-virt"
+              "-DCAMKES_VM_APP=vm_minimal"
+            ];
+          };
 
 
-          seL4-camkes-vm-examples-aarch64-zcu102 =
-            let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "aarch64-unknown-linux-gnu";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
-            in
-            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
-              extraCmakeFlags = [
-                "-DPLATFORM=zcu102"
-                "-DCAMKES_VM_APP=vm_minimal"
-              ];
-            };
+          seL4-camkes-vm-examples-aarch64-zcu102 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+            stdenvNoLibs = pkgsCrossAarch64OldBintools.overrideCC pkgsCrossAarch64OldBintools.stdenvNoLibs pkgsCrossAarch64OldBintools.stdenvNoLibs.cc;
+            extraCmakeFlags = [
+              "-DPLATFORM=zcu102"
+              "-DCAMKES_VM_APP=vm_minimal"
+            ];
+          };
 
 
-          seL4-camkes-vm-examples-armv7l-exynos5422 =
-            let
-              pkgsCross = (import nixpkgs {
-                inherit system;
-                crossSystem.config = "armv7l-unknown-linux-gnueabi";
-                overlays = [
-                  self.overlays.default
-                  # seL4's musllibc fork can't stand modern bintools because its too old.
-                  (final: prev: {
-                    bintools = prev.wrapBintoolsWith {
-                      bintools = prev.binutils-unwrapped_2_38;
-                      libc = prev.stdenv.cc.libc;
-                    };
-                  })
-                ];
-              });
-            in
-            pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-              stdenvNoLibs = pkgsCross.overrideCC pkgsCross.stdenvNoLibs pkgsCross.stdenvNoLibs.cc;
-              extraCmakeFlags = [
-                "-DPLATFORM=exynos5422"
-                "-DCAMKES_VM_APP=vm_minimal"
-              ];
-            };
+          seL4-camkes-vm-examples-armv7l-exynos5422 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
+            stdenvNoLibs = pkgsCrossArmv7lOldBintools.overrideCC pkgsCrossArmv7lOldBintools.stdenvNoLibs pkgsCrossArmv7lOldBintools.stdenvNoLibs.cc;
+            extraCmakeFlags = [
+              "-DPLATFORM=exynos5422"
+              "-DCAMKES_VM_APP=vm_minimal"
+            ];
+          };
 
 
           #
@@ -622,5 +551,13 @@
       }) // {
     # declare overlay with added deps, i. e. the python packages not available in official nixpkgs
     overlays.default = import ./overlay.nix;
+
+    # seL4's musllibc fork can't stand modern bintools because its too old.
+    overlays.oldBintools = final: prev: {
+      bintools = prev.wrapBintoolsWith {
+        bintools = prev.binutils-unwrapped_2_38;
+        libc = prev.stdenv.cc.libc;
+      };
+    };
   };
 }
