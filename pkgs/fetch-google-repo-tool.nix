@@ -47,32 +47,47 @@ lib.makeOverridable (
       runHook preInstall
 
       git-describe-tip(){
-        git --no-pager show --pretty=format:"%h%x09%an%x09%ad%x09%s" -s
+        git --no-pager show --no-patch \
+          --pretty=format:"%C(bold)%aI  %C(ul)%cI%C(reset)  %h%    %x09%an%x09%s%n"
       }
 
-      mkdir -- $out home
+      mkdir -- "$out" home
       export HOME="$PWD/home"
-      cd $out
+      cd "$out"
       repo init --manifest-url=${escapeShellArg url} --no-repo-verify
 
-      pushd .repo/manifests
+      pushd .repo/manifests > /dev/null
       git fetch --all --tags
       git checkout --quiet ${escapeShellArg rev}
-      MANIFEST_TIMESTAMP=${if latestCommitTimestamp != null then latestCommitTimestamp else "$(git show --no-patch --format=%ct)"}
+      MANIFEST_TIMESTAMP=${if latestCommitTimestamp != null then escapeShellArg latestCommitTimestamp else "$(git show --no-patch --format=%cI)"}
+      echo -e "Cutoff date is \033[1;4m''${MANIFEST_TIMESTAMP}\033[0m"
       echo "Manifest is checked out at"
-      git-describe-tip      
-      popd
+      git-describe-tip
+      popd > /dev/null
 
       repo sync
 
       find . -not \( -path ./.repo -prune \) -name .git -type l -printf '%h\0' |
-        while IFS= read -r -d ''' line; do
-          pushd "$line"
-          git checkout --quiet \
-            "$(git rev-list -n 1 --first-parent --before="$MANIFEST_TIMESTAMP" HEAD)"
-          echo "''${PWD##*/} is checked out at"
+        while IFS= read -r -d ''' GIT_REPO_ROOT; do
+          pushd "$GIT_REPO_ROOT" > /dev/null
+
+          echo "''${PWD##*/}: is checked out at"
           git-describe-tip
-          popd
+
+          CUTOFF_EPOCH="$(date --date "$MANIFEST_TIMESTAMP" '+%s')"
+          AUTHOR_EPOCH="$(git show --no-patch --format='%at')"
+          COMMIT_EPOCH="$(git show --no-patch --format='%ct')"
+          if [ "$AUTHOR_EPOCH" -gt "$CUTOFF_EPOCH" ] || [ "$COMMIT_EPOCH" -gt "$CUTOFF_EPOCH" ];
+          then
+            echo -e "HEAD is younger than cutoff date, \033[0;31mrewinding history\033[0m"
+
+            git checkout --quiet \
+              "$(git rev-list -n 1 --first-parent --before="$MANIFEST_TIMESTAMP" HEAD)"
+
+            echo "now checked out at"
+            git-describe-tip
+          fi
+          popd > /dev/null
         done
 
       rm --force --recursive -- .repo
