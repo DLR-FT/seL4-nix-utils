@@ -21,8 +21,7 @@ stdenvNoLibs.mkDerivation rec {
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/sel4test-manifest.git";
     rev = version;
-    hash = "sha256-/SexWcq6GYaAomqsRpwSsyYY40l0qUedVg+dhkJFHao=";
-    latestCommitTimestamp = "2024-07-08";
+    hash = "sha256-mEcimqgii4ohiJbXz1pNSqthWObrbnLmqEn8yQpkUKo=";
   };
 
   nativeBuildInputs = [
