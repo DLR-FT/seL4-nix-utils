@@ -87,7 +87,6 @@
           ### microkit(-sdk)
           #
           microkit-sdk = pkgs.microkit-sdk;
-          microkit-sdk-bin = pkgs.microkit-sdk-bin;
 
           #
           ### seL4 Kernel Flavours
@@ -511,13 +510,14 @@
             bear
             gnumake
             qemu
+            microkit-sdk
           ];
 
           # mitigates the following errors:
           # undefined reference to `__stack_chk_guard'
           # undefined reference to `__stack_chk_fail'
           hardeningDisable = [ "all" ];
-          env.MICROKIT_SDK = pkgs.microkit-sdk-bin;
+          env.MICROKIT_SDK = pkgs.microkit-sdk;
         };
 
 
