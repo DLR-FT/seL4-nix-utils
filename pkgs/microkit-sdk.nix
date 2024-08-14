@@ -22,8 +22,8 @@ let
     repo = "seL4";
     # bespoke commit from microkit README, taken on 2024-07-02
     # https://github.com/seL4/microkit/tree/1.3.0?tab=readme-ov-file#sel4-version
-    rev = "0cdbffec9cf6b4c7c9c57971cbee5a24a70c8fd0";
-    hash = "sha256-avBeo3kwv08b263umMf6kMtiWgpieT0+vOTGjvnqQgk=";
+    rev = "4cae30a6ef166a378d4d23697b00106ce7e4e76f";
+    hash = "sha256-9rOVhq0k3K3E62DkUkw+cNAGMVd+agmrm5heRrdfPCw=";
   };
 
   # To debug the required TeX packages:
@@ -43,23 +43,25 @@ let
       tcolorbox
       titlesec;
   });
+
+  inherit (lib.strings) escapeShellArg;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
-  version = "1.3.0";
+  version = "1.4.0";
 
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
     rev = finalAttrs.version;
-    hash = "sha256-gIGlLPAEZ+eJ9TU8B8POAeS2gf/C+R+MjT24zN57R0k=";
+    hash = "sha256-gJAQ5JcNTbkp+85Eh2WDa5x87IXj3J6NUIMoBhICxDk=";
   };
 
   cargoRoot = "tool/microkit/";
   cargoDeps = rustPlatform.fetchCargoTarball {
     inherit (finalAttrs) src;
     sourceRoot = "source/" + finalAttrs.cargoRoot;
-    hash = "sha256-+IfOFMGz9dz4L1uE4zJ+K2/nW9Q7+prJqYCZSN9P2ZY=";
+    hash = "sha256-fkfx88jh2naF/p//xB+9YEHXtaDKukO4fbBwZYU52yc=";
   };
 
   nativeBuildInputs = [
@@ -68,10 +70,10 @@ stdenv.mkDerivation (finalAttrs: {
     # We want the unwrapped cc, Nix usually injects some compiler flags that might collide with
     # seL4's way of building things. However, the unwrapped compiler (stdenv.cc.cc) does not contain
     # bintools, so we have to import them as well.
-    pkgsCross.aarch64-embedded.stdenv.cc.cc
-    pkgsCross.riscv64-embedded.stdenv.cc.cc
     pkgsCross.aarch64-embedded.stdenv.cc.bintools
+    pkgsCross.aarch64-embedded.stdenv.cc.cc
     pkgsCross.riscv64-embedded.stdenv.cc.bintools
+    pkgsCross.riscv64-embedded.stdenv.cc.cc
 
     # microkit-sdk dependencies
     cargo
@@ -100,11 +102,25 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   dontUseCmakeConfigure = true; # the build is driven by build_sdk.py, not cmake
 
-  postPatch = ''
+  prePatch = ''
     cp --recursive -- "${seL4-src}" seL4-src
     chmod --recursive -- u+w seL4-src
     patchShebangs seL4-src
+
+    # upstream issue: https://github.com/seL4/microkit/issues/201
+    substituteInPlace build_sdk.py --replace "riscv64-unknown-elf-" \
+      ${escapeShellArg pkgsCross.riscv64-embedded.stdenv.cc.targetPrefix}
   '';
+
+  patches = [
+    # a recent PR fixed compilation on older rustc, but was merged after 1.4.0:
+    # https://github.com/seL4/microkit/pull/199
+    ../patches/microkit-lifetime-error.patch
+
+    # upstream PR: https://github.com/seL4/seL4/pull/1310
+    # relevant issue: https://github.com/seL4/microkit/issues/201
+    ../patches/seL4-riscv-toolchain-prefix.patch
+  ];
 
   buildPhase = ''
     runHook preInstall
