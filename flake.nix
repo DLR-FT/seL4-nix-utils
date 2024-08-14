@@ -398,6 +398,7 @@
             '';
             filesToInstall = [ "spl/boot.bin" "u-boot.elf" "u-boot.img" ];
             version = "xilinx-v2023.2";
+            dontPatch = true; # avoid unapplicable raspberrypi patches
 
             # u-boot-xlnx ignores the CONFIG_ARMV8_SWITCH_TO_EL1 macro, and always unconditionally
             # boots into EL1 when doing `go`. This little patch changes that behavior to stay in
@@ -423,6 +424,7 @@
             env.DEVICE_TREE = "zynq-zc702";
             filesToInstall = [ "spl/boot.bin" "u-boot.elf" "u-boot.img" ];
             version = "xilinx-v2023.2";
+            dontPatch = true; # avoid unapplicable raspberrypi patches
             src = pkgs.fetchFromGitHub {
               owner = "Xilinx";
               repo = "u-boot-xlnx";
