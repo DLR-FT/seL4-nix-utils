@@ -48,20 +48,20 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
-  version = "1.4.0";
+  version = "1.4.1";
 
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
     rev = finalAttrs.version;
-    hash = "sha256-gJAQ5JcNTbkp+85Eh2WDa5x87IXj3J6NUIMoBhICxDk=";
+    hash = "sha256-eTZ+6vG10ySqeGBcrvwzcITdmujwKF6Hllr+XSpmOgI=";
   };
 
   cargoRoot = "tool/microkit/";
   cargoDeps = rustPlatform.fetchCargoTarball {
     inherit (finalAttrs) src;
     sourceRoot = "source/" + finalAttrs.cargoRoot;
-    hash = "sha256-fkfx88jh2naF/p//xB+9YEHXtaDKukO4fbBwZYU52yc=";
+    hash = "sha256-R5YeQdmPR9tphDBXMB7B//gpr+YuNrvtmrT99fWIqHU=";
   };
 
   nativeBuildInputs = [
@@ -113,10 +113,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   patches = [
-    # a recent PR fixed compilation on older rustc, but was merged after 1.4.0:
-    # https://github.com/seL4/microkit/pull/199
-    ../patches/microkit-lifetime-error.patch
-
     # upstream PR: https://github.com/seL4/seL4/pull/1310
     # relevant issue: https://github.com/seL4/microkit/issues/201
     ../patches/seL4-riscv-toolchain-prefix.patch
