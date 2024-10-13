@@ -16,6 +16,8 @@
           overlays = [ self.overlays.default ];
         };
 
+        treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+
         #
         ### Custom cross-compilation Environments
         #
@@ -499,7 +501,6 @@
             python3Packages.camkes-deps # includes seL4-deps
 
             # Nix flake related tooling
-            treefmt # formatting orchestrator
             nixpkgs-fmt # formatting nix files
             nodePackages.prettier # prettifier for MarkDown and YAML
           ];
@@ -527,20 +528,11 @@
         ### Checks & CI
         #
 
-        # checks the formatting of stuff
-        checks.treefmt =
-          let
-            treefmtModule = {
-              projectRootFile = "flake.nix";
-              settings = nixpkgs.lib.trivial.importTOML ./treefmt.toml;
-            };
-            evaluatedModule = (treefmt-nix.lib.evalModule pkgs treefmtModule).config.build.check self;
-            overridenModule = evaluatedModule.overrideAttrs (prev: {
-              buildInputs = prev.buildInputs
-                ++ self.devShells.${system}.default.nativeBuildInputs;
-            });
-          in
-          overridenModule;
+        # for `nix fmt`
+        formatter = treefmtEval.config.build.wrapper;
+
+        # for `nix flake check`
+        checks.formatting = treefmtEval.config.build.check self;
 
         # instructions for the CI server
         hydraJobs =
