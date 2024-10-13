@@ -532,7 +532,7 @@
           let
             treefmtModule = {
               projectRootFile = "flake.nix";
-              settings = with builtins; (fromTOML (readFile ./treefmt.toml));
+              settings = nixpkgs.lib.trivial.importTOML ./treefmt.toml;
             };
             evaluatedModule = (treefmt-nix.lib.evalModule pkgs treefmtModule).config.build.check self;
             overridenModule = evaluatedModule.overrideAttrs (prev: {
