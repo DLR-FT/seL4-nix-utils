@@ -15,6 +15,7 @@ lib.makeOverridable (
   , rev
   , name ? "source"
   , hash
+  , manifest ? "default.xml"
     # Problem
     #
     # `repo` allows for the manifest to just specify a branch, defaulting to the latest commit.
@@ -54,7 +55,7 @@ lib.makeOverridable (
       mkdir -- "$out" home
       export HOME="$PWD/home"
       cd "$out"
-      repo init --manifest-url=${escapeShellArg url} --no-repo-verify
+      repo init --manifest-url=${escapeShellArg url} --manifest-name=${escapeShellArg manifest} --no-repo-verify
 
       pushd .repo/manifests > /dev/null
       git fetch --all --tags
