@@ -84,6 +84,12 @@
 
 
           #
+          ### Proofs
+          #
+          l4v = pkgs.l4v;
+
+
+          #
           ### microkit(-sdk)
           #
           microkit-sdk = pkgs.microkit-sdk;
