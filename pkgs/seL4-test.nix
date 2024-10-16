@@ -53,12 +53,6 @@ stdenvNoLibs.mkDerivation rec {
     patchShebangs .
   '';
 
-  env.NIX_CFLAGS_COMPILE = builtins.concatStringsSep " " ([ ]
-    # Hotfix for:
-    # aarch64-unknown-linux-musl-ld: apps/sel4test-driver/musllibc/build-temp/stage/lib/libc.a(__stdio_exit.o): copy relocation against non-copyable protected symbol `__stdin_used'
-    ++ lib.lists.optional (!stdenvNoLibs.hostPlatform.isx86) "-fpic"
-  );
-
   # prevent Nix from injecting any flags meant to harden the build
   hardeningDisable = [ "all" ];
 
