@@ -11,6 +11,54 @@ Among other things this includes:
 - a generic [FOD](https://nixos.org/manual/nixpkgs/stable/#fixed-output-derivation) fetcher for
   [Google's repo tool](https://android.googlesource.com/tools/repo)
 
+# Getting Started
+
+Here you find a couple of examples to get started. Please note, that it is assumed you have Nix
+already installed, with the experimental `flakes` and `nix-command` features enabled. If you have
+these features not enabled, you can simply append the flag
+`--extra-experimental-features 'flakes nix-command'` to the `nix {build,develop}` commands. For
+convenience, we recommend you enable flakes permanently. Check out `man 5 nix.conf`, look for
+`extra-experimental-features` (and on NixOS use
+[`nix.settings`](https://search.nixos.org/options?query=nix.settings)).
+
+If you do not have Nix installed, there are a couple of options, i.e.:
+
+- Use the [official Nix installer](https://nixos.org/download/)
+- Use the [Determinate Systems Nix Installer](https://github.com/DeterminateSystems/nix-installer),
+  comes with the aforementioned experimental features pre-enabled
+- Run the [`nixos/nix` Docker Container](https://hub.docker.com/r/nixos/nix)
+- Run the [NixOS-WSL](https://github.com/nix-community/NixOS-WSL) image, if you are on Windows
+
+Once these preconditions are satisfied, here is an incomplete selection of what you could do:
+
+```sh
+# Play the Microkit tutorial
+curl -L trustworthy.systems/Downloads/microkit_tutorial/tutorial.tar.gz -o tutorial.tar.gz
+nix run nixpkgs#gnutar xf tutorial.tar.gz
+nix develop github:DLR-FT/seL4-nix-utils#microkit
+
+
+# Build & run seL4-test for x86_64-linux in QEMU
+nix build github:DLR-FT/seL4-nix-utils#seL4-test-x86_64-x86_64-simulate
+cd result && ./simulate
+
+
+# Build U-Boot for the zcu102 platform, patched to enable EL2
+# (Xilinx' U-Boot fork always switches to EL1, prohibiting seL4/Microkit in Hypervisor mode)
+nix build github:DLR-FT/seL4-nix-utils#uboot-aarch64-zcu102
+
+
+# Enter an interactive devshell for the seL4 test suite on the zynq7000, build it
+nix develop github:DLR-FT/seL4-nix-utils#seL4-test-armv7l-zynq7000-simulate
+unpackPhase && cd source # extract source code to new dir, cd there
+configurePhase # configure the build dir, target etc.
+ninja # compile
+
+
+# Show all transitive build-time dependencies of Microkit
+nix-store --query --tree $(nix eval --raw .\#microkit-sdk.drvPath)
+```
+
 # Caching
 
 Many of the derivations in this repository depend on huge builds, which are not cached by
