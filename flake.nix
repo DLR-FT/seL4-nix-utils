@@ -499,10 +499,6 @@
 
             # both
             python3Packages.camkes-deps # includes seL4-deps
-
-            # Nix flake related tooling
-            nixpkgs-fmt # formatting nix files
-            nodePackages.prettier # prettifier for MarkDown and YAML
           ];
         };
 
