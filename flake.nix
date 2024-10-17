@@ -506,6 +506,8 @@
           nativeBuildInputs = with pkgs; [
             pkgsCross.aarch64-multiplatform.stdenv.cc
             pkgsCross.aarch64-multiplatform.stdenv.cc.bintools
+            pkgsCross.riscv64-embedded.stdenv.cc.bintools
+            pkgsCross.riscv64-embedded.stdenv.cc.cc
             bear
             gnumake
             qemu
