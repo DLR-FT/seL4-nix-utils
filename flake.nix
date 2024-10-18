@@ -104,15 +104,28 @@
           #
           microkit-sdk = pkgs.microkit-sdk;
 
+
           #
           ### seL4 verified kernel flavours
           #
+          seL4-kernel-aarch64 = pkgsCrossAarch64.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "AARCH64_verified";
+          };
+
+          seL4-kernel-arm-hyp-exynos5 = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "ARM_HYP_exynos5_verified";
+          };
+
           seL4-kernel-arm-hyp = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "ARM_HYP_verified";
           };
 
           seL4-kernel-arm-mcs = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "ARM_MCS_verified";
+          };
+
+          seL4-kernel-arm-imx8mm = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "ARM_imx8mm_verified";
           };
 
           seL4-kernel-arm = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
@@ -130,6 +143,7 @@
           seL4-kernel-x64 = pkgsCrossx86_64.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "X64_verified";
           };
+
 
           #
           ### seL4 kernel + userspace flavours
