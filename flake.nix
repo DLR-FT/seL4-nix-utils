@@ -56,6 +56,18 @@
           crossSystem.config = "x86_64-unknown-linux-musl";
           overlays = [ self.overlays.default ];
         });
+
+        pkgsCrossRiscv32 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "riscv32-unknown-none-elf";
+          overlays = [ self.overlays.default ];
+        });
+
+        pkgsCrossRiscv64 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "riscv64-unknown-none-elf";
+          overlays = [ self.overlays.default ];
+        });
       in
       {
         packages = {
@@ -68,6 +80,8 @@
           crossStdenvArmv7lOldBintools = pkgsCrossArmv7lOldBintools.stdenvNoLibs;
           crossStdenvi686 = pkgsCrossi686.stdenvNoLibs;
           crossStdenvx86_64 = pkgsCrossx86_64.stdenvNoLibs;
+          crossStdenvRiscv32 = pkgsCrossRiscv32.stdenvNoLibs;
+          crossStdenvRiscv64 = pkgsCrossRiscv64.stdenvNoLibs;
 
 
           #
@@ -91,30 +105,30 @@
           microkit-sdk = pkgs.microkit-sdk;
 
           #
-          ### seL4 Kernel Flavours
+          ### seL4 verified kernel flavours
           #
-          seL4-kernel-arm-hyp = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "ARM_HYP_verified";
+          seL4-kernel-arm-hyp = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "ARM_HYP_verified";
           };
 
-          seL4-kernel-arm-mcs = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "ARM_MCS_verified";
+          seL4-kernel-arm-mcs = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "ARM_MCS_verified";
           };
 
-          seL4-kernel-arm = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "ARM_verified";
+          seL4-kernel-arm = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "ARM_verified";
           };
 
-          seL4-kernel-riscv64-mcs = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "RISCV64_MCS_verified";
+          seL4-kernel-riscv64-mcs = pkgsCrossRiscv64.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "RISCV64_MCS_verified";
           };
 
-          seL4-kernel-riscv64 = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "RISCV64_verified";
+          seL4-kernel-riscv64 = pkgsCrossRiscv64.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "RISCV64_verified";
           };
 
-          seL4-kernel-x64 = pkgs.callPackage pkgs/seL4-kernel.nix {
-            config = "X64_verified";
+          seL4-kernel-x64 = pkgsCrossx86_64.callPackage pkgs/seL4-kernel.nix {
+            verifiedConfig = "X64_verified";
           };
 
           #

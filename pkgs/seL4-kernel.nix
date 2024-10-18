@@ -1,6 +1,6 @@
 # builds an seL4 kernel
-{ targetStdenv ? null
-, pkgsCross ? null
+{ lib
+, stdenv
 , fetchFromGitHub
 , cmake
 , ninja
@@ -8,31 +8,25 @@
 , dtc
 , cpio
 , python3Packages
-, config
-, extra-seL4-configs ? { }
+, verifiedConfig ? null
+, extraVerifiedConfigs ? [ ]
 }:
 
 
 let
-  # known seL4 configs and their respective toolchain
-  seL4-configs = {
-    "ARM_HYP_verified" = "armhf-embedded";
-    "ARM_MCS_verified" = "armhf-embedded";
-    "ARM_verified" = "arm-embedded";
-    "RISCV64_MCS_verified" = "riscv64-embedded";
-    "RISCV64_verified" = "riscv64-embedded";
-    "X64_verified" = "x86_64-embedded";
-  } // extra-seL4-configs;
-
-  # stdenv to be used for this build
-  stdenv =
-    if targetStdenv == null then
-      pkgsCross.${seL4-configs.${config}}.stdenvNoLibs
-    else targetStdenv;
+  # known seL4 configs
+  knownVerifiedConfigs = [
+    "ARM_HYP_verified"
+    "ARM_MCS_verified"
+    "ARM_verified"
+    "RISCV64_MCS_verified"
+    "RISCV64_verified"
+    "X64_verified"
+  ] ++ extraVerifiedConfigs;
 in
 
 # check that the passed seL4 config is known
-assert builtins.elem config (builtins.attrNames seL4-configs);
+assert if verifiedConfig != null then builtins.elem verifiedConfig knownVerifiedConfigs else true;
 
 stdenv.mkDerivation rec {
   pname = "seL4";
@@ -46,7 +40,6 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    # targetStdenv'.cc
     cmake # build tools
     ninja # build tools
     libxml2 # xmllint
@@ -62,15 +55,9 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = [
     "-GNinja"
-    "-C../configs/${config}.cmake"
     "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
     "-DCMAKE_TOOLCHAIN_FILE=../gcc.cmake"
-  ];
+  ] ++ lib.lists.optional (verifiedConfig != null) "-C../configs/${verifiedConfig}.cmake";
 
-  installPhase = ''
-    runHook preInstall
-    cp --recursive -- .. $out/
-    runHook postInstall
-  '';
   dontFixup = true;
 }
