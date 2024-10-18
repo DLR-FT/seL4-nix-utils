@@ -16,8 +16,11 @@
 let
   # known seL4 configs
   knownVerifiedConfigs = [
+    "AARCH64_verified"
+    "ARM_HYP_exynos5_verified"
     "ARM_HYP_verified"
     "ARM_MCS_verified"
+    "ARM_imx8mm_verified"
     "ARM_verified"
     "RISCV64_MCS_verified"
     "RISCV64_verified"
