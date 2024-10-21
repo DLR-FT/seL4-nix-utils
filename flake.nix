@@ -72,7 +72,7 @@
       {
         packages = {
           #
-          ### Re-export toolchains to cause proper cashing
+          ### Re-export toolchains to cause proper caching
           #
           crossStdenvAarch64 = pkgsCrossAarch64.stdenvNoLibs;
           crossStdenvArmv7l = pkgsCrossArmv7l.stdenvNoLibs;

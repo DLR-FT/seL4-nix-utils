@@ -10,42 +10,31 @@ def depends [
     subject:string # package to examine
     maybe_dep:string # maybe a dependency of subject
   ] {
-  let subject_drv = (nix eval --raw $"($subject).drvPath")
-  let maybe_dep_drv = (nix eval --raw $"($maybe_dep).drvPath")
+  let subject_drv = (nix eval --no-warn-dirty --raw -- $"($subject).drvPath")
+  let maybe_dep_drv = (nix eval --no-warn-dirty --raw -- $"($maybe_dep).drvPath")
+  log info $"checking if ($subject_drv) depends on ($maybe_dep_drv)"
   
   let stem = $".cache/deps-tracking/($subject_drv | hash sha256)"
-  let depends_dir = $"($stem)/depends-on"
-  let depends_not_dir = $"($stem)/depends-not-on"
+  mkdir ".cache/deps-tracking/"
 
-  let depends_entry = $"($stem)/depends-on/($maybe_dep_drv | hash sha256)"
-  let depends_not_entry = $"($stem)/depends-not-on/($maybe_dep_drv | hash sha256)"
-  
-
-  mkdir $depends_dir $depends_not_dir
-
-  if ( $depends_entry | path exists ) {
-    return true
-  } else if ( $depends_not_entry | path exists ) {
-    return false
+  mut depends_on = false
+  if not ( $stem | path exists ) {
+    log info $"getting requisites for ($subject_drv)"
+    let tmp_file = (mktemp)
+    nix-store --query --requisites $subject_drv | save --raw --force $tmp_file
+    mv $tmp_file $stem
+    log info $"requisites stored under ($stem)"
   }
-  
-  let depends_on = not ( nix why-depends --quiet --derivation $subject_drv $maybe_dep_drv
-    | is-empty )
 
+  $depends_on = (not ( open $stem | find $maybe_dep_drv | is-empty ))
+  
   if $depends_on {
     let first = ( [$subject, $maybe_dep] | sort | first )
 
     # this is a self-dependency, we must ignore it one way to avoid cycles
     if $subject_drv == $maybe_dep_drv and $first == $subject {
-      ln --symbolic -- $maybe_dep_drv $depends_not_entry
       return false
     }
-  }
-
-  if $depends_on {
-    ln --symbolic -- $maybe_dep_drv $depends_entry
-  } else {
-    ln --symbolic -- $maybe_dep_drv $depends_not_entry
   }
 
   return $depends_on
@@ -85,7 +74,7 @@ let systems_map = {
 
 let categories = [".#packages" ".#devShells" ".#checks"]
 let targets = (get-attr-names $categories
-  | par-each {|system| { $system : (
+  | each {|system| { $system : (
       $categories 
         | par-each {
             |cat| get-attr-names [$"($cat).($system)"] 

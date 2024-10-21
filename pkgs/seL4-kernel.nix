@@ -25,6 +25,10 @@ let
     "RISCV64_MCS_verified"
     "RISCV64_verified"
     "X64_verified"
+
+    # TODO add these (and more?!) once the next release is out
+    # "AARCH64_bcm2711_verified"
+    # "AARCH64_zynqmp_verified"
   ] ++ extraVerifiedConfigs;
 in
 
