@@ -91,6 +91,14 @@
           microkit-sdk = pkgs.microkit-sdk;
 
           #
+          ### Linux
+          #
+          linux-aarch64 = pkgsCrossAarch64.callPackage pkgs/linux-vm.nix {
+            linuxPackages = pkgsCrossAarch64.linuxPackages_6_1;
+          };
+
+
+          #
           ### seL4 Kernel Flavours
           #
           seL4-kernel-arm-hyp = pkgs.callPackage pkgs/seL4-kernel.nix {
