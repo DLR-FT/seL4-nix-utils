@@ -56,6 +56,18 @@
           crossSystem.config = "x86_64-unknown-linux-musl";
           overlays = [ self.overlays.default ];
         });
+
+        pkgsCrossRiscv32 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "riscv32-unknown-linux-gnu";
+          overlays = [ self.overlays.default ];
+        });
+
+        pkgsCrossRiscv64 = (import nixpkgs {
+          inherit system;
+          crossSystem.config = "riscv64-none-elf";
+          overlays = [ self.overlays.default ];
+        });
       in
       {
         packages = {
@@ -265,27 +277,16 @@
               ];
             };
 
-
-          # seL4-test-riscv32-spike = (import nixpkgs {
-          #   inherit system;
-          #   crossSystem.config = "riscv32-unknown-linux-gnu";
-          #   overlays = [ self.overlays.default ];
-          # }).callPackage pkgs/seL4-test.nix
+          # seL4-test-riscv32-spike = pkgsCrossRiscv32.callPackage pkgs/seL4-test.nix
           #   { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
 
-
-          # seL4-test-riscv32-spike-simulate = (import nixpkgs {
-          #   inherit system;
-          #   crossSystem.config = "riscv32-unknown-linux-gnu";
-          #   overlays = [ self.overlays.default ];
-          # }).callPackage pkgs/seL4-test.nix
+          # seL4-test-riscv32-spike-simulate = pkgsCrossRiscv32.callPackage pkgs/seL4-test.nix
           #   {
           #     extraCmakeFlags = [
           #       "-DPLATFORM=spike"
           #       "-DSIMULATION=1"
           #     ];
           #   };
-
 
           # seL4-test-riscv64-spike = (import nixpkgs {
           #   inherit system;
@@ -294,18 +295,13 @@
           # }).callPackage pkgs/seL4-test.nix
           #   { extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
 
-
-          # seL4-test-riscv64-spike-simulate = (import nixpkgs {
-          #   inherit system;
-          #   crossSystem.config = "riscv64-unknown-linux-musl";
-          #   overlays = [ self.overlays.default ];
-          # }).callPackage pkgs/seL4-test.nix
-          #   {
-          #     extraCmakeFlags = [
-          #       "-DPLATFORM=spike"
-          #       "-DSIMULATION=1"
-          #     ];
-          #   };
+          seL4-test-riscv64-spike-simulate = pkgsCrossRiscv64.callPackage pkgs/seL4-test.nix
+            {
+              extraCmakeFlags = [
+                "-DPLATFORM=spike"
+                "-DSIMULATION=1"
+              ];
+            };
 
 
           seL4-test-i686-ia32 = pkgsCrossi686.callPackage pkgs/seL4-test.nix
@@ -533,9 +529,9 @@
 
         devShells.microkit = pkgs.mkShell.override { stdenv = pkgs.stdenvNoCC; } {
           nativeBuildInputs = with pkgs; [
-            pkgsCross.aarch64-multiplatform.stdenv.cc
-            pkgsCross.aarch64-multiplatform.stdenv.cc.bintools
-            pkgsCross.riscv64-embedded.stdenv.cc.bintools
+            pkgsCross.aarch64-multiplatform.stdenv.cc.bintools.bintools
+            pkgsCross.aarch64-multiplatform.stdenv.cc.cc
+            pkgsCross.riscv64-embedded.stdenv.cc.bintools.bintools
             pkgsCross.riscv64-embedded.stdenv.cc.cc
             bear
             gnumake
