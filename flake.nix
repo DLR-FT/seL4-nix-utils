@@ -29,6 +29,7 @@
           "i686-unknown-none-elf"
           "microblazeel-none-elf"
           "riscv32-unknown-none-elf"
+          "riscv64-unknown-linux-gnu"
           "riscv64-unknown-none-elf"
           "x86_64-unknown-none-elf"
         ]
@@ -50,6 +51,7 @@
           toolchain-i686-elf = pkgsCross.i686-unknown-none-elf.stdenvNoLibs;
           toolchain-riscv32-elf = pkgsCross.riscv32-unknown-none-elf.stdenvNoLibs;
           toolchain-riscv64-elf = pkgsCross.riscv64-unknown-none-elf.stdenvNoLibs;
+          toolchain-riscv64-linux = pkgsCross.riscv64-unknown-linux-gnu.stdenvNoLibs;
           toolchain-x86_64-elf = pkgsCross.x86_64-unknown-none-elf.stdenvNoLibs;
 
 
@@ -335,6 +337,18 @@
           #
           ### Firmware
           #
+          opensbi-riscv64-cva6 = (pkgsCross.riscv64-unknown-linux-gnu.opensbi.overrideAttrs
+            (_: {
+              src = pkgs.fetchFromGitHub {
+                owner = "riscv-software-src";
+                repo = "opensbi";
+                rev = "be245acfffa297b5ed4e0c7bb473a6bd55231bf8";
+                hash = "sha256-EtG5MgeeAo7Lw0XkvcDonpIhSmb/1Y4GnA2/DB8yCJg=";
+              };
+              env.NIX_CFLAGS_COMPILE = "-march=rv64imafdc_zicsr_zifencei";
+            }));
+
+
           pmufw-mblaze-zcu102 = pkgsCross.microblazeel-none-elf.callPackage ./pkgs/xilinx-pmufw.nix { };
 
 
