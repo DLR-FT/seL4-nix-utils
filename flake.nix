@@ -112,8 +112,8 @@
             #
             # nix develop .\#linux-aarch64.menuconfigShell
 
-            #kernel = linuxManualConfig {
-            #  inherit (pkgsCrossAarch64,linuxPackages.kernel) version src;
+            #kernel = pkgsCrossAarch64.linuxManualConfig {
+            #  inherit (pkgsCrossAarch64.linuxPackages.kernel) version src;
             #  configfile = ./.config;
             #};
           };
