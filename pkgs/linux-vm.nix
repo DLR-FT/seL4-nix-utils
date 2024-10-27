@@ -16,20 +16,24 @@ let
   # To tinker with the kernel config, run
   #
   # nix develop .\#linux-aarch64.kernel.configEnv
-  menuconfigShell = linuxPackages.kernel.configEnv.overrideAttrs (_: {
-    shellHook = ''
-      # unpack only if not already present
-      if [ ! -d linux-* ]
-      then
-        unpackPhase
-        cd linux-*
-        patchPhase
-      else
-        cd linux-*
-      fi
-      make menuconfig ARCH=${linuxPackages.kernel.stdenv.hostPlatform.linuxArch}
-    '';
-  });
+  menuconfigShell =
+    # otherwise the menuconfigShell might spit out incompatible .config files
+    assert linuxPackages.kernel.version == kernel.version;
+
+    linuxPackages.kernel.configEnv.overrideAttrs (old: {
+      shellHook = ''
+        # unpack only if not already present
+        if [ ! -d linux-${old.version} ]
+        then
+          unpackPhase
+          cd linux-${old.version}
+          patchPhase
+        else
+          cd linux-${old.version}
+        fi
+        make menuconfig ARCH=${linuxPackages.kernel.stdenv.hostPlatform.linuxArch}
+      '';
+    });
 
 
   # Attrsets of things to put into the initramfs
@@ -127,7 +131,7 @@ let
       # create new root for initrd and cd there
       mkdir --parent -- rootfs
       cd rootfs
-      
+
       mkdir --parent -- \
         dev \
         etc/network/if-{,pre-}{up,down}.d \
