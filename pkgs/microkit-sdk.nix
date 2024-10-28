@@ -70,9 +70,9 @@ stdenv.mkDerivation (finalAttrs: {
     # We want the unwrapped cc, Nix usually injects some compiler flags that might collide with
     # seL4's way of building things. However, the unwrapped compiler (stdenv.cc.cc) does not contain
     # bintools, so we have to import them as well.
-    pkgsCross.aarch64-embedded.stdenv.cc.bintools
+    pkgsCross.aarch64-embedded.stdenv.cc.bintools.bintools
     pkgsCross.aarch64-embedded.stdenv.cc.cc
-    pkgsCross.riscv64-embedded.stdenv.cc.bintools
+    pkgsCross.riscv64-embedded.stdenv.cc.bintools.bintools
     pkgsCross.riscv64-embedded.stdenv.cc.cc
 
     # microkit-sdk dependencies
