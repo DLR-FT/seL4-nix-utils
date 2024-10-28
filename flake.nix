@@ -533,9 +533,9 @@
 
         devShells.microkit = pkgs.mkShell.override { stdenv = pkgs.stdenvNoCC; } {
           nativeBuildInputs = with pkgs; [
-            pkgsCross.aarch64-multiplatform.stdenv.cc
-            pkgsCross.aarch64-multiplatform.stdenv.cc.bintools
-            pkgsCross.riscv64-embedded.stdenv.cc.bintools
+            pkgsCross.aarch64-multiplatform.stdenv.cc.bintools.bintools
+            pkgsCross.aarch64-multiplatform.stdenv.cc.cc
+            pkgsCross.riscv64-embedded.stdenv.cc.bintools.bintools
             pkgsCross.riscv64-embedded.stdenv.cc.cc
             bear
             gnumake
