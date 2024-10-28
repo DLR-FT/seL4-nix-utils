@@ -26,6 +26,8 @@ let
     "RISCV64_verified"
     "X64_verified"
   ] ++ extraVerifiedConfigs;
+
+  brokenVerifiedConfigs = [ "ARM_HYP_exynos5_verified" "ARM_HYP_verified" ];
 in
 
 # check that the passed seL4 config is known
@@ -61,6 +63,14 @@ stdenv.mkDerivation rec {
     "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
     "-DCMAKE_TOOLCHAIN_FILE=../gcc.cmake"
   ] ++ lib.lists.optional (verifiedConfig != null) "-C../configs/${verifiedConfig}.cmake";
+
+  # TODO remove hotfix for https://github.com/seL4/seL4/issues/1334
+  installPhase = lib.strings.optionalString (lib.lists.elem verifiedConfig brokenVerifiedConfigs)
+    ''
+      runHook preInstall
+      ninja install || true
+      runHook postInstall
+    '';
 
   dontFixup = true;
 }
