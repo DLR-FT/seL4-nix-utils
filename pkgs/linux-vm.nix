@@ -56,10 +56,12 @@ let
     "/etc/init.d/rcS".copy = writeScript "script" ''
       #!/bin/sh
 
-      mkdir -p -- /dev /proc /sys
+      mkdir -p -- /dev /proc /sys /tmp
       mount -t devtmpfs none /dev
       mount -t proc procfs /proc
       mount -t sysfs sysfs /sys/
+      mount -t cgroup2 none /sys/fs/cgroup
+      mount -t tmpfs none /tmp
 
       ip link set dev eth0 up
       udhcpc -A 0 -b -R
@@ -76,8 +78,20 @@ let
         CONFIG_UDHCPC_DEFAULT_SCRIPT "/default.script"
       '';
     };
+    "/init".copy = writeScript "init" ''
+      #!/bin/sh
 
-    "/init".target = "/bin/init";
+      # mount new root as tmpfs
+      mkdir /.newroot
+      mount -t tmpfs none /.newroot
+      cd /.newroot
+
+      # move all files to new root
+      cp /init .
+      mv --no-clobber --target-directory=/.newroot /.* /*
+
+      exec bin/switch_root . "/bin/init" "$@"
+    '';
   } // extraRootfsFiles;
 
 
