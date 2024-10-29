@@ -7,9 +7,23 @@
 , pkgsStatic
 , zstd
 , kernel ? linuxPackages.kernel.override {
-    enableCommonConfig = false; # don't inject nixpkgs specifics
+    enableCommonConfig = false; # don't inject nixpkgs' specific kernel settings
   }
+
+  # Example:
+  #
+  # ```nix
+  # "/bin/cool-script".copy = writeScript "my-script" ''echo "Excellent!"'';
+  # "/" = [
+  #   pkgsStatic.busybox
+  #   pkgsStatic.hello
+  # ];
+  # ```
 , extraRootfsFiles ? { }
+
+  # If true, copy over the Nix store closure for the extraRootfsFiles.
+  # If false, fail the build if any `/nix/store` paths are discovered.
+, propagateNixStore ? false
 }:
 
 let
@@ -37,25 +51,27 @@ let
 
 
   # Attrsets of things to put into the initramfs
-  #
-  # Example:
-  #
-  # ```nix
-  # "/var/lib/my-file".copy =
   # TODO handle permissions, and username/groups
   rootfsFiles = {
     "/etc/init.d/rcS".copy = writeScript "script" ''
       #!/bin/sh
 
+      mkdir -p -- /dev /proc /sys
       mount -t devtmpfs none /dev
       mount -t proc procfs /proc
       mount -t sysfs sysfs /sys/
-      mount -t tmpfs none /var/run
+
       ip link set dev eth0 up
       udhcpc -A 0 -b -R
     '';
 
-    "/".copy = pkgsStatic.busybox.override {
+    "/".copy = (pkgsStatic.busybox.overrideAttrs (old: {
+      # patch out the store references
+      postFixup = ''
+        sed --in-place --regexp-extended 's|/nix/store/[^/]+/|/|g' \
+          $out/default.script
+      '';
+    })).override {
       extraConfig = ''
         CONFIG_UDHCPC_DEFAULT_SCRIPT "/default.script"
       '';
@@ -69,9 +85,11 @@ let
   # `rootfsFiles`
   setupScript =
     let
-      inherit (lib.lists) any;
+      inherit (lib.lists) any toList;
       inherit (lib.attrsets) attrValues hasAttr mapAttrsToList;
-      inherit (lib.strings) concatStringsSep escapeShellArg optionalString removePrefix;
+      inherit (lib.strings) concatMapStringsSep concatStringsSep escapeShellArg optionalString removePrefix;
+
+      escapeRelativePath = path: escapeShellArg ("./" + (lib.strings.removePrefix "/" path));
     in
 
     # an operation must __either__ be a copy __or__ a symlink creation, but not both
@@ -87,31 +105,30 @@ let
 
         # case: copy a dir/file
         (mapAttrsToList
-          (path': value:
-            let
-              path = removePrefix "/" path';
-            in
+          (path: value:
             optionalString (value ? copy) ''
-              mkdir --parent -- "$(dirname -- ${escapeShellArg path})"
-              cp --recursive --no-clobber --no-target-directory -- \
-                ${escapeShellArg value.copy} \
-                ${escapeShellArg path}
+              mkdir --parent -- "$(dirname -- ${escapeRelativePath path})"
+              ${concatMapStringsSep "\n" (source: ''
+                echo "Copying over ${escapeShellArg source} to ${escapeRelativePath path}"
+                cp --recursive --no-clobber --no-target-directory -- \
+                  ${escapeShellArg source} \
+                  ${escapeRelativePath path}
+                find ${escapeRelativePath path} -type d -exec chmod -- u+w {} \;
+              '') (toList value.copy)
+              }
             ''
           )
           rootfsFiles) ++
 
         # case: create a symlink
         (mapAttrsToList
-          (path': value:
-            let
-              path = removePrefix "/" path';
-            in
-
+          (path: value:
             optionalString (value ? target) ''
-              mkdir --parent -- "$(dirname -- ${escapeShellArg path})"
+              mkdir --parent -- "$(dirname -- ${escapeRelativePath path})"
+              echo "Linking ${escapeRelativePath value.target} to ${escapeRelativePath path}"
               ln --relative --symbolic -- \
-                ${escapeShellArg (removePrefix "/" value.target)} \
-                ${escapeShellArg path}
+                ${escapeRelativePath value.target} \
+                ${escapeRelativePath path}
             ''
           )
           rootfsFiles)
@@ -122,9 +139,9 @@ let
 
   # minimal initramfs, containing solely busybox
   initrd = runCommand
-    "initrd"
+    "initrd.cpio.zst"
     {
-      depsBuildBuild = [ cpio zstd ];
+      depsBuildBuild = [ cpio setupScript zstd ];
       doCheck = true;
     }
     ''
@@ -132,27 +149,31 @@ let
       mkdir --parent -- rootfs
       cd rootfs
 
-      mkdir --parent -- \
-        dev \
-        etc/network/if-{,pre-}{up,down}.d \
-        proc \
-        sys \
-        var/run
-
-      # propagate new root
+      echo "Propagate rootfs"
       ${lib.meta.getExe setupScript}
 
-      # patch out the store references
-      sed --in-place --regexp-extended 's|/nix/store/[^/]+/|/|g' \
-        default.script
+      ${
+        if propagateNixStore then ''
+          echo "Propagating Nix store"
+          mkdir --parent -- ${lib.strings.removePrefix "/" builtins.storeDir}
+          grep --extended-regexp --null-data --recursive --only-matching --no-filename \
+            -- ${lib.strings.escapeShellArg "${builtins.storeDir}/[^/]+"} . \
+            | while IFS= read -r -d $'\0' storePath ; do
+            relativeStorePath="''${storePath#/}"
+            [ -d "$relativeStorePath" ] && continue
 
-      # verify the new root is free-standing, as in, has no dependencies
-      # TODO allow store references if present in rootfs dir
-      if grep --recursive -- ${builtins.storeDir} .
-      then
-        echo "Found references to store which will be unavailable at run-time"
-        exit 1
-      fi
+            echo "Copying $storePath"
+            cp --recursive --no-clobber -- "$storePath" "$relativeStorePath"
+          done
+        '' else ''
+          echo "Verifying the new initramfs is free-standing, as in, has no dependencies to the Nix store"
+          if grep --recursive -- ${builtins.storeDir} .
+          then
+            echo "Found references to store which will be unavailable at run-time"
+            exit 1
+          fi
+        ''
+      }
 
       # pack it up into an archive
       find . | cpio --create --format='newc' | zstd -19 --check > "$out"
@@ -166,7 +187,7 @@ writeShellApplication
     text = ''
       qemu-system-aarch64 \
         -machine virt \
-        -m 64 \
+        -m 256 \
         -cpu cortex-a53 \
         -kernel ${kernel}/Image \
         -initrd ${initrd} \
