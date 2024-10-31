@@ -21,67 +21,36 @@
         #
         ### Custom cross-compilation Environments
         #
-        pkgsCrossArmv7l = (import nixpkgs {
-          inherit system;
-          crossSystem.config = "armv7l-unknown-linux-gnueabihf";
-          overlays = [ self.overlays.default ];
-        });
-
-        pkgsCrossAarch64 = (import nixpkgs {
-          inherit system;
-          crossSystem.config = "aarch64-unknown-linux-gnu";
-          overlays = [ self.overlays.default ];
-        });
-
-        pkgsCrossArmv7lOldBintools = (import nixpkgs {
-          inherit system;
-          crossSystem.config = "armv7l-unknown-linux-gnueabihf";
-          overlays = [ self.overlays.default self.overlays.oldBintools ];
-        });
-
-        pkgsCrossAarch64OldBintools = (import nixpkgs {
-          inherit system;
-          crossSystem.config = "aarch64-unknown-linux-gnu";
-          overlays = [ self.overlays.default self.overlays.oldBintools ];
-        });
-
-        pkgsCrossi686 = (import nixpkgs {
-          inherit system;
-          crossSystem.config = "i686-unknown-linux-gnu";
-          overlays = [ self.overlays.default ];
-        });
-
-        pkgsCrossx86_64 = (import nixpkgs {
-          inherit system;
-          crossSystem.config = "x86_64-unknown-linux-musl";
-          overlays = [ self.overlays.default ];
-        });
-
-        pkgsCrossRiscv32 = (import nixpkgs {
-          inherit system;
-          crossSystem.config = "riscv32-unknown-none-elf";
-          overlays = [ self.overlays.default ];
-        });
-
-        pkgsCrossRiscv64 = (import nixpkgs {
-          inherit system;
-          crossSystem.config = "riscv64-unknown-none-elf";
-          overlays = [ self.overlays.default ];
-        });
+        pkgsCross = nixpkgs.lib.attrsets.genAttrs [
+          "aarch64-unknown-none-elf"
+          "aarch64-unknown-linux-gnu"
+          "armv7l-unknown-none-eabihf"
+          "armv7l-unknown-linux-gnueabihf"
+          "i686-unknown-none-elf"
+          "microblazeel-none-elf"
+          "riscv32-unknown-none-elf"
+          "riscv64-unknown-none-elf"
+          "x86_64-unknown-none-elf"
+        ]
+          (config: import nixpkgs {
+            inherit system;
+            crossSystem = { inherit config; };
+            overlays = [ self.overlays.default ];
+          });
       in
       {
         packages = {
           #
-          ### Re-export toolchains to cause proper cashing
+          ### Re-export toolchains to cause proper caching
           #
-          crossStdenvAarch64 = pkgsCrossAarch64.stdenvNoLibs;
-          crossStdenvArmv7l = pkgsCrossArmv7l.stdenvNoLibs;
-          crossStdenvAarch64OldBintools = pkgsCrossAarch64OldBintools.stdenvNoLibs;
-          crossStdenvArmv7lOldBintools = pkgsCrossArmv7lOldBintools.stdenvNoLibs;
-          crossStdenvi686 = pkgsCrossi686.stdenvNoLibs;
-          crossStdenvx86_64 = pkgsCrossx86_64.stdenvNoLibs;
-          crossStdenvRiscv32 = pkgsCrossRiscv32.stdenvNoLibs;
-          crossStdenvRiscv64 = pkgsCrossRiscv64.stdenvNoLibs;
+          toolchain-aarch64-elf = pkgsCross.aarch64-unknown-none-elf.stdenvNoLibs;
+          toolchain-aarch64-linux = pkgsCross.aarch64-unknown-linux-gnu.stdenvNoLibs;
+          toolchain-armv7l-eabihf = pkgsCross.armv7l-unknown-none-eabihf.stdenvNoLibs;
+          toolchain-armv7l-linux = pkgsCross.armv7l-unknown-linux-gnueabihf.stdenvNoLibs;
+          toolchain-i686-elf = pkgsCross.i686-unknown-none-elf.stdenvNoLibs;
+          toolchain-riscv32-elf = pkgsCross.riscv32-unknown-none-elf.stdenvNoLibs;
+          toolchain-riscv64-elf = pkgsCross.riscv64-unknown-none-elf.stdenvNoLibs;
+          toolchain-x86_64-elf = pkgsCross.x86_64-unknown-none-elf.stdenvNoLibs;
 
 
           #
@@ -108,8 +77,8 @@
           #
           ### Linux
           #
-          linux-aarch64 = pkgsCrossAarch64.callPackage pkgs/linux-vm.nix {
-            kernel = pkgsCrossAarch64.linuxPackages_6_1.kernel.override {
+          linux-aarch64 = pkgsCross.aarch64-unknown-linux-gnu.callPackage pkgs/linux-vm.nix {
+            kernel = pkgsCross.aarch64-unknown-linux-gnu.linuxPackages_6_1.kernel.override {
               autoModules = false;
               kernelPreferBuiltin = true;
               enableCommonConfig = false; # only use our extraStructuredConfig
@@ -127,8 +96,8 @@
             #
             # nix develop .\#linux-aarch64.menuconfigShell
 
-            #kernel = pkgsCrossAarch64.linuxManualConfig {
-            #  inherit (pkgsCrossAarch64.linuxPackages.kernel) version src;
+            #kernel = pkgsCross.aarch64-unknown-linux-gnu.linuxManualConfig {
+            #  inherit (aarch64-elf.linuxPackages.kernel) version src;
             #  configfile = ./.config;
             #};
           };
@@ -137,39 +106,39 @@
           #
           ### seL4 verified kernel flavours
           #
-          seL4-kernel-aarch64 = pkgsCrossAarch64.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-aarch64 = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "AARCH64_verified";
           };
 
-          seL4-kernel-arm-hyp-exynos5 = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm-hyp-exynos5 = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "ARM_HYP_exynos5_verified";
           };
 
-          seL4-kernel-arm-hyp = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm-hyp = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "ARM_HYP_verified";
           };
 
-          seL4-kernel-arm-mcs = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm-mcs = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "ARM_MCS_verified";
           };
 
-          seL4-kernel-arm-imx8mm = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm-imx8mm = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "ARM_imx8mm_verified";
           };
 
-          seL4-kernel-arm = pkgsCrossArmv7l.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "ARM_verified";
           };
 
-          seL4-kernel-riscv64-mcs = pkgsCrossRiscv64.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-riscv64-mcs = pkgsCross.riscv64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "RISCV64_MCS_verified";
           };
 
-          seL4-kernel-riscv64 = pkgsCrossRiscv64.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-riscv64-elf = pkgsCross.riscv64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "RISCV64_verified";
           };
 
-          seL4-kernel-x64 = pkgsCrossx86_64.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-x64 = pkgsCross.x86_64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "X64_verified";
           };
 
@@ -177,11 +146,11 @@
           #
           ### seL4 test suite for various platforms
           #
-          seL4-test-aarch64-imx8mq-evk = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-imx8mq-evk = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=imx8mq-evk" ]; };
 
 
-          seL4-test-aarch64-rpi4-1GB = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-rpi4-1GB = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
@@ -189,7 +158,7 @@
               ];
             };
 
-          seL4-test-aarch64-rpi4-2GB = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-rpi4-2GB = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
@@ -197,7 +166,7 @@
               ];
             };
 
-          seL4-test-aarch64-rpi4-4GB = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-rpi4-4GB = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
@@ -205,7 +174,7 @@
               ];
             };
 
-          seL4-test-aarch64-rpi4-8GB = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-rpi4-8GB = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=rpi4"
@@ -213,19 +182,19 @@
               ];
             };
 
-          seL4-test-aarch64-zcu102 = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
+          seL4-test-aarch64-zcu102 = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=zcu102" ]; };
 
 
-          seL4-test-armv7l-rpi3 = pkgsCrossArmv7l.callPackage pkgs/seL4-test.nix
+          seL4-test-armv7l-rpi3 = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=rpi3" ]; };
 
 
-          seL4-test-armv7l-zynq7000 = pkgsCrossArmv7l.callPackage pkgs/seL4-test.nix
+          seL4-test-armv7l-zynq7000 = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=zynq7000" ]; };
 
 
-          seL4-test-armv7l-zynq7000-simulate = pkgsCrossArmv7l.callPackage pkgs/seL4-test.nix
+          seL4-test-armv7l-zynq7000-simulate = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=zynq7000"
@@ -276,11 +245,11 @@
           #   };
 
 
-          seL4-test-i686-ia32 = pkgsCrossi686.callPackage pkgs/seL4-test.nix
+          seL4-test-i686-ia32 = pkgsCross.i686-unknown-none-elf.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=ia32" ]; };
 
 
-          seL4-test-i686-ia32-simulate = pkgsCrossi686.callPackage pkgs/seL4-test.nix
+          seL4-test-i686-ia32-simulate = pkgsCross.i686-unknown-none-elf.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=ia32"
@@ -289,11 +258,11 @@
             };
 
 
-          seL4-test-x86_64-x86_64 = pkgsCrossx86_64.callPackage pkgs/seL4-test.nix
+          seL4-test-x86_64-x86_64 = pkgsCross.x86_64-unknown-none-elf.callPackage pkgs/seL4-test.nix
             { extraCmakeFlags = [ "-DPLATFORM=x86_64" ]; };
 
 
-          seL4-test-x86_64-x86_64-simulate = pkgsCrossx86_64.callPackage pkgs/seL4-test.nix
+          seL4-test-x86_64-x86_64-simulate = pkgsCross.x86_64-unknown-none-elf.callPackage pkgs/seL4-test.nix
             {
               extraCmakeFlags = [
                 "-DPLATFORM=x86_64"
@@ -305,8 +274,7 @@
           #
           ### seL4 CAmkES VM Examples
           #
-          seL4-camkes-vm-examples-aarch64-tx1 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-            stdenvNoLibs = pkgsCrossAarch64OldBintools.overrideCC pkgsCrossAarch64OldBintools.stdenvNoLibs pkgsCrossAarch64OldBintools.stdenvNoLibs.cc;
+          seL4-camkes-vm-examples-aarch64-tx1 = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-camkes-vm-examples.nix {
             extraCmakeFlags = [
               "-DPLATFORM=tx1"
               "-DCAMKES_VM_APP=vm_minimal"
@@ -314,8 +282,7 @@
           };
 
 
-          seL4-camkes-vm-examples-aarch64-tx2 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-            stdenvNoLibs = pkgsCrossAarch64OldBintools.overrideCC pkgsCrossAarch64OldBintools.stdenvNoLibs pkgsCrossAarch64OldBintools.stdenvNoLibs.cc;
+          seL4-camkes-vm-examples-aarch64-tx2 = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-camkes-vm-examples.nix {
             extraCmakeFlags = [
               "-DPLATFORM=tx2"
               "-DCAMKES_VM_APP=vm_minimal"
@@ -323,8 +290,7 @@
           };
 
 
-          seL4-camkes-vm-examples-aarch64-qemu-arm-virt = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-            stdenvNoLibs = pkgsCrossAarch64OldBintools.overrideCC pkgsCrossAarch64OldBintools.stdenvNoLibs pkgsCrossAarch64OldBintools.stdenvNoLibs.cc;
+          seL4-camkes-vm-examples-aarch64-qemu-arm-virt = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-camkes-vm-examples.nix {
             extraCmakeFlags = [
               "-DPLATFORM=qemu-arm-virt"
               "-DCAMKES_VM_APP=vm_minimal"
@@ -332,8 +298,7 @@
           };
 
 
-          seL4-camkes-vm-examples-aarch64-zcu102 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-            stdenvNoLibs = pkgsCrossAarch64OldBintools.overrideCC pkgsCrossAarch64OldBintools.stdenvNoLibs pkgsCrossAarch64OldBintools.stdenvNoLibs.cc;
+          seL4-camkes-vm-examples-aarch64-zcu102 = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-camkes-vm-examples.nix {
             extraCmakeFlags = [
               "-DPLATFORM=zcu102"
               "-DCAMKES_VM_APP=vm_minimal"
@@ -341,8 +306,7 @@
           };
 
 
-          seL4-camkes-vm-examples-armv7l-exynos5422 = pkgs.callPackage pkgs/seL4-camkes-vm-examples.nix {
-            stdenvNoLibs = pkgsCrossArmv7lOldBintools.overrideCC pkgsCrossArmv7lOldBintools.stdenvNoLibs pkgsCrossArmv7lOldBintools.stdenvNoLibs.cc;
+          seL4-camkes-vm-examples-armv7l-exynos5422 = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-camkes-vm-examples.nix {
             extraCmakeFlags = [
               "-DPLATFORM=exynos5422"
               "-DCAMKES_VM_APP=vm_minimal"
@@ -353,7 +317,7 @@
           #
           ### Arm Trusted Firmware
           #
-          atf-aarch64-zcu102 = pkgsCrossAarch64.buildArmTrustedFirmware rec {
+          atf-aarch64-zcu102 = pkgsCross.aarch64-unknown-linux-gnu.buildArmTrustedFirmware rec {
             platform = "zynqmp";
             extraMeta.platforms = [ "aarch64-linux" ];
             extraMakeFlags = [ "RESET_TO_BL31=1" ];
@@ -371,23 +335,18 @@
           #
           ### Firmware
           #
-          pmufw-mblaze-zcu102 = (import nixpkgs {
-            inherit system;
-            crossSystem.config = "microblazeel-none-elf";
-            overlays = [ self.overlays.default ];
-          }).callPackage ./pkgs/xilinx-pmufw.nix
-            { };
+          pmufw-mblaze-zcu102 = pkgsCross.microblazeel-none-elf.callPackage ./pkgs/xilinx-pmufw.nix { };
 
 
           #
           ### UBoot with specific patches
           #
-          uboot-aarch64-rpi4 = pkgsCrossAarch64.ubootRaspberryPi4_64bit;
+          uboot-aarch64-rpi4 = pkgsCross.aarch64-unknown-linux-gnu.ubootRaspberryPi4_64bit;
 
 
           # For more information on compiling the Xilinx U-Boot fork see
           # https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841973/Build+U-Boot
-          uboot-aarch64-zcu102 = pkgsCrossAarch64.buildUBoot rec {
+          uboot-aarch64-zcu102 = pkgsCross.aarch64-unknown-linux-gnu.buildUBoot rec {
             extraMeta.platforms = [ "aarch64-linux" ];
             defconfig = "xilinx_zynqmp_virt_defconfig";
             # The `DEVICE_TREE` environment variable must only be propagated __after__ the initial
@@ -417,7 +376,7 @@
 
 
           # based of https://github.com/Xilinx/u-boot-xlnx/blob/master/doc/board/xilinx/zynq.rst
-          uboot-armv7l-zynq-zc702 = pkgsCrossArmv7l.buildUBoot rec {
+          uboot-armv7l-zynq-zc702 = pkgsCross.armv7l-unknown-linux-gnueabihf.buildUBoot rec {
             extraMeta.platforms = [ "armv7l-linux" ];
             defconfig = "xilinx_zynq_virt_defconfig";
             env.DEVICE_TREE = "zynq-zc702";
@@ -433,7 +392,7 @@
           };
 
 
-          #
+
           ### SD Card
           #
           sd-aarch64-rpi4 =
@@ -500,15 +459,16 @@
         };
 
         devShells.microkit = pkgs.mkShell.override { stdenv = pkgs.stdenvNoCC; } {
-          nativeBuildInputs = with pkgs; [
-            pkgsCross.aarch64-embedded.stdenv.cc.bintools.bintools
-            pkgsCross.aarch64-embedded.stdenv.cc.cc
-            pkgsCross.riscv64-embedded.stdenv.cc.bintools.bintools
-            pkgsCross.riscv64-embedded.stdenv.cc.cc
+          nativeBuildInputs = (with pkgs; [
             bear
             gnumake
             qemu
             microkit-sdk
+          ]) ++ [
+            pkgs.pkgsCross.aarch64-embedded.stdenv.cc.bintools.bintools
+            pkgs.pkgsCross.aarch64-embedded.stdenv.cc.cc
+            pkgs.pkgsCross.riscv64-embedded.stdenv.cc.bintools.bintools
+            pkgs.pkgsCross.riscv64-embedded.stdenv.cc.cc
           ];
 
           # mitigates the following errors:
@@ -540,13 +500,5 @@
       }) // {
     # declare overlay with added deps, i. e. the python packages not available in official nixpkgs
     overlays.default = import ./overlay.nix;
-
-    # seL4's musllibc fork can't stand modern bintools because its too old.
-    overlays.oldBintools = final: prev: {
-      bintools = prev.wrapBintoolsWith {
-        bintools = prev.binutils-unwrapped_2_38;
-        libc = prev.stdenv.cc.libc;
-      };
-    };
   };
 }
