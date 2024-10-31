@@ -175,66 +175,6 @@
 
 
           #
-          ### seL4 kernel + userspace flavours
-          #
-          seL4-moritz-fork-arm-hyp = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
-            config = "ARM_HYP_verified";
-            extraCmakeFlags = [
-              "-DPLATFORM=zynq7000"
-              "-DRELEASE=FALSE"
-              "-DVERIFICATION=FALSE"
-            ];
-          };
-
-          seL4-moritz-fork-arm-mcs = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
-            config = "ARM_MCS_verified";
-            extraCmakeFlags = [
-              "-DPLATFORM=zynq7000"
-              "-DRELEASE=FALSE"
-              "-DVERIFICATION=FALSE"
-              "-DKernelIsMCS=ON"
-            ];
-          };
-
-          seL4-moritz-fork-arm = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
-            config = "ARM_verified";
-            extraCmakeFlags = [
-              "-DPLATFORM=zynq7000"
-              "-DRELEASE=FALSE"
-              "-DVERIFICATION=FALSE"
-            ];
-          };
-
-          # seL4-moritz-fork-riscv64-mcs = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
-          #   config = "RISCV64_MCS_verified";
-          #   extraCmakeFlags = [
-          #     "-DPLATFORM=hifive"
-          #     "-DRELEASE=FALSE"
-          #     "-DVERIFICATION=FALSE"
-          #     "-DKernelIsMCS=ON"
-          #   ];
-          # };
-
-          # seL4-moritz-fork-riscv64 = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
-          #   config = "RISCV64_verified";
-          #   extraCmakeFlags = [
-          #     "-DPLATFORM=hifive"
-          #     "-DRELEASE=FALSE"
-          #     "-DVERIFICATION=FALSE"
-          #   ];
-          # };
-
-          seL4-moritz-fork-x64 = pkgs.callPackage pkgs/seL4-moritz-fork.nix {
-            config = "X64_verified";
-            extraCmakeFlags = [
-              "-DPLATFORM=pc99"
-              "-DRELEASE=FALSE"
-              "-DVERIFICATION=FALSE"
-            ];
-          };
-
-
-          #
           ### seL4 test suite for various platforms
           #
           seL4-test-aarch64-imx8mq-evk = pkgsCrossAarch64.callPackage pkgs/seL4-test.nix
