@@ -75,134 +75,6 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.concurrencytest --print-build-logs
-  x86_64-linux---packages---crossStdenvAarch64:
-    name: x86_64-linux---packages---crossStdenvAarch64
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v14
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.crossStdenvAarch64 --print-build-logs
-  x86_64-linux---packages---crossStdenvAarch64OldBintools:
-    name: x86_64-linux---packages---crossStdenvAarch64OldBintools
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v14
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.crossStdenvAarch64OldBintools --print-build-logs
-  x86_64-linux---packages---crossStdenvArmv7l:
-    name: x86_64-linux---packages---crossStdenvArmv7l
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v14
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.crossStdenvArmv7l --print-build-logs
-  x86_64-linux---packages---crossStdenvArmv7lOldBintools:
-    name: x86_64-linux---packages---crossStdenvArmv7lOldBintools
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v14
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.crossStdenvArmv7lOldBintools --print-build-logs
-  x86_64-linux---packages---crossStdenvRiscv32:
-    name: x86_64-linux---packages---crossStdenvRiscv32
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v14
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.crossStdenvRiscv32 --print-build-logs
-  x86_64-linux---packages---crossStdenvRiscv64:
-    name: x86_64-linux---packages---crossStdenvRiscv64
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v14
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.crossStdenvRiscv64 --print-build-logs
-  x86_64-linux---packages---crossStdenvi686:
-    name: x86_64-linux---packages---crossStdenvi686
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v14
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.crossStdenvi686 --print-build-logs
-  x86_64-linux---packages---crossStdenvx86_64:
-    name: x86_64-linux---packages---crossStdenvx86_64
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v14
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.crossStdenvx86_64 --print-build-logs
   x86_64-linux---packages---guardonce:
     name: x86_64-linux---packages---guardonce
     runs-on:
@@ -309,10 +181,10 @@ jobs:
       - x86_64-linux---packages---camkes-deps
       - x86_64-linux---packages---capDL-tool
       - x86_64-linux---packages---concurrencytest
-      - x86_64-linux---packages---crossStdenvAarch64OldBintools
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -332,10 +204,10 @@ jobs:
       - x86_64-linux---packages---camkes-deps
       - x86_64-linux---packages---capDL-tool
       - x86_64-linux---packages---concurrencytest
-      - x86_64-linux---packages---crossStdenvAarch64OldBintools
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -355,10 +227,10 @@ jobs:
       - x86_64-linux---packages---camkes-deps
       - x86_64-linux---packages---capDL-tool
       - x86_64-linux---packages---concurrencytest
-      - x86_64-linux---packages---crossStdenvAarch64OldBintools
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -378,10 +250,10 @@ jobs:
       - x86_64-linux---packages---camkes-deps
       - x86_64-linux---packages---capDL-tool
       - x86_64-linux---packages---concurrencytest
-      - x86_64-linux---packages---crossStdenvAarch64OldBintools
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -401,10 +273,10 @@ jobs:
       - x86_64-linux---packages---camkes-deps
       - x86_64-linux---packages---capDL-tool
       - x86_64-linux---packages---concurrencytest
-      - x86_64-linux---packages---crossStdenvArmv7lOldBintools
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-armv7l-eabihf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -479,6 +351,7 @@ jobs:
     needs:
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
+      - x86_64-linux---packages---seL4-deps
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -547,8 +420,8 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm-mcs --print-build-logs
-  x86_64-linux---packages---seL4-kernel-riscv64:
-    name: x86_64-linux---packages---seL4-kernel-riscv64
+  x86_64-linux---packages---seL4-kernel-riscv64-elf:
+    name: x86_64-linux---packages---seL4-kernel-riscv64-elf
     runs-on:
       - ubuntu-latest
     needs:
@@ -565,7 +438,7 @@ jobs:
           name: dlr-ft
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
-        run: nix build .#packages.x86_64-linux.seL4-kernel-riscv64 --print-build-logs
+        run: nix build .#packages.x86_64-linux.seL4-kernel-riscv64-elf --print-build-logs
   x86_64-linux---packages---seL4-kernel-riscv64-mcs:
     name: x86_64-linux---packages---seL4-kernel-riscv64-mcs
     runs-on:
@@ -609,10 +482,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvAarch64
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -629,10 +502,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvAarch64
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -649,10 +522,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvAarch64
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -669,10 +542,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvAarch64
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -689,10 +562,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvAarch64
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -709,10 +582,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvAarch64
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-aarch64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -729,10 +602,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvArmv7l
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-armv7l-eabihf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -749,10 +622,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvArmv7l
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-armv7l-eabihf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -769,10 +642,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvArmv7l
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-armv7l-eabihf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -789,10 +662,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvi686
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-i686-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -809,10 +682,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvi686
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-i686-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -829,10 +702,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvx86_64
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-x86_64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -849,10 +722,10 @@ jobs:
     runs-on:
       - ubuntu-latest
     needs:
-      - x86_64-linux---packages---crossStdenvx86_64
       - x86_64-linux---packages---guardonce
       - x86_64-linux---packages---pyfdt
       - x86_64-linux---packages---seL4-deps
+      - x86_64-linux---packages---toolchain-x86_64-elf
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v25
@@ -864,6 +737,134 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-x86_64-x86_64-simulate --print-build-logs
+  x86_64-linux---packages---toolchain-aarch64-elf:
+    name: x86_64-linux---packages---toolchain-aarch64-elf
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.toolchain-aarch64-elf --print-build-logs
+  x86_64-linux---packages---toolchain-aarch64-linux:
+    name: x86_64-linux---packages---toolchain-aarch64-linux
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.toolchain-aarch64-linux --print-build-logs
+  x86_64-linux---packages---toolchain-armv7l-eabihf:
+    name: x86_64-linux---packages---toolchain-armv7l-eabihf
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.toolchain-armv7l-eabihf --print-build-logs
+  x86_64-linux---packages---toolchain-armv7l-linux:
+    name: x86_64-linux---packages---toolchain-armv7l-linux
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.toolchain-armv7l-linux --print-build-logs
+  x86_64-linux---packages---toolchain-i686-elf:
+    name: x86_64-linux---packages---toolchain-i686-elf
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.toolchain-i686-elf --print-build-logs
+  x86_64-linux---packages---toolchain-riscv32-elf:
+    name: x86_64-linux---packages---toolchain-riscv32-elf
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.toolchain-riscv32-elf --print-build-logs
+  x86_64-linux---packages---toolchain-riscv64-elf:
+    name: x86_64-linux---packages---toolchain-riscv64-elf
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.toolchain-riscv64-elf --print-build-logs
+  x86_64-linux---packages---toolchain-x86_64-elf:
+    name: x86_64-linux---packages---toolchain-x86_64-elf
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - uses: cachix/cachix-action@v14
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.toolchain-x86_64-elf --print-build-logs
   x86_64-linux---packages---uboot-aarch64-rpi4:
     name: x86_64-linux---packages---uboot-aarch64-rpi4
     runs-on:
