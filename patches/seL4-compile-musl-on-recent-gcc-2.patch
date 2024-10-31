@@ -1,0 +1,185 @@
+From 41e4ef7776c1ab8e3f8d7d597f26f8fbef38e0da Mon Sep 17 00:00:00 2001
+From: Alwin Joshy <joshyalwin@gmail.com>
+Date: Wed, 14 Aug 2024 18:17:35 +1000
+Subject: [PATCH] hack: allow musllibc to compile with gcc >= 12
+
+Signed-off-by: Alwin Joshy <joshyalwin@gmail.com>
+---
+ include/features.h        | 11 +++++++++++
+ include/stdio.h           | 18 ++++++++++++++++++
+ src/internal/stdio_impl.h |  4 ++++
+ src/stdio/stderr.c        | 27 +++++++++++++++------------
+ src/stdio/stdin.c         | 25 ++++++++++++++-----------
+ src/stdio/stdout.c        | 28 ++++++++++++++++------------
+ 6 files changed, 78 insertions(+), 35 deletions(-)
+
+diff --git a/include/features.h b/include/features.h
+index f4d651efc..ac5c2f25b 100644
+--- a/include/features.h
++++ b/include/features.h
+@@ -36,3 +36,14 @@
+ #endif
+ 
+ #endif
++
++#ifndef FEATURES_H
++#define FEATURES_H
++
++// #define weak __attribute__((__weak__))
++#define hidden __attribute__((__visibility__("hidden")))
++/*
++#define weak_alias(old, new) \
++       extern __typeof(old) new __attribute__((__weak__, __alias__(#old)))
++*/
++#endif
+\ No newline at end of file
+diff --git a/include/stdio.h b/include/stdio.h
+index 884d2e6a7..a92fcc248 100644
+--- a/include/stdio.h
++++ b/include/stdio.h
+@@ -201,3 +201,21 @@ int fputs_unlocked(const char *, FILE *);
+ #endif
+ 
+ #endif
++
++
++#ifndef STDIO_H
++#define STDIO_H
++
++#undef stdin
++#undef stdout
++#undef stderr
++
++extern hidden FILE __stdin_FILE;
++extern hidden FILE __stdout_FILE;
++extern hidden FILE __stderr_FILE;
++
++#define stdin (&__stdin_FILE)
++#define stdout (&__stdout_FILE)
++#define stderr (&__stderr_FILE)
++
++#endif
+diff --git a/src/internal/stdio_impl.h b/src/internal/stdio_impl.h
+index 7cdf729de..433a71f72 100644
+--- a/src/internal/stdio_impl.h
++++ b/src/internal/stdio_impl.h
+@@ -50,6 +50,10 @@ struct _IO_FILE {
+ 	struct __locale_struct *locale;
+ };
+ 
++extern hidden FILE *volatile __stdin_used;
++extern hidden FILE *volatile __stdout_used;
++extern hidden FILE *volatile __stderr_used;
++
+ size_t __stdio_read(FILE *, unsigned char *, size_t);
+ size_t __stdio_write(FILE *, const unsigned char *, size_t);
+ size_t __stdout_write(FILE *, const unsigned char *, size_t);
+diff --git a/src/stdio/stderr.c b/src/stdio/stderr.c
+index 229c8651d..e837cdfa0 100644
+--- a/src/stdio/stderr.c
++++ b/src/stdio/stderr.c
+@@ -1,16 +1,19 @@
+ #include "stdio_impl.h"
++#include "features.h"
++
++#undef stderr
+ 
+ static unsigned char buf[UNGET];
+-static FILE f = {
+-	.buf = buf+UNGET,
+-	.buf_size = 0,
+-	.fd = 2,
+-	.flags = F_PERM | F_NORD,
+-	.lbf = -1,
+-	.write = __stdio_write,
+-	.seek = __stdio_seek,
+-	.close = __stdio_close,
+-	.lock = -1,
++hidden FILE __stderr_FILE  = {
++        .buf = buf+UNGET,
++        .buf_size = 0,
++        .fd = 2,
++        .flags = F_PERM | F_NORD,
++        .lbf = -1,
++        .write = __stdio_write,
++        .seek = __stdio_seek,
++        .close = __stdio_close,
++        .lock = -1,
+ };
+-FILE *const stderr = &f;
+-FILE *volatile __stderr_used = &f;
++FILE *const stderr = &__stderr_FILE;
++FILE *volatile __stderr_used = &__stderr_FILE;
+\ No newline at end of file
+diff --git a/src/stdio/stdin.c b/src/stdio/stdin.c
+index 171ff22a9..3655871c7 100644
+--- a/src/stdio/stdin.c
++++ b/src/stdio/stdin.c
+@@ -1,15 +1,18 @@
+ #include "stdio_impl.h"
++#include "features.h"
++
++#undef stdin
+ 
+ static unsigned char buf[BUFSIZ+UNGET];
+-static FILE f = {
+-	.buf = buf+UNGET,
+-	.buf_size = sizeof buf-UNGET,
+-	.fd = 0,
+-	.flags = F_PERM | F_NOWR,
+-	.read = __stdio_read,
+-	.seek = __stdio_seek,
+-	.close = __stdio_close,
+-	.lock = -1,
++hidden FILE __stdin_FILE  = {
++        .buf = buf+UNGET,
++        .buf_size = sizeof buf-UNGET,
++        .fd = 0,
++        .flags = F_PERM | F_NOWR,
++        .read = __stdio_read,
++        .seek = __stdio_seek,
++        .close = __stdio_close,
++        .lock = -1,
+ };
+-FILE *const stdin = &f;
+-FILE *volatile __stdin_used = &f;
++FILE *const stdin = &__stdin_FILE;
++FILE *volatile __stdin_used = &__stdin_FILE;
+\ No newline at end of file
+diff --git a/src/stdio/stdout.c b/src/stdio/stdout.c
+index 6b188942d..85268d2e4 100644
+--- a/src/stdio/stdout.c
++++ b/src/stdio/stdout.c
+@@ -1,16 +1,20 @@
+ #include "stdio_impl.h"
++#include "features.h"
++
++#undef stdout
+ 
+ static unsigned char buf[BUFSIZ+UNGET];
+-static FILE f = {
+-	.buf = buf+UNGET,
+-	.buf_size = sizeof buf-UNGET,
+-	.fd = 1,
+-	.flags = F_PERM | F_NORD,
+-	.lbf = '\n',
+-	.write = __stdout_write,
+-	.seek = __stdio_seek,
+-	.close = __stdio_close,
+-	.lock = -1,
++hidden FILE __stdout_FILE = {
++        .buf = buf+UNGET,
++        .buf_size = sizeof buf-UNGET,
++        .fd = 1,
++        .flags = F_PERM | F_NORD,
++        .lbf = '\n',
++        .write = __stdout_write,
++        .seek = __stdio_seek,
++        .close = __stdio_close,
++        .lock = -1,
+ };
+-FILE *const stdout = &f;
+-FILE *volatile __stdout_used = &f;
++
++FILE *const stdout = &__stdout_FILE;
++FILE *volatile __stdout_used = &__stdout_FILE;

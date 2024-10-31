@@ -2,29 +2,24 @@
 { lib
 , stdenvNoLibs
 , fetchGoogleRepoTool
-, fetchurl
-, writeShellScriptBin
 , writeText
-, capDL-tool
+, buildPackages
 , cmake
+, cpio
+, dtc
+, libxml2
 , nanopb
 , ninja
-, libxml2
-, dtc
-, cpio
-, protobuf
-, python3
 , qemu
 , ubootTools
 , extraCmakeFlags ? [ ]
-, stack
 }:
 
 let
   capDL-makefile = writeText "Makefile" ''
     .RECIPEPREFIX = >
     all:
-    > ln --symbolic -- ${lib.getExe capDL-tool} ./
+    > ln --symbolic -- ${lib.getExe buildPackages.capDL-tool} ./
   '';
 in
 
@@ -46,12 +41,11 @@ stdenvNoLibs.mkDerivation rec {
     libxml2 # xmllint
     nanopb # ser/de
     ninja # build tools
-    protobuf # to generate ser/de stuff
     ubootTools # for mkimage
-    (python3.withPackages (ps: with ps; [ camkes-deps protobuf seL4-deps ]))
+    (buildPackages.python3.withPackages (ps: with ps; [ camkes-deps seL4-deps protobuf ]))
 
     # fakegit
-    (writeShellScriptBin "git" ''
+    (buildPackages.writeShellScriptBin "git" ''
       # Taken from https://git.musl-libc.org/cgit/musl/tree/tools/version.sh
       if [[ $@ = "git describe --tags --match 'v[0-9]*'" ]]; then
         echo "${version}"
@@ -61,31 +55,9 @@ stdenvNoLibs.mkDerivation rec {
       fi
     '')
   ];
-
   depsBuildBuild = [
     qemu # qemu-system-aarch64
   ];
-
-  # required because the musllibc fork of seL4 is so old it won't compile with gcc12
-  # see https://github.com/seL4/musllibc/issues/19#issuecomment-1841713558
-  # and https://www.mail-archive.com/devel@sel4.systems/msg04088.html
-  patches = [
-    # introduces base for new hidden macro
-    (fetchurl {
-      url = "https://git.musl-libc.org/cgit/musl/patch/src/include/features.h?id=13d1afa46f8098df290008c681816c9eb89ffbdb";
-      hash = "sha256-2W5iKJP9SdXy+SdcX5dEBLGSjJMrFK1OKHn2BZGJJpc=";
-    })
-
-    # introduces new way to access stdio stuff, relying on hidden symbol macro
-    (fetchurl {
-      url = "https://git.musl-libc.org/cgit/musl/patch/?id=d8f2efa708a027132d443f45a8c98a0c7c1b2d77";
-      hash = "sha256-kt30c6joUxU7BcTyq/TcY9+YgJ5Cw01cOTGn8hQpCOU=";
-    })
-
-    # make sure the new definition of hidden macro is seen by the stdio stuff
-    ../patches/musslibc-add-features.h-to-stdio_impl.h.patch
-  ];
-  patchFlags = [ "-p1" "--directory=projects/musllibc" ];
 
   postPatch = ''
     # fix /bin/bash et al.
@@ -95,6 +67,16 @@ stdenvNoLibs.mkDerivation rec {
 
     # avoid from-scratch compilation of capDL-tool
     cp -- ${capDL-makefile} projects/capdl/capDL-tool/Makefile
+  ''
+
+  # required because the musllibc fork of seL4 is so old it won't compile with gcc12
+  # see https://github.com/seL4/musllibc/issues/19#issuecomment-1841713558
+  # and https://www.mail-archive.com/devel@sel4.systems/msg04088.html
+  + ''
+    pushd projects/musllibc
+    patch -p1 < ${ ../patches/seL4-compile-musl-on-recent-gcc-1.patch }
+    patch -p1 < ${ ../patches/seL4-compile-musl-on-recent-gcc-2.patch }
+    popd
   '';
 
   hardeningDisable = [ "all" ];
