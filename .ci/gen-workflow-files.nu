@@ -30,22 +30,31 @@ def depends [
 def get-attr-names [
     exprs: # nix expressions to get attrNames of
   ] {
-  $exprs 
+  $exprs
     | par-each {
-        |expr| nix eval --json $expr --apply builtins.attrNames 
-        | from json 
-      } 
-    | flatten 
-    | uniq 
+        |expr| nix eval --json $expr --apply builtins.attrNames
+        | from json
+      }
+    | flatten
+    | uniq
     | sort
 }
 
 def job-id [
   derivation:string,
   ] {
-  $derivation 
-    | parse '.#{type}.{system}.{name}' 
+  $derivation
+    | parse '.#{type}.{system}.{name}'
     | $"($in.system.0)---($in.type.0)---($in.name.0)"
+}
+
+
+def job-name [
+  derivation:string,
+  ] {
+  $derivation
+    | parse '.#{type}.{system}.{name}'
+    | $in.name.0
 }
 
 # map from nixos system to github runner type
@@ -61,11 +70,11 @@ let systems_map = {
 let categories = [".#packages" ".#devShells" ".#checks"]
 let targets = (get-attr-names $categories
   | par-each {|system| { $system : (
-      $categories 
+      $categories
         | par-each {
-            |cat| get-attr-names [$"($cat).($system)"] 
-            | each { $"($cat).($system).($in)" } 
-          } 
+            |cat| get-attr-names [$"($cat).($system)"]
+            | each { $"($cat).($system).($in)" }
+          }
         | flatten
     ) } }
   | reduce {|it, acc| $acc | merge $it }
@@ -122,7 +131,7 @@ for system in ($targets | columns) {
     let id = ( job-id $derivation )
 
     # name displayed
-    let name = ( job-id $derivation )
+    let name = ( job-name $derivation )
 
     # collection of dependencies
     # TODO currently only considers dependencies on the same $system
@@ -152,8 +161,8 @@ for system in ($targets | columns) {
     $cachix_workflow.jobs = ($cachix_workflow.jobs | insert $id $new_job )
   }
 
-  let checks = $derivations 
-    | filter { $in | str contains $'.#checks.($system)' } 
+  let checks = $derivations
+    | filter { $in | str contains $'.#checks.($system)' }
     | each { job-id $in }
 
   # add check job

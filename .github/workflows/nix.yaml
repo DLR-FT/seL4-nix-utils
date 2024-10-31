@@ -8,7 +8,7 @@ on:
       - main
 jobs:
   x86_64-linux---packages---atf-aarch64-zcu102:
-    name: x86_64-linux---packages---atf-aarch64-zcu102
+    name: atf-aarch64-zcu102
     runs-on:
       - ubuntu-latest
     needs: []
@@ -24,7 +24,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.atf-aarch64-zcu102 --print-build-logs
   x86_64-linux---packages---camkes-deps:
-    name: x86_64-linux---packages---camkes-deps
+    name: camkes-deps
     runs-on:
       - ubuntu-latest
     needs:
@@ -44,7 +44,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.camkes-deps --print-build-logs
   x86_64-linux---packages---capDL-tool:
-    name: x86_64-linux---packages---capDL-tool
+    name: capDL-tool
     runs-on:
       - ubuntu-latest
     needs: []
@@ -60,7 +60,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.capDL-tool --print-build-logs
   x86_64-linux---packages---concurrencytest:
-    name: x86_64-linux---packages---concurrencytest
+    name: concurrencytest
     runs-on:
       - ubuntu-latest
     needs: []
@@ -76,7 +76,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.concurrencytest --print-build-logs
   x86_64-linux---packages---guardonce:
-    name: x86_64-linux---packages---guardonce
+    name: guardonce
     runs-on:
       - ubuntu-latest
     needs: []
@@ -92,7 +92,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.guardonce --print-build-logs
   x86_64-linux---packages---linux-aarch64:
-    name: x86_64-linux---packages---linux-aarch64
+    name: linux-aarch64
     runs-on:
       - ubuntu-latest
     needs: []
@@ -108,7 +108,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.linux-aarch64 --print-build-logs
   x86_64-linux---packages---microkit-sdk:
-    name: x86_64-linux---packages---microkit-sdk
+    name: microkit-sdk
     runs-on:
       - ubuntu-latest
     needs:
@@ -125,7 +125,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.microkit-sdk --print-build-logs
   x86_64-linux---packages---pmufw-mblaze-zcu102:
-    name: x86_64-linux---packages---pmufw-mblaze-zcu102
+    name: pmufw-mblaze-zcu102
     runs-on:
       - ubuntu-latest
     needs: []
@@ -141,7 +141,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.pmufw-mblaze-zcu102 --print-build-logs
   x86_64-linux---packages---pyfdt:
-    name: x86_64-linux---packages---pyfdt
+    name: pyfdt
     runs-on:
       - ubuntu-latest
     needs: []
@@ -157,7 +157,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.pyfdt --print-build-logs
   x86_64-linux---packages---sd-aarch64-rpi4:
-    name: x86_64-linux---packages---sd-aarch64-rpi4
+    name: sd-aarch64-rpi4
     runs-on:
       - ubuntu-latest
     needs:
@@ -174,7 +174,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.sd-aarch64-rpi4 --print-build-logs
   x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-qemu-arm-virt:
-    name: x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-qemu-arm-virt
+    name: seL4-camkes-vm-examples-aarch64-qemu-arm-virt
     runs-on:
       - ubuntu-latest
     needs:
@@ -197,7 +197,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-camkes-vm-examples-aarch64-qemu-arm-virt --print-build-logs
   x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-tx1:
-    name: x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-tx1
+    name: seL4-camkes-vm-examples-aarch64-tx1
     runs-on:
       - ubuntu-latest
     needs:
@@ -220,7 +220,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-camkes-vm-examples-aarch64-tx1 --print-build-logs
   x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-tx2:
-    name: x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-tx2
+    name: seL4-camkes-vm-examples-aarch64-tx2
     runs-on:
       - ubuntu-latest
     needs:
@@ -243,7 +243,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-camkes-vm-examples-aarch64-tx2 --print-build-logs
   x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-zcu102:
-    name: x86_64-linux---packages---seL4-camkes-vm-examples-aarch64-zcu102
+    name: seL4-camkes-vm-examples-aarch64-zcu102
     runs-on:
       - ubuntu-latest
     needs:
@@ -266,7 +266,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-camkes-vm-examples-aarch64-zcu102 --print-build-logs
   x86_64-linux---packages---seL4-camkes-vm-examples-armv7l-exynos5422:
-    name: x86_64-linux---packages---seL4-camkes-vm-examples-armv7l-exynos5422
+    name: seL4-camkes-vm-examples-armv7l-exynos5422
     runs-on:
       - ubuntu-latest
     needs:
@@ -289,7 +289,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-camkes-vm-examples-armv7l-exynos5422 --print-build-logs
   x86_64-linux---packages---seL4-deps:
-    name: x86_64-linux---packages---seL4-deps
+    name: seL4-deps
     runs-on:
       - ubuntu-latest
     needs:
@@ -307,7 +307,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-deps --print-build-logs
   x86_64-linux---packages---seL4-kernel-aarch64:
-    name: x86_64-linux---packages---seL4-kernel-aarch64
+    name: seL4-kernel-aarch64
     runs-on:
       - ubuntu-latest
     needs:
@@ -326,7 +326,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-aarch64 --print-build-logs
   x86_64-linux---packages---seL4-kernel-arm:
-    name: x86_64-linux---packages---seL4-kernel-arm
+    name: seL4-kernel-arm
     runs-on:
       - ubuntu-latest
     needs:
@@ -345,7 +345,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm --print-build-logs
   x86_64-linux---packages---seL4-kernel-arm-hyp:
-    name: x86_64-linux---packages---seL4-kernel-arm-hyp
+    name: seL4-kernel-arm-hyp
     runs-on:
       - ubuntu-latest
     needs:
@@ -364,7 +364,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm-hyp --print-build-logs
   x86_64-linux---packages---seL4-kernel-arm-hyp-exynos5:
-    name: x86_64-linux---packages---seL4-kernel-arm-hyp-exynos5
+    name: seL4-kernel-arm-hyp-exynos5
     runs-on:
       - ubuntu-latest
     needs:
@@ -383,7 +383,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm-hyp-exynos5 --print-build-logs
   x86_64-linux---packages---seL4-kernel-arm-imx8mm:
-    name: x86_64-linux---packages---seL4-kernel-arm-imx8mm
+    name: seL4-kernel-arm-imx8mm
     runs-on:
       - ubuntu-latest
     needs:
@@ -402,7 +402,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm-imx8mm --print-build-logs
   x86_64-linux---packages---seL4-kernel-arm-mcs:
-    name: x86_64-linux---packages---seL4-kernel-arm-mcs
+    name: seL4-kernel-arm-mcs
     runs-on:
       - ubuntu-latest
     needs:
@@ -421,7 +421,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-arm-mcs --print-build-logs
   x86_64-linux---packages---seL4-kernel-riscv64-elf:
-    name: x86_64-linux---packages---seL4-kernel-riscv64-elf
+    name: seL4-kernel-riscv64-elf
     runs-on:
       - ubuntu-latest
     needs:
@@ -440,7 +440,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-riscv64-elf --print-build-logs
   x86_64-linux---packages---seL4-kernel-riscv64-mcs:
-    name: x86_64-linux---packages---seL4-kernel-riscv64-mcs
+    name: seL4-kernel-riscv64-mcs
     runs-on:
       - ubuntu-latest
     needs:
@@ -459,7 +459,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-riscv64-mcs --print-build-logs
   x86_64-linux---packages---seL4-kernel-x64:
-    name: x86_64-linux---packages---seL4-kernel-x64
+    name: seL4-kernel-x64
     runs-on:
       - ubuntu-latest
     needs:
@@ -478,7 +478,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-kernel-x64 --print-build-logs
   x86_64-linux---packages---seL4-test-aarch64-imx8mq-evk:
-    name: x86_64-linux---packages---seL4-test-aarch64-imx8mq-evk
+    name: seL4-test-aarch64-imx8mq-evk
     runs-on:
       - ubuntu-latest
     needs:
@@ -498,7 +498,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-imx8mq-evk --print-build-logs
   x86_64-linux---packages---seL4-test-aarch64-rpi4-1GB:
-    name: x86_64-linux---packages---seL4-test-aarch64-rpi4-1GB
+    name: seL4-test-aarch64-rpi4-1GB
     runs-on:
       - ubuntu-latest
     needs:
@@ -518,7 +518,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-rpi4-1GB --print-build-logs
   x86_64-linux---packages---seL4-test-aarch64-rpi4-2GB:
-    name: x86_64-linux---packages---seL4-test-aarch64-rpi4-2GB
+    name: seL4-test-aarch64-rpi4-2GB
     runs-on:
       - ubuntu-latest
     needs:
@@ -538,7 +538,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-rpi4-2GB --print-build-logs
   x86_64-linux---packages---seL4-test-aarch64-rpi4-4GB:
-    name: x86_64-linux---packages---seL4-test-aarch64-rpi4-4GB
+    name: seL4-test-aarch64-rpi4-4GB
     runs-on:
       - ubuntu-latest
     needs:
@@ -558,7 +558,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-rpi4-4GB --print-build-logs
   x86_64-linux---packages---seL4-test-aarch64-rpi4-8GB:
-    name: x86_64-linux---packages---seL4-test-aarch64-rpi4-8GB
+    name: seL4-test-aarch64-rpi4-8GB
     runs-on:
       - ubuntu-latest
     needs:
@@ -578,7 +578,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-rpi4-8GB --print-build-logs
   x86_64-linux---packages---seL4-test-aarch64-zcu102:
-    name: x86_64-linux---packages---seL4-test-aarch64-zcu102
+    name: seL4-test-aarch64-zcu102
     runs-on:
       - ubuntu-latest
     needs:
@@ -598,7 +598,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-aarch64-zcu102 --print-build-logs
   x86_64-linux---packages---seL4-test-armv7l-rpi3:
-    name: x86_64-linux---packages---seL4-test-armv7l-rpi3
+    name: seL4-test-armv7l-rpi3
     runs-on:
       - ubuntu-latest
     needs:
@@ -618,7 +618,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-armv7l-rpi3 --print-build-logs
   x86_64-linux---packages---seL4-test-armv7l-zynq7000:
-    name: x86_64-linux---packages---seL4-test-armv7l-zynq7000
+    name: seL4-test-armv7l-zynq7000
     runs-on:
       - ubuntu-latest
     needs:
@@ -638,7 +638,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-armv7l-zynq7000 --print-build-logs
   x86_64-linux---packages---seL4-test-armv7l-zynq7000-simulate:
-    name: x86_64-linux---packages---seL4-test-armv7l-zynq7000-simulate
+    name: seL4-test-armv7l-zynq7000-simulate
     runs-on:
       - ubuntu-latest
     needs:
@@ -658,7 +658,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-armv7l-zynq7000-simulate --print-build-logs
   x86_64-linux---packages---seL4-test-i686-ia32:
-    name: x86_64-linux---packages---seL4-test-i686-ia32
+    name: seL4-test-i686-ia32
     runs-on:
       - ubuntu-latest
     needs:
@@ -678,7 +678,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-i686-ia32 --print-build-logs
   x86_64-linux---packages---seL4-test-i686-ia32-simulate:
-    name: x86_64-linux---packages---seL4-test-i686-ia32-simulate
+    name: seL4-test-i686-ia32-simulate
     runs-on:
       - ubuntu-latest
     needs:
@@ -698,7 +698,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-i686-ia32-simulate --print-build-logs
   x86_64-linux---packages---seL4-test-x86_64-x86_64:
-    name: x86_64-linux---packages---seL4-test-x86_64-x86_64
+    name: seL4-test-x86_64-x86_64
     runs-on:
       - ubuntu-latest
     needs:
@@ -718,7 +718,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-x86_64-x86_64 --print-build-logs
   x86_64-linux---packages---seL4-test-x86_64-x86_64-simulate:
-    name: x86_64-linux---packages---seL4-test-x86_64-x86_64-simulate
+    name: seL4-test-x86_64-x86_64-simulate
     runs-on:
       - ubuntu-latest
     needs:
@@ -738,7 +738,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.seL4-test-x86_64-x86_64-simulate --print-build-logs
   x86_64-linux---packages---toolchain-aarch64-elf:
-    name: x86_64-linux---packages---toolchain-aarch64-elf
+    name: toolchain-aarch64-elf
     runs-on:
       - ubuntu-latest
     needs: []
@@ -754,7 +754,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.toolchain-aarch64-elf --print-build-logs
   x86_64-linux---packages---toolchain-aarch64-linux:
-    name: x86_64-linux---packages---toolchain-aarch64-linux
+    name: toolchain-aarch64-linux
     runs-on:
       - ubuntu-latest
     needs: []
@@ -770,7 +770,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.toolchain-aarch64-linux --print-build-logs
   x86_64-linux---packages---toolchain-armv7l-eabihf:
-    name: x86_64-linux---packages---toolchain-armv7l-eabihf
+    name: toolchain-armv7l-eabihf
     runs-on:
       - ubuntu-latest
     needs: []
@@ -786,7 +786,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.toolchain-armv7l-eabihf --print-build-logs
   x86_64-linux---packages---toolchain-armv7l-linux:
-    name: x86_64-linux---packages---toolchain-armv7l-linux
+    name: toolchain-armv7l-linux
     runs-on:
       - ubuntu-latest
     needs: []
@@ -802,7 +802,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.toolchain-armv7l-linux --print-build-logs
   x86_64-linux---packages---toolchain-i686-elf:
-    name: x86_64-linux---packages---toolchain-i686-elf
+    name: toolchain-i686-elf
     runs-on:
       - ubuntu-latest
     needs: []
@@ -818,7 +818,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.toolchain-i686-elf --print-build-logs
   x86_64-linux---packages---toolchain-riscv32-elf:
-    name: x86_64-linux---packages---toolchain-riscv32-elf
+    name: toolchain-riscv32-elf
     runs-on:
       - ubuntu-latest
     needs: []
@@ -834,7 +834,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.toolchain-riscv32-elf --print-build-logs
   x86_64-linux---packages---toolchain-riscv64-elf:
-    name: x86_64-linux---packages---toolchain-riscv64-elf
+    name: toolchain-riscv64-elf
     runs-on:
       - ubuntu-latest
     needs: []
@@ -850,7 +850,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.toolchain-riscv64-elf --print-build-logs
   x86_64-linux---packages---toolchain-x86_64-elf:
-    name: x86_64-linux---packages---toolchain-x86_64-elf
+    name: toolchain-x86_64-elf
     runs-on:
       - ubuntu-latest
     needs: []
@@ -866,7 +866,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.toolchain-x86_64-elf --print-build-logs
   x86_64-linux---packages---uboot-aarch64-rpi4:
-    name: x86_64-linux---packages---uboot-aarch64-rpi4
+    name: uboot-aarch64-rpi4
     runs-on:
       - ubuntu-latest
     needs: []
@@ -882,7 +882,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.uboot-aarch64-rpi4 --print-build-logs
   x86_64-linux---packages---uboot-aarch64-zcu102:
-    name: x86_64-linux---packages---uboot-aarch64-zcu102
+    name: uboot-aarch64-zcu102
     runs-on:
       - ubuntu-latest
     needs: []
@@ -898,7 +898,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.uboot-aarch64-zcu102 --print-build-logs
   x86_64-linux---packages---uboot-armv7l-zynq-zc702:
-    name: x86_64-linux---packages---uboot-armv7l-zynq-zc702
+    name: uboot-armv7l-zynq-zc702
     runs-on:
       - ubuntu-latest
     needs: []
@@ -914,7 +914,7 @@ jobs:
       - name: Build
         run: nix build .#packages.x86_64-linux.uboot-armv7l-zynq-zc702 --print-build-logs
   x86_64-linux---devShells---default:
-    name: x86_64-linux---devShells---default
+    name: default
     runs-on:
       - ubuntu-latest
     needs:
@@ -935,7 +935,7 @@ jobs:
       - name: Build
         run: nix build .#devShells.x86_64-linux.default --print-build-logs
   x86_64-linux---devShells---microkit:
-    name: x86_64-linux---devShells---microkit
+    name: microkit
     runs-on:
       - ubuntu-latest
     needs:
@@ -953,7 +953,7 @@ jobs:
       - name: Build
         run: nix build .#devShells.x86_64-linux.microkit --print-build-logs
   x86_64-linux---checks---formatting:
-    name: x86_64-linux---checks---formatting
+    name: formatting
     runs-on:
       - ubuntu-latest
     needs: []
