@@ -1,0 +1,58 @@
+From ab8415c5ad17a3452223e111deecf04b12d5515a Mon Sep 17 00:00:00 2001
+From: Kent McLeod <kent@kry10.com>
+Date: Tue, 29 Oct 2024 09:56:30 +1100
+Subject: [PATCH] Fixes #1334: install target fails arm_hyp configs
+
+The source layout for arm_hyp configurations uses a symlink to redirect
+sel4_arch include paths back to aarch32 when KernelSel4Arch is set to
+arm_hyp. This case wasn't being handled by the CMake install target for
+installing libsel4 and kernel.elf when the project is used in a
+standalone context. The consequence is that the ARM_HYP verified
+configurations would fail to install even though they would build
+correctly.
+
+We directly address this issue by accounting for the arm_hyp special
+case in the installation command where we manually resolve the symlink.
+If new arm_hyp symlinks are added in the future, this fix should still
+apply providing that the update to the CMake install target uses the
+same resolved sel4arch path variable introduced by this change.
+
+There is a longer-term plan to remove the arm_hyp KernelSel4Arch config
+value which is expected to remove these sorts of issues.
+
+Signed-off-by: Kent McLeod <kent@kry10.com>
+---
+ CMakeLists.txt | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dcdf92b2be..e413a0b1c2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -733,16 +733,23 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+     # Install kernel.elf to bin/kernel.elf
+     install(TARGETS kernel.elf RUNTIME DESTINATION bin)
+     # Install all libsel4 headers to libsel4/include
++    # If building for aarch32,hyp explicitly use aarch32 for sel4arch path
++    # otherwise the install command tries to install the arm_hyp symlink file
++    # instead of its realpath.
++    set(realpath_sel4arch "${KernelSel4Arch}")
++    if (KernelSel4ArchArmHyp)
++        set(realpath_sel4arch "aarch32")
++    endif()
+     install(
+         DIRECTORY
+             "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/include/"
+             "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/arch_include/${KernelArch}/"
+-            "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_arch_include/${KernelSel4Arch}/"
++            "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_arch_include/${realpath_sel4arch}/"
+             "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_plat_include/${KernelPlatform}/"
+             "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/mode_include/${KernelWordSize}/"
+             "${CMAKE_CURRENT_BINARY_DIR}/libsel4/include/"
+             "${CMAKE_CURRENT_BINARY_DIR}/libsel4/arch_include/${KernelArch}/"
+-            "${CMAKE_CURRENT_BINARY_DIR}/libsel4/sel4_arch_include/${KernelSel4Arch}/"
++            "${CMAKE_CURRENT_BINARY_DIR}/libsel4/sel4_arch_include/${realpath_sel4arch}/"
+             # The following directories install the autoconf headers
+             "${CMAKE_CURRENT_BINARY_DIR}/gen_config/"
+             "${CMAKE_CURRENT_BINARY_DIR}/libsel4/gen_config/"
+
