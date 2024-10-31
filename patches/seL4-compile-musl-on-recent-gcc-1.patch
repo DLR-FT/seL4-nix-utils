@@ -1,0 +1,26 @@
+From 29d041ae7c9d0afd312f77c11a737fab2a371d2c Mon Sep 17 00:00:00 2001
+From: Alwin Joshy <joshyalwin@gmail.com>
+Date: Thu, 15 Aug 2024 16:32:59 +1000
+Subject: [PATCH] hack: provide __getauxval()
+
+Signed-off-by: Alwin Joshy <joshyalwin@gmail.com>
+---
+ src/misc/getauxval.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/misc/getauxval.c b/src/misc/getauxval.c
+index b846c80fd..c1134492b 100644
+--- a/src/misc/getauxval.c
++++ b/src/misc/getauxval.c
+@@ -2,6 +2,11 @@
+ #include <errno.h>
+ #include "libc.h"
+ 
++unsigned long __getauxval(unsigned long type) {
++    errno = ENOENT;
++    return 0;
++}
++
+ unsigned long getauxval(unsigned long item)
+ {
+ 	size_t *auxv = libc.auxv;

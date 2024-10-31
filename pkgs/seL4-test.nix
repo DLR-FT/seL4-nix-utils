@@ -2,7 +2,7 @@
 { lib
 , stdenvNoLibs
 , fetchGoogleRepoTool
-, writeShellScriptBin
+, buildPackages
 , cmake
 , cpio
 , dtc
@@ -25,8 +25,6 @@ stdenvNoLibs.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    # leak cross compiler into eventual devShell, if one uses this drv with inputsFrom
-    stdenvNoLibs.cc
     cmake # build tools
     cpio # cpio archive tool
     dtc # device tree compiler
@@ -37,7 +35,7 @@ stdenvNoLibs.mkDerivation rec {
     python3Packages.seL4-deps # python deps for seL4
 
     # fakegit
-    (writeShellScriptBin "git" ''
+    (buildPackages.writeShellScriptBin "git" ''
       # Taken from https://git.musl-libc.org/cgit/musl/tree/tools/version.sh
       if [[ $@ = "git describe --tags --match 'v[0-9]*'" ]]; then
         echo "${version}"
@@ -51,13 +49,15 @@ stdenvNoLibs.mkDerivation rec {
   # fix /bin/bash et al.
   postPatch = ''
     patchShebangs .
+  ''
+  # Patch old musllibc to work with new bintools
+  # TODO remove this once https://github.com/seL4/sel4test-manifest/issues/21 is fixed
+  + ''
+    pushd projects/musllibc
+    patch -p1 < ${ ../patches/seL4-compile-musl-on-recent-gcc-1.patch }
+    patch -p1 < ${ ../patches/seL4-compile-musl-on-recent-gcc-2.patch }
+    popd
   '';
-
-  env.NIX_CFLAGS_COMPILE = builtins.concatStringsSep " " ([ ]
-    # Hotfix for:
-    # aarch64-unknown-linux-musl-ld: apps/sel4test-driver/musllibc/build-temp/stage/lib/libc.a(__stdio_exit.o): copy relocation against non-copyable protected symbol `__stdin_used'
-    ++ lib.lists.optional (!stdenvNoLibs.hostPlatform.isx86) "-fpic"
-  );
 
   # prevent Nix from injecting any flags meant to harden the build
   hardeningDisable = [ "all" ];
