@@ -65,12 +65,7 @@ stdenv.mkDerivation rec {
   ] ++ lib.lists.optional (verifiedConfig != null) "-C../configs/${verifiedConfig}.cmake";
 
   # TODO remove hotfix for https://github.com/seL4/seL4/issues/1334
-  installPhase = lib.strings.optionalString (lib.lists.elem verifiedConfig brokenVerifiedConfigs)
-    ''
-      runHook preInstall
-      ninja install || true
-      runHook postInstall
-    '';
+  patches = lib.lists.optional (lib.lists.elem verifiedConfig brokenVerifiedConfigs) ../patches/seL4-cmake-install-target-failure.patch;
 
   dontFixup = true;
 }
