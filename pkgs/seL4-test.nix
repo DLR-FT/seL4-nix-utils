@@ -59,6 +59,12 @@ stdenvNoLibs.mkDerivation rec {
     popd
   '';
 
+  # Fix for https://github.com/seL4/sel4test/issues/127
+  # Gcc compiling for an x86 -elf target treats single forward slashed (`/`) as
+  # beginning of comments, which breaks the alignment tests in
+  # projects/sel4test/apps/sel4test-tests/src/arch/x86/tests/alignment_asm.S
+  env.NIX_CFLAGS_COMPILE = lib.strings.optionalString (stdenvNoLibs.hostPlatform.isx86) "-Wa,--divide";
+
   # prevent Nix from injecting any flags meant to harden the build
   hardeningDisable = [ "all" ];
 
