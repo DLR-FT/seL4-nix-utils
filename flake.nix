@@ -22,10 +22,10 @@
         ### Custom cross-compilation Environments
         #
         pkgsCross = nixpkgs.lib.attrsets.genAttrs [
-          "aarch64-unknown-none-elf"
           "aarch64-unknown-linux-gnu"
-          "armv7l-unknown-none-eabihf"
+          "aarch64-unknown-none-elf"
           "armv7l-unknown-linux-gnueabihf"
+          "armv7l-unknown-none-eabihf"
           "i686-unknown-none-elf"
           "microblazeel-none-elf"
           "riscv32-unknown-none-elf"
