@@ -144,6 +144,12 @@
 
 
           #
+          ### seL4 kernel loader
+          #
+          seL4-kernel-loader-aarch64 = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-kernel-loader.nix { };
+
+
+          #
           ### seL4 test suite for various platforms
           #
           seL4-test-aarch64-imx8mq-evk = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-test.nix
