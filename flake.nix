@@ -18,6 +18,12 @@
 
         treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
+        # Rust sometimes uses differing target triples for the same thing
+        rustTargets = {
+          "arch64-unknown-none-elf" = "aarch64-unknown-none";
+        };
+
+
         #
         ### Custom cross-compilation Environments
         #
@@ -34,8 +40,11 @@
         ]
           (config: import nixpkgs {
             inherit system;
-            crossSystem = { inherit config; };
-            overlays = [ self.overlays.default ];
+            crossSystem = {
+              inherit config;
+              rust.rustcTarget = nixpkgs.lib.strings.optionalString (rustTargets?config) rustTargets.${config};
+              overlays = [ self.overlays.default ];
+            };
           });
       in
       {
