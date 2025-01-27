@@ -1,0 +1,12 @@
+diff --git a/seL4-src/src/object/interrupt.c b/seL4-src/src/object/interrupt.c
+index bf5604a03..e9ce1a4f8 100644
+--- a/seL4-src/src/object/interrupt.c
++++ b/seL4-src/src/object/interrupt.c
+@@ -206,6 +206,7 @@ void handleInterrupt(irq_t irq)
+         /* Merging the variable declaration and initialization into one line
+          * requires an update in the proofs first. Might be a c89 legacy.
+          */
++        printf("KERNEL: Received IRQ %d\n", (int)IRQT_TO_IRQ(irq));
+         cap_t cap;
+         cap = intStateIRQNode[IRQT_TO_IDX(irq)].cap;
+         if (cap_get_capType(cap) == cap_notification_cap &&

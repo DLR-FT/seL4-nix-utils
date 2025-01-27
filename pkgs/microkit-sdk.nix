@@ -116,6 +116,7 @@ stdenv.mkDerivation (finalAttrs: {
     # upstream PR: https://github.com/seL4/seL4/pull/1310
     # relevant issue: https://github.com/seL4/microkit/issues/201
     ../patches/seL4-riscv-toolchain-prefix.patch
+    ../patches/seL4-print-irqs.patch
   ];
 
   buildPhase = ''
