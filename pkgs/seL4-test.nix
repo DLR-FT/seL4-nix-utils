@@ -1,7 +1,7 @@
 # builds an seL4 kernel + userland
 {
   lib,
-  stdenvNoLibs,
+  stdenv,
   fetchGoogleRepoTool,
   buildPackages,
   cmake,
@@ -15,7 +15,7 @@
   extraCmakeFlags ? [ ],
 }:
 
-stdenvNoLibs.mkDerivation rec {
+stdenv.mkDerivation rec {
   pname = "seL4test";
   version = "13.0.0";
 
@@ -30,7 +30,7 @@ stdenvNoLibs.mkDerivation rec {
     cpio # cpio archive tool
     dtc # device tree compiler
     libxml2 # xmllint
-    nanopb # ser/de
+    nanopb.generator # ser/de
     ninja # build tools
     protobuf # to generate ser/de stuff
     python3Packages.seL4-deps # python deps for seL4
@@ -65,27 +65,24 @@ stdenvNoLibs.mkDerivation rec {
   # Gcc compiling for an x86 -elf target treats single forward slashed (`/`) as
   # beginning of comments, which breaks the alignment tests in
   # projects/sel4test/apps/sel4test-tests/src/arch/x86/tests/alignment_asm.S
-  env.NIX_CFLAGS_COMPILE = lib.strings.optionalString (stdenvNoLibs.hostPlatform.isx86) "-Wa,--divide";
+  env.NIX_CFLAGS_COMPILE = lib.strings.optionalString (stdenv.hostPlatform.isx86) "-Wa,--divide";
 
   # prevent Nix from injecting any flags meant to harden the build
   hardeningDisable = [ "all" ];
 
-  dontUseCmakeConfigure = true;
   preConfigure = ''
-    mkdir build
-    cd build
-    ../init-build.sh ${lib.strings.escapeShellArgs cmakeFlags}
+    cd projects/sel4test
   '';
   cmakeFlags =
     [
       "-GNinja"
-      "-DCROSS_COMPILER_PREFIX=${stdenvNoLibs.cc.targetPrefix}"
-      "-DCMAKE_TOOLCHAIN_FILE=../kernel/gcc.cmake"
+      "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
+      "-DCMAKE_TOOLCHAIN_FILE=../../kernel/gcc.cmake"
     ]
-    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32) "-DAARCH32=1"
-    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch64) "-DAARCH64=1"
-    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV64) "-DRISCV64=1"
-    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV32) "-DRISCV32=1"
+    ++ lib.lists.optional (stdenv.hostPlatform.isAarch32) "-DAARCH32=1"
+    ++ lib.lists.optional (stdenv.hostPlatform.isAarch64) "-DAARCH64=1"
+    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
+    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
     ++ extraCmakeFlags;
 
   installPhase = ''

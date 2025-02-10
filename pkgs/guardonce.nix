@@ -2,7 +2,6 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  nose,
   pip,
 }:
 
@@ -24,10 +23,7 @@ buildPythonPackage rec {
     export HOME="$(mktemp --directory)"
   '';
 
-  propagatedBuildInputs = [
-    nose
-    pip
-  ];
+  propagatedBuildInputs = [ pip ];
 
   meta = with lib; {
     description = "Utilities for converting from C/C++ include guards to #pragma once and back again";
