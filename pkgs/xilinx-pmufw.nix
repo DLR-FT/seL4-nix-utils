@@ -1,10 +1,8 @@
 { stdenv, fetchFromGitHub }:
 
 # inspired by https://github.com/lucaceresoli/zynqmp-pmufw-builder
-let
-  inherit (stdenv.cc) targetPrefix;
-in
-stdenv.mkDerivation rec {
+let inherit (stdenv.cc) targetPrefix;
+in stdenv.mkDerivation rec {
   pname = "zynqmp-pmufw";
   version = "2023.2";
   src = fetchFromGitHub {

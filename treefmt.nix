@@ -1,6 +1,5 @@
-{ ... }:
-{
+{ ... }: {
   projectRootFile = "flake.nix";
-  programs.nixpkgs-fmt.enable = true;
+  programs.nixfmt.enable = true;
   programs.prettier.enable = true;
 }

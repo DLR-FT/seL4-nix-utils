@@ -1,19 +1,5 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, rustPlatform
-, pkgsCross
-, dtc
-, cargo
-, cmake
-, libxml2
-, ninja
-, pandoc
-, python3Packages
-, qemu
-, rustc
-, texlive
-}:
+{ lib, stdenv, fetchFromGitHub, rustPlatform, pkgsCross, dtc, cargo, cmake
+, libxml2, ninja, pandoc, python3Packages, qemu, rustc, texlive }:
 
 let
   # TODO make seL4-src overridable
@@ -31,22 +17,12 @@ let
   # nix-shell --pure --packages '(texlive.combine { inherit (texlive) enumitem environ fontaxes isodate roboto pdfcol scheme-medium sfmath substr tcolorbox titlesec; })' --packages pandoc --run "TEXINPUTS=$(nix eval --raw .\#microkit-sdk.src)/docs/style/: pandoc $(nix eval --raw .\#microkit-sdk.src)/docs/manual.md -o manual.pdf"
   tex = (texlive.combine {
     inherit (texlive)
-      enumitem
-      environ
-      fontaxes
-      isodate
-      pdfcol
-      roboto
-      scheme-medium
-      sfmath
-      substr
-      tcolorbox
-      titlesec;
+      enumitem environ fontaxes isodate pdfcol roboto scheme-medium sfmath
+      substr tcolorbox titlesec;
   });
 
   inherit (lib.strings) escapeShellArg;
-in
-stdenv.mkDerivation (finalAttrs: {
+in stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
   version = "1.4.1";
 
@@ -89,16 +65,8 @@ stdenv.mkDerivation (finalAttrs: {
     dtc
     libxml2 # xmllint
 
-    (python3Packages.python.withPackages (ps: with ps; [
-      mypy
-      black
-      flake8
-      ply
-      jinja2
-      pyyaml
-      pyfdt
-      lxml
-    ]))
+    (python3Packages.python.withPackages
+      (ps: with ps; [ mypy black flake8 ply jinja2 pyyaml pyfdt lxml ]))
   ];
   dontUseCmakeConfigure = true; # the build is driven by build_sdk.py, not cmake
 
@@ -131,7 +99,8 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   meta = {
-    description = "An SDK to enable system designers to create static software systems based on the seL4 microkernel";
+    description =
+      "An SDK to enable system designers to create static software systems based on the seL4 microkernel";
     homepage = "https://trustworthy.systems/projects/microkit/";
     license = lib.licenses.bsd2;
     maintainers = with lib.maintainers; [ wucke13 ];

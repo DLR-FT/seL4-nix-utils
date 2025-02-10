@@ -1,18 +1,7 @@
 # builds an seL4 kernel
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, ninja
-, libxml2
-, dtc
-, cpio
-, python3Packages
-, verifiedConfig ? null
-, extraVerifiedConfigs ? [ ]
-, extraCmakeFlags ? [ ]
-}:
-
+{ lib, stdenv, fetchFromGitHub, cmake, ninja, libxml2, dtc, cpio
+, python3Packages, verifiedConfig ? null, extraVerifiedConfigs ? [ ]
+, extraCmakeFlags ? [ ] }:
 
 let
   # known seL4 configs
@@ -29,10 +18,12 @@ let
   ] ++ extraVerifiedConfigs;
 
   brokenVerifiedConfigs = [ "ARM_HYP_exynos5_verified" "ARM_HYP_verified" ];
-in
 
-# check that the passed seL4 config is known
-assert if verifiedConfig != null then builtins.elem verifiedConfig knownVerifiedConfigs else true;
+  # check that the passed seL4 config is known
+in assert if verifiedConfig != null then
+  builtins.elem verifiedConfig knownVerifiedConfigs
+else
+  true;
 
 stdenv.mkDerivation rec {
   pname = "seL4";
@@ -63,11 +54,13 @@ stdenv.mkDerivation rec {
     "-GNinja"
     "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
     "-DCMAKE_TOOLCHAIN_FILE=../gcc.cmake"
-  ] ++ lib.lists.optional (verifiedConfig != null) "-C../configs/${verifiedConfig}.cmake"
-  ++ extraCmakeFlags;
+  ] ++ lib.lists.optional (verifiedConfig != null)
+    "-C../configs/${verifiedConfig}.cmake" ++ extraCmakeFlags;
 
   # TODO remove hotfix for https://github.com/seL4/seL4/issues/1334
-  patches = lib.lists.optional (lib.lists.elem verifiedConfig brokenVerifiedConfigs) ../patches/seL4-cmake-install-target-failure.patch;
+  patches =
+    lib.lists.optional (lib.lists.elem verifiedConfig brokenVerifiedConfigs)
+    ../patches/seL4-cmake-install-target-failure.patch;
 
   dontFixup = true;
 }

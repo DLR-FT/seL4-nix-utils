@@ -1,18 +1,6 @@
 # builds an seL4 kernel + userland
-{ lib
-, stdenvNoLibs
-, fetchGoogleRepoTool
-, buildPackages
-, cmake
-, cpio
-, dtc
-, libxml2
-, nanopb
-, ninja
-, protobuf
-, python3Packages
-, extraCmakeFlags ? [ ]
-}:
+{ lib, stdenvNoLibs, fetchGoogleRepoTool, buildPackages, cmake, cpio, dtc
+, libxml2, nanopb, ninja, protobuf, python3Packages, extraCmakeFlags ? [ ] }:
 
 stdenvNoLibs.mkDerivation rec {
   pname = "seL4test";
@@ -50,20 +38,21 @@ stdenvNoLibs.mkDerivation rec {
   postPatch = ''
     patchShebangs .
   ''
-  # Patch old musllibc to work with new bintools
-  # TODO remove this once https://github.com/seL4/sel4test-manifest/issues/21 is fixed
-  + ''
-    pushd projects/musllibc
-    patch -p1 < ${ ../patches/seL4-compile-musl-on-recent-gcc-1.patch }
-    patch -p1 < ${ ../patches/seL4-compile-musl-on-recent-gcc-2.patch }
-    popd
-  '';
+    # Patch old musllibc to work with new bintools
+    # TODO remove this once https://github.com/seL4/sel4test-manifest/issues/21 is fixed
+    + ''
+      pushd projects/musllibc
+      patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-1.patch}
+      patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-2.patch}
+      popd
+    '';
 
   # Fix for https://github.com/seL4/sel4test/issues/127
   # Gcc compiling for an x86 -elf target treats single forward slashed (`/`) as
   # beginning of comments, which breaks the alignment tests in
   # projects/sel4test/apps/sel4test-tests/src/arch/x86/tests/alignment_asm.S
-  env.NIX_CFLAGS_COMPILE = lib.strings.optionalString (stdenvNoLibs.hostPlatform.isx86) "-Wa,--divide";
+  env.NIX_CFLAGS_COMPILE =
+    lib.strings.optionalString (stdenvNoLibs.hostPlatform.isx86) "-Wa,--divide";
 
   # prevent Nix from injecting any flags meant to harden the build
   hardeningDisable = [ "all" ];
@@ -78,12 +67,11 @@ stdenvNoLibs.mkDerivation rec {
     "-GNinja"
     "-DCROSS_COMPILER_PREFIX=${stdenvNoLibs.cc.targetPrefix}"
     "-DCMAKE_TOOLCHAIN_FILE=../kernel/gcc.cmake"
-  ]
-  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32) "-DAARCH32=1"
-  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch64) "-DAARCH64=1"
-  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV64) "-DRISCV64=1"
-  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV32) "-DRISCV32=1"
-  ++ extraCmakeFlags;
+  ] ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32) "-DAARCH32=1"
+    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch64) "-DAARCH64=1"
+    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV64) "-DRISCV64=1"
+    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV32) "-DRISCV32=1"
+    ++ extraCmakeFlags;
 
   installPhase = ''
     runHook preInstall

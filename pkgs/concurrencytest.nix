@@ -1,4 +1,5 @@
-{ lib, buildPythonPackage, fetchPypi, setuptools, wheel, python-subunit, testtools }:
+{ lib, buildPythonPackage, fetchPypi, setuptools, wheel, python-subunit
+, testtools }:
 
 buildPythonPackage rec {
   pname = "concurrencytest";
@@ -9,10 +10,7 @@ buildPythonPackage rec {
     hash = "sha256-ZKnFtc25lJo3X8xeEUqCGA9qB8waAm05ViMK7PmAwtg=";
   };
 
-  propagatedBuildInputs = [
-    python-subunit
-    testtools
-  ];
+  propagatedBuildInputs = [ python-subunit testtools ];
 
   pythonImportsCheck = [
     "time"
@@ -23,7 +21,8 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
-    description = "testtools extension for running unittest suites concurrently";
+    description =
+      "testtools extension for running unittest suites concurrently";
     homepage = "https://github.com/cgoldberg/concurrencytest";
     license = with licenses; [ gpl3 ];
     maintainers = with maintainers; [ wucke13 ];
