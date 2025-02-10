@@ -1,7 +1,7 @@
 # builds an seL4 kernel + userland
 {
   lib,
-  stdenvNoLibs,
+  stdenv,
   fetchGoogleRepoTool,
   writeText,
   buildPackages,
@@ -11,6 +11,7 @@
   libxml2,
   nanopb,
   ninja,
+  python3Packages,
   qemu,
   ubootTools,
   extraCmakeFlags ? [ ],
@@ -24,7 +25,7 @@ let
   '';
 
 in
-stdenvNoLibs.mkDerivation rec {
+stdenv.mkDerivation rec {
   pname = "seL4-camkes-vm-examples.";
   version = "camkes-3.11.0";
 
@@ -35,21 +36,18 @@ stdenvNoLibs.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    stdenvNoLibs.cc
+    stdenv.cc
     cmake # build tools
     cpio # cpio archive tool
     dtc # device tree compiler
     libxml2 # xmllint
-    nanopb # ser/de
+    nanopb.generator # ser/de
     ninja # build tools
     ubootTools # for mkimage
-    (buildPackages.python3.withPackages (
-      ps: with ps; [
-        camkes-deps
-        seL4-deps
-        protobuf
-      ]
-    ))
+    python3Packages.seL4-deps # python deps for seL4
+    python3Packages.camkes-deps # python deps for CAmkES
+    python3Packages.protobuf
+    python3Packages.six
 
     # fakegit
     (buildPackages.writeShellScriptBin "git" ''
@@ -71,7 +69,7 @@ stdenvNoLibs.mkDerivation rec {
       # fix /bin/bash et al.
       patchShebangs .
       substituteInPlace kernel/tools/circular_includes.py \
-        --replace 'file_stack[-1]' 'len(file_stack) > 0 and file_stack[-1]'
+        --replace-fail 'file_stack[-1]' 'len(file_stack) > 0 and file_stack[-1]'
 
       # avoid from-scratch compilation of capDL-tool
       cp -- ${capDL-makefile} projects/capdl/capDL-tool/Makefile
@@ -89,24 +87,24 @@ stdenvNoLibs.mkDerivation rec {
 
   hardeningDisable = [ "all" ];
 
-  dontUseCmakeConfigure = true;
   preConfigure = ''
-    mkdir home
-    export HOME="$PWD/home"
-    mkdir build
-    cd build
-    ../init-build.sh ${lib.strings.escapeShellArgs cmakeFlags}  '';
+    cd projects/vm-examples
+
+    # TODO remove workaround for https://github.com/seL4/camkes-tool/issues/154
+    sed --in-place -- 's|"PYTHONPATH=\([^"]*\)"|"PYTHONPATH=\1:'"$PYTHONPATH"'"|g' ../../projects/camkes-tool/camkes.cmake
+  '';
+
   cmakeFlags =
     [
       "-GNinja"
-      "-DCROSS_COMPILER_PREFIX=${stdenvNoLibs.cc.targetPrefix}"
-      "-DC_PREPROCESSOR=${stdenvNoLibs.cc}/bin/${stdenvNoLibs.cc.targetPrefix}cpp"
-      "-DCMAKE_TOOLCHAIN_FILE=../kernel/gcc.cmake"
+      "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
+      "-DC_PREPROCESSOR=${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cpp"
+      "-DCMAKE_TOOLCHAIN_FILE=../../kernel/gcc.cmake"
     ]
-    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32) "-DAARCH32=1"
-    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch64) "-DAARCH64=1"
-    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV64) "-DRISCV64=1"
-    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV32) "-DRISCV32=1"
+    ++ lib.lists.optional (stdenv.hostPlatform.isAarch32) "-DAARCH32=1"
+    ++ lib.lists.optional (stdenv.hostPlatform.isAarch64) "-DAARCH64=1"
+    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
+    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
     ++ extraCmakeFlags;
 
   installPhase = ''

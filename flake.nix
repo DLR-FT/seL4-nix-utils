@@ -1,7 +1,9 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
-    nixpkgs-new.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    # TODO remove nixpkgs-old, the capDLInjectorOverlay et al. once capDL builds with an up-to-date
+    # nixpkgs
+    nixpkgs-old.url = "github:NixOS/nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -22,10 +24,22 @@
       let
         pkgs = import nixpkgs {
           inherit system;
+          overlays = [
+            self.overlays.default
+            capDLInjectorOverlay
+          ];
+        };
+
+        pkgsOld = import inputs.nixpkgs-old {
+          inherit system;
           overlays = [ self.overlays.default ];
         };
 
-        treefmtEval = treefmt-nix.lib.evalModule inputs.nixpkgs-new.legacyPackages.${system} ./treefmt.nix;
+        treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+
+        capDLInjectorOverlay = final: prev: {
+          inherit (self.packages.${system}) capDL-tool;
+        };
 
         #
         ### Custom cross-compilation Environments
@@ -49,7 +63,10 @@
               import nixpkgs {
                 inherit system;
                 crossSystem = { inherit config; };
-                overlays = [ self.overlays.default ];
+                overlays = [
+                  self.overlays.default
+                  capDLInjectorOverlay
+                ];
               }
             );
       in
@@ -71,7 +88,7 @@
           #
           ### seL4 related tools and dependencies
           #
-          capDL-tool = pkgs.capDL-tool;
+          capDL-tool = pkgsOld.capDL-tool;
 
           # python dependencies for seL4
           # these are not actually part of the nixpkgs, but provided over the default overlay of
@@ -199,6 +216,7 @@
             extraCmakeFlags = [ "-DPLATFORM=rpi3" ];
           };
 
+          seL4-test-armv7l = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-test.nix { };
           seL4-test-armv7l-zynq7000 = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-test.nix {
             extraCmakeFlags = [ "-DPLATFORM=zynq7000" ];
           };
