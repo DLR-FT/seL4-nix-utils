@@ -2,7 +2,6 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  nose,
   pip,
 }:
 
@@ -25,7 +24,6 @@ buildPythonPackage rec {
   '';
 
   propagatedBuildInputs = [
-    nose
     pip
   ];
 
