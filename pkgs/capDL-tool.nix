@@ -1,20 +1,21 @@
-{ mkDerivation
-, array
-, base
-, base-compat
-, containers
-, fetchgit
-, filepath
-, lens
-, lib
-, MissingH
-, mtl
-, parsec
-, pretty
-, regex-compat
-, split
-, unix
-, yaml
+{
+  mkDerivation,
+  array,
+  base,
+  base-compat,
+  containers,
+  fetchgit,
+  filepath,
+  lens,
+  lib,
+  MissingH,
+  mtl,
+  parsec,
+  pretty,
+  regex-compat,
+  split,
+  unix,
+  yaml,
 }:
 mkDerivation {
   pname = "capDL-tool";

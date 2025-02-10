@@ -1,20 +1,22 @@
-{ lib
-, stdenvNoCC
-, cacert
-, git
-, git-repo
-, nukeReferences
+{
+  lib,
+  stdenvNoCC,
+  cacert,
+  git,
+  git-repo,
+  nukeReferences,
 }:
 
 let
   inherit (lib.strings) escapeShellArg;
-in
 
+in
 lib.makeOverridable (
-  { url
-  , rev
-  , name ? "source"
-  , hash
+  {
+    url,
+    rev,
+    name ? "source",
+    hash,
     # Problem
     #
     # `repo` allows for the manifest to just specify a branch, defaulting to the latest commit.
@@ -33,7 +35,7 @@ lib.makeOverridable (
     # without a changed date. Also, force pushes to the repo will yield different results. Both
     # of these cases are however caught by the fixed output derivation hash, and are present with
     # normal git checkouts as well.
-  , latestCommitTimestamp ? null
+    latestCommitTimestamp ? null,
   }@args:
 
   stdenvNoCC.mkDerivation {
@@ -41,7 +43,11 @@ lib.makeOverridable (
     dontUnpack = true;
     dontBuild = true;
 
-    nativeBuildInputs = [ cacert git git-repo ];
+    nativeBuildInputs = [
+      cacert
+      git
+      git-repo
+    ];
 
     installPhase = ''
       runHook preInstall
@@ -59,7 +65,12 @@ lib.makeOverridable (
       pushd .repo/manifests > /dev/null
       git fetch --all --tags
       git checkout --quiet ${escapeShellArg rev}
-      MANIFEST_TIMESTAMP=${if latestCommitTimestamp != null then escapeShellArg latestCommitTimestamp else "$(git show --no-patch --format=%cI)"}
+      MANIFEST_TIMESTAMP=${
+        if latestCommitTimestamp != null then
+          escapeShellArg latestCommitTimestamp
+        else
+          "$(git show --no-patch --format=%cI)"
+      }
       echo -e "Cutoff date is \033[1;4m''${MANIFEST_TIMESTAMP}\033[0m"
       echo "Manifest is checked out at"
       git-describe-tip

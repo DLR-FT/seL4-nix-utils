@@ -1,16 +1,17 @@
-{ lib
-, buildPythonPackage
-, aenum
-, jinja2
-, ordered-set
-, plyplus
-, pyelftools
-, seL4-deps
-, pycparser
-, pyfdt
-, concurrencytest
-, sortedcontainers
-, hypothesis
+{
+  lib,
+  buildPythonPackage,
+  aenum,
+  jinja2,
+  ordered-set,
+  plyplus,
+  pyelftools,
+  seL4-deps,
+  pycparser,
+  pyfdt,
+  concurrencytest,
+  sortedcontainers,
+  hypothesis,
 }:
 
 buildPythonPackage rec {

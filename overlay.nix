@@ -17,16 +17,13 @@ final: prev: {
     in
     hsPkgs.callPackage pkgs/capDL-tool.nix { };
 
-
   # Fetcher that uses Google's repo tool. Kinf of cursed, had some issues with determinism.
   # Hopefully now it's fully deterministic.
   # https://android.googlesource.com/tools/repo
   fetchGoogleRepoTool = prev.callPackage pkgs/fetch-google-repo-tool.nix { };
 
-
   # microkit
   microkit-sdk = prev.callPackage pkgs/microkit-sdk.nix { };
-
 
   # overlay python packages
   pythonPackagesOverlays = (prev.pythonPackagesOverlays or [ ]) ++ [

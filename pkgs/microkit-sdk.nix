@@ -1,18 +1,19 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, rustPlatform
-, pkgsCross
-, dtc
-, cargo
-, cmake
-, libxml2
-, ninja
-, pandoc
-, python3Packages
-, qemu
-, rustc
-, texlive
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  rustPlatform,
+  pkgsCross,
+  dtc,
+  cargo,
+  cmake,
+  libxml2,
+  ninja,
+  pandoc,
+  python3Packages,
+  qemu,
+  rustc,
+  texlive,
 }:
 
 let
@@ -29,20 +30,23 @@ let
   # To debug the required TeX packages:
   #
   # nix-shell --pure --packages '(texlive.combine { inherit (texlive) enumitem environ fontaxes isodate roboto pdfcol scheme-medium sfmath substr tcolorbox titlesec; })' --packages pandoc --run "TEXINPUTS=$(nix eval --raw .\#microkit-sdk.src)/docs/style/: pandoc $(nix eval --raw .\#microkit-sdk.src)/docs/manual.md -o manual.pdf"
-  tex = (texlive.combine {
-    inherit (texlive)
-      enumitem
-      environ
-      fontaxes
-      isodate
-      pdfcol
-      roboto
-      scheme-medium
-      sfmath
-      substr
-      tcolorbox
-      titlesec;
-  });
+  tex = (
+    texlive.combine {
+      inherit (texlive)
+        enumitem
+        environ
+        fontaxes
+        isodate
+        pdfcol
+        roboto
+        scheme-medium
+        sfmath
+        substr
+        tcolorbox
+        titlesec
+        ;
+    }
+  );
 
   inherit (lib.strings) escapeShellArg;
 in
@@ -89,16 +93,18 @@ stdenv.mkDerivation (finalAttrs: {
     dtc
     libxml2 # xmllint
 
-    (python3Packages.python.withPackages (ps: with ps; [
-      mypy
-      black
-      flake8
-      ply
-      jinja2
-      pyyaml
-      pyfdt
-      lxml
-    ]))
+    (python3Packages.python.withPackages (
+      ps: with ps; [
+        mypy
+        black
+        flake8
+        ply
+        jinja2
+        pyyaml
+        pyfdt
+        lxml
+      ]
+    ))
   ];
   dontUseCmakeConfigure = true; # the build is driven by build_sdk.py, not cmake
 

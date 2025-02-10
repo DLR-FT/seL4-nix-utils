@@ -1,4 +1,12 @@
-{ lib, buildPythonPackage, fetchPypi, setuptools, wheel, python-subunit, testtools }:
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  setuptools,
+  wheel,
+  python-subunit,
+  testtools,
+}:
 
 buildPythonPackage rec {
   pname = "concurrencytest";

@@ -1,23 +1,24 @@
-{ lib
-, buildPythonPackage
-, six
-, future
-, jinja2
-, lxml
-, ply
-, psutil
-, beautifulsoup4
-, pyelftools
-, sh
-, pexpect
-, pyaml
-, jsonschema
-, pyfdt
-, cmake-format
-, guardonce
-, autopep8
-, libarchive-c
-, setuptools
+{
+  lib,
+  buildPythonPackage,
+  six,
+  future,
+  jinja2,
+  lxml,
+  ply,
+  psutil,
+  beautifulsoup4,
+  pyelftools,
+  sh,
+  pexpect,
+  pyaml,
+  jsonschema,
+  pyfdt,
+  cmake-format,
+  guardonce,
+  autopep8,
+  libarchive-c,
+  setuptools,
 }:
 
 buildPythonPackage rec {
@@ -27,7 +28,6 @@ buildPythonPackage rec {
   dontUnpack = true;
   dontBuild = true;
   format = "other"; # don't actually try to install anything
-
 
   propagatedBuildInputs = [
     # taken of sel-deps 0.3.1 on 2024-02-07

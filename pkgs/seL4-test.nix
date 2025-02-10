@@ -1,17 +1,18 @@
 # builds an seL4 kernel + userland
-{ lib
-, stdenvNoLibs
-, fetchGoogleRepoTool
-, buildPackages
-, cmake
-, cpio
-, dtc
-, libxml2
-, nanopb
-, ninja
-, protobuf
-, python3Packages
-, extraCmakeFlags ? [ ]
+{
+  lib,
+  stdenvNoLibs,
+  fetchGoogleRepoTool,
+  buildPackages,
+  cmake,
+  cpio,
+  dtc,
+  libxml2,
+  nanopb,
+  ninja,
+  protobuf,
+  python3Packages,
+  extraCmakeFlags ? [ ],
 }:
 
 stdenvNoLibs.mkDerivation rec {
@@ -47,17 +48,18 @@ stdenvNoLibs.mkDerivation rec {
   ];
 
   # fix /bin/bash et al.
-  postPatch = ''
-    patchShebangs .
-  ''
-  # Patch old musllibc to work with new bintools
-  # TODO remove this once https://github.com/seL4/sel4test-manifest/issues/21 is fixed
-  + ''
-    pushd projects/musllibc
-    patch -p1 < ${ ../patches/seL4-compile-musl-on-recent-gcc-1.patch }
-    patch -p1 < ${ ../patches/seL4-compile-musl-on-recent-gcc-2.patch }
-    popd
-  '';
+  postPatch =
+    ''
+      patchShebangs .
+    ''
+    # Patch old musllibc to work with new bintools
+    # TODO remove this once https://github.com/seL4/sel4test-manifest/issues/21 is fixed
+    + ''
+      pushd projects/musllibc
+      patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-1.patch}
+      patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-2.patch}
+      popd
+    '';
 
   # Fix for https://github.com/seL4/sel4test/issues/127
   # Gcc compiling for an x86 -elf target treats single forward slashed (`/`) as
@@ -74,16 +76,17 @@ stdenvNoLibs.mkDerivation rec {
     cd build
     ../init-build.sh ${lib.strings.escapeShellArgs cmakeFlags}
   '';
-  cmakeFlags = [
-    "-GNinja"
-    "-DCROSS_COMPILER_PREFIX=${stdenvNoLibs.cc.targetPrefix}"
-    "-DCMAKE_TOOLCHAIN_FILE=../kernel/gcc.cmake"
-  ]
-  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32) "-DAARCH32=1"
-  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch64) "-DAARCH64=1"
-  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV64) "-DRISCV64=1"
-  ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV32) "-DRISCV32=1"
-  ++ extraCmakeFlags;
+  cmakeFlags =
+    [
+      "-GNinja"
+      "-DCROSS_COMPILER_PREFIX=${stdenvNoLibs.cc.targetPrefix}"
+      "-DCMAKE_TOOLCHAIN_FILE=../kernel/gcc.cmake"
+    ]
+    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch32) "-DAARCH32=1"
+    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isAarch64) "-DAARCH64=1"
+    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV64) "-DRISCV64=1"
+    ++ lib.lists.optional (stdenvNoLibs.hostPlatform.isRiscV32) "-DRISCV32=1"
+    ++ extraCmakeFlags;
 
   installPhase = ''
     runHook preInstall

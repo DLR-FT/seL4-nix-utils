@@ -1,4 +1,10 @@
-{ lib, buildPythonPackage, fetchFromGitHub, nose, pip }:
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  nose,
+  pip,
+}:
 
 buildPythonPackage rec {
   pname = "guardonce";
@@ -11,7 +17,6 @@ buildPythonPackage rec {
     hash = "sha256-yTywLxvo6R02svdfHx5iP5njFUTWdhnwNXN6BNIbyR8=";
   };
 
-
   # TODO investigate why some test fais in the nose code with
   #  AttributeError: module 'collections' has no attribute 'Sequence'
   doCheck = false;
@@ -19,7 +24,10 @@ buildPythonPackage rec {
     export HOME="$(mktemp --directory)"
   '';
 
-  propagatedBuildInputs = [ nose pip ];
+  propagatedBuildInputs = [
+    nose
+    pip
+  ];
 
   meta = with lib; {
     description = "Utilities for converting from C/C++ include guards to #pragma once and back again";
