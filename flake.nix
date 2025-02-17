@@ -341,6 +341,32 @@
               };
 
           #
+          ### seL4 Rust support
+          #
+          seL4-kernel-loader = pkgsCross.aarch64-unknown-linux-gnu.callPackage ./pkgs/seL4-kernel-loader.nix {
+            packageToBuild = "sel4-kernel-loader";
+
+            seL4-kernel = self.packages.${system}.seL4-kernel-arm.overrideAttrs (old: {
+              nativeBuildInputs = old.nativeBuildInputs ++ [
+                pkgs.pkgsCross.aarch64-embedded.stdenv.cc
+                pkgs.qemu_full
+              ];
+              cmakeFlags = [
+                "-DCROSS_COMPILER_PREFIX=aarch64-none-elf-"
+                "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
+                "-DKernelPlatform=qemu-arm-virt"
+                "-DKernelArmHypervisorSupport=ON"
+                "-DKernelVerificationBuild=OFF"
+                "-DARM_CPU=cortex-a53"
+              ];
+            });
+          };
+
+          seL4-kernel-loader-add-payload = pkgs.callPackage ./pkgs/seL4-kernel-loader.nix {
+            packageToBuild = "sel4-kernel-loader-add-payload";
+          };
+
+          #
           ### Arm Trusted Firmware
           #
           atf-aarch64-zcu102 = pkgsCross.aarch64-unknown-linux-gnu.buildArmTrustedFirmware rec {
