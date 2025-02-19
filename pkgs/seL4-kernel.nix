@@ -9,11 +9,13 @@
   dtc,
   cpio,
   python3Packages,
+  pkgsBuildBuild,
+  # User configurable arguments
   verifiedConfig ? null,
+  withQemu ? false,
   extraVerifiedConfigs ? [ ],
   extraCmakeFlags ? [ ],
 }:
-
 let
   # known seL4 configs
   knownVerifiedConfigs = [
@@ -56,6 +58,8 @@ stdenv.mkDerivation rec {
     cpio # cpio archive tool
     python3Packages.seL4-deps # python build deps
   ];
+
+  depsBuildBuild = lib.optional withQemu pkgsBuildBuild.qemu_full;
 
   # fix /bin/bash et al.
   postPatch = ''

@@ -172,7 +172,7 @@ for system in ($targets | columns) {
     needs: $checks,
     steps: ($runner_setup | append {
       name: Check,
-      run: "nix flake check . --print-build-logs"
+      run: "nix flake check . --print-build-logs --option allow-import-from-derivation true"
     })
   })
 
