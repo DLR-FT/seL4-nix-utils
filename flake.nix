@@ -9,6 +9,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -17,6 +21,7 @@
       nixpkgs,
       flake-utils,
       treefmt-nix,
+      rust-overlay,
       ...
     }@inputs:
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (
@@ -27,6 +32,7 @@
           overlays = [
             self.overlays.default
             capDLInjectorOverlay
+            (import rust-overlay)
           ];
         };
 
@@ -66,6 +72,7 @@
                 overlays = [
                   self.overlays.default
                   capDLInjectorOverlay
+                  (import rust-overlay)
                 ];
               }
             );
@@ -172,6 +179,27 @@
           seL4-kernel-x64 = pkgsCross.x86_64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
             verifiedConfig = "X64_verified";
           };
+
+          #
+          ### QEMU seL4 kernel flavours
+          #
+
+          seL4-qemu-kernel-aarch64-none-elf =
+            self.packages.${system}.seL4-kernel-aarch64.overrideAttrs
+              (old: {
+                nativeBuildInputs = old.nativeBuildInputs ++ [
+                  pkgs.pkgsCross.aarch64-embedded.stdenv.cc
+                  pkgs.qemu_full
+                ];
+                cmakeFlags = [
+                  "-DCROSS_COMPILER_PREFIX=aarch64-none-elf-"
+                  "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
+                  "-DKernelPlatform=qemu-arm-virt"
+                  "-DKernelArmHypervisorSupport=ON"
+                  "-DKernelVerificationBuild=OFF"
+                  "-DARM_CPU=cortex-a53"
+                ];
+              });
 
           #
           ### seL4 test suite for various platforms
@@ -343,28 +371,39 @@
           #
           ### seL4 Rust support
           #
-          seL4-kernel-loader = pkgsCross.aarch64-unknown-linux-gnu.callPackage ./pkgs/seL4-kernel-loader.nix {
-            packageToBuild = "sel4-kernel-loader";
-
-            seL4-kernel = self.packages.${system}.seL4-kernel-arm.overrideAttrs (old: {
-              nativeBuildInputs = old.nativeBuildInputs ++ [
-                pkgs.pkgsCross.aarch64-embedded.stdenv.cc
-                pkgs.qemu_full
-              ];
-              cmakeFlags = [
-                "-DCROSS_COMPILER_PREFIX=aarch64-none-elf-"
-                "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
-                "-DKernelPlatform=qemu-arm-virt"
-                "-DKernelArmHypervisorSupport=ON"
-                "-DKernelVerificationBuild=OFF"
-                "-DARM_CPU=cortex-a53"
-              ];
-            });
-          };
-
-          seL4-kernel-loader-add-payload = pkgs.callPackage ./pkgs/seL4-kernel-loader.nix {
+          seL4-kernel-loader-aarch64-none-elf =
+            pkgsCross.aarch64-unknown-none-elf.callPackage ./pkgs/seL4-kernel-loader.nix
+              {
+                rustcTarget = "aarch64-unknown-none";
+                seL4-kernel = self.packages.${system}.seL4-qemu-kernel-aarch64-none-elf;
+              };
+          seL4-kernel-loader-add-payload = pkgs.callPackage ./pkgs/rust-seL4-package.nix {
             packageToBuild = "sel4-kernel-loader-add-payload";
           };
+
+          seL4-generate-target-specs = pkgs.callPackage ./pkgs/rust-seL4-package.nix {
+            packageToBuild = "sel4-generate-target-specs";
+            rustToolchain = pkgs.rust-bin.stable."1.80.0".minimal.override {
+              extensions = [
+                "rustc-dev"
+                "llvm-tools-preview"
+              ];
+            };
+          };
+
+          seL4-rust-targets = pkgs.callPackage ./pkgs/seL4-rust-targets.nix {
+            seL4-generate-target-specs = self.packages.${system}.seL4-generate-target-specs;
+          };
+
+          seL4-rust-task-aarch64-none-elf =
+            pkgsCross.aarch64-unknown-none-elf.callPackage ./pkgs/seL4-rust-task.nix
+              {
+                rustcTarget = "aarch64-sel4";
+                rustToolchainTargets = [ "aarch64-unknown-none" ];
+                packageToBuild = "hello";
+                rustTargetPath = self.packages.${system}.seL4-rust-targets;
+                seL4-kernel = self.packages.${system}.seL4-qemu-kernel-aarch64-none-elf;
+              };
 
           #
           ### Arm Trusted Firmware
@@ -570,4 +609,7 @@
       # declare overlay with added deps, i. e. the python packages not available in official nixpkgs
       overlays.default = import ./overlay.nix;
     };
+  nixConfig = {
+    allow-import-from-derivation = true;
+  };
 }
