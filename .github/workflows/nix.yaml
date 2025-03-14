@@ -1011,6 +1011,7 @@ jobs:
       - uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: "allow-import-from-derivation = true"
       - uses: cachix/cachix-action@v14
         with:
           name: dlr-ft
