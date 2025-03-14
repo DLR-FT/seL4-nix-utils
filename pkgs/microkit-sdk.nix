@@ -23,8 +23,8 @@ let
     repo = "seL4";
     # bespoke commit from microkit README, taken on 2024-07-02
     # https://github.com/seL4/microkit/tree/1.3.0?tab=readme-ov-file#sel4-version
-    rev = "4cae30a6ef166a378d4d23697b00106ce7e4e76f";
-    hash = "sha256-9rOVhq0k3K3E62DkUkw+cNAGMVd+agmrm5heRrdfPCw=";
+    rev = "968d8f6f97a37ea315243510348e933b612319f1";
+    hash = "sha256-m4PZj+bDWCgGF+LQDLS/Z4thZKAp070TBt8+fpPl5PI=";
   };
 
   # To debug the required TeX packages:
@@ -48,24 +48,24 @@ let
     }
   );
 
-  inherit (lib.strings) escapeShellArg;
+  inherit (lib.strings) escapeShellArg removeSuffix;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
-  version = "1.4.1";
+  version = "2.0.0";
 
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
     rev = finalAttrs.version;
-    hash = "sha256-eTZ+6vG10ySqeGBcrvwzcITdmujwKF6Hllr+XSpmOgI=";
+    hash = "sha256-bFKD6Sqro2NokTYY25JcyWLYkMWmjdCUOSoeIyuR+YQ=";
   };
 
   cargoRoot = "tool/microkit/";
   cargoDeps = rustPlatform.fetchCargoTarball {
     inherit (finalAttrs) src;
     sourceRoot = "source/" + finalAttrs.cargoRoot;
-    hash = "sha256-R5YeQdmPR9tphDBXMB7B//gpr+YuNrvtmrT99fWIqHU=";
+    hash = "sha256-bGGD5Gz5UffaCzX4ZL7yIJfKj3D7qU+sqdro4COiiGY=";
   };
 
   nativeBuildInputs = [
@@ -114,15 +114,9 @@ stdenv.mkDerivation (finalAttrs: {
     patchShebangs seL4-src
 
     # upstream issue: https://github.com/seL4/microkit/issues/201
-    substituteInPlace build_sdk.py --replace "riscv64-unknown-elf-" \
-      ${escapeShellArg pkgsCross.riscv64-embedded.stdenv.cc.targetPrefix}
+    substituteInPlace build_sdk.py --replace-fail riscv64-unknown-elf \
+      ${escapeShellArg (removeSuffix "-" pkgsCross.riscv64-embedded.stdenv.cc.targetPrefix)}
   '';
-
-  patches = [
-    # upstream PR: https://github.com/seL4/seL4/pull/1310
-    # relevant issue: https://github.com/seL4/microkit/issues/201
-    ../patches/seL4-riscv-toolchain-prefix.patch
-  ];
 
   buildPhase = ''
     runHook preInstall
