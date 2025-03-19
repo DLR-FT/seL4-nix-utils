@@ -31,9 +31,11 @@ let
     cargo = rustToolchain';
   };
   cargoBuildHook = rustPlatform.cargoBuildHook.overrideAttrs (_: {
+    inherit rustcTarget;
     rustHostPlatformSpec = rustcTarget; # change to desired rustcTarget
   });
   cargoInstallHook = rustPlatform.cargoInstallHook.overrideAttrs (_: {
+    inherit rustcTarget;
     targetSubdirectory = rustcTarget; # change subdirectory to utilized rustcTarget
   });
 in
