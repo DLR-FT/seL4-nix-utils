@@ -5,7 +5,7 @@
   fetchFromGitHub,
   pkgsBuildBuild,
   # User configurable arguments
-  src ? null,
+  packageSource ? null,
   rustToolchainTargets ? null,
   packageToBuild,
   rustTargetPath ? "",
@@ -40,7 +40,7 @@ let
     rev = "v1.0.0";
     hash = "sha256-gZOvuq+icY+6MSlGkPVpqpjzOnhx4G83+x9APc+35nE=";
   };
-  src' = if isNull src then defaultSrc else src;
+  src = if isNull packageSource then defaultSrc else packageSource;
   defaultRustToolchainTargets = [ rustcTarget ];
   rustToolchainTargets' =
     if isNull rustToolchainTargets then defaultRustToolchainTargets else rustToolchainTargets;
@@ -74,7 +74,7 @@ rustPlatform.buildRustPackage {
   name = packageToBuild;
   version = "1.0.0";
 
-  src = src';
+  inherit src;
 
   nativeBuildInputs = [ pkgsBuildBuild.rustPlatform.bindgenHook ];
 

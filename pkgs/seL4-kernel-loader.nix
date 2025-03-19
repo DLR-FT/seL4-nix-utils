@@ -4,6 +4,7 @@
   fetchFromGitHub,
   pkgsBuildBuild,
   # User configurable arguments
+  rust-sel4 ? null,
   rustToolchain ? null,
   rustcTarget ? stdenv.targetPlatform.rust.rustcTarget,
   seL4-kernel,
@@ -14,6 +15,13 @@ assert
   -> throw "if rustToolchain is null, the oxalica overlay is required";
 assert isNull rustcTarget -> throw "rustcTarget may not be null";
 let
+  defaultRustSeL4 = fetchFromGitHub {
+    owner = "seL4";
+    repo = "rust-sel4";
+    rev = "v1.0.0";
+    hash = "sha256-gZOvuq+icY+6MSlGkPVpqpjzOnhx4G83+x9APc+35nE=";
+  };
+  rustSeL4 = if isNull rust-sel4 then defaultRustSeL4 else rust-sel4;
   defaultRustToolchain = pkgsBuildBuild.rust-bin.stable.latest.minimal.override {
     targets = [ rustcTarget ];
   };
@@ -34,12 +42,7 @@ rustPlatform.buildRustPackage rec {
   name = "seL4-kernel-loader";
   version = "1.0.0";
 
-  src = fetchFromGitHub {
-    owner = "seL4";
-    repo = "rust-sel4";
-    rev = "v${version}";
-    hash = "sha256-gZOvuq+icY+6MSlGkPVpqpjzOnhx4G83+x9APc+35nE=";
-  };
+  src = rustSeL4;
 
   buildInputs = [
     cargoBuildHook # shadow old cargoBuildHook
