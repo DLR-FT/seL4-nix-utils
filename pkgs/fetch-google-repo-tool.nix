@@ -17,7 +17,7 @@ lib.makeOverridable (
     rev,
     name ? "source",
     hash,
-  , manifest ? "default.xml"
+    manifest ? "default.xml",
     # Problem
     #
     # `repo` allows for the manifest to just specify a branch, defaulting to the latest commit.
