@@ -199,6 +199,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
     cd proof
 
+    export FONTCONFIG_FILE=${fontconfig.out}/etc/fonts/fonts.conf
+
     make all
 
     runHook postBuild
