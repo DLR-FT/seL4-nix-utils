@@ -54,4 +54,26 @@ final: prev: {
     self;
 
   python3Packages = final.python3.pkgs;
+
+  buildSeL4Kernel = final.lib.makeOverridable (
+    {
+      verifiedConfig ? null,
+      extraVerifiedConfigs ? [ ],
+      extraCmakeFlags ? [ ],
+      ...
+    }@args:
+    (final.callPackage pkgs/seL4-kernel.nix {
+      inherit verifiedConfig;
+      inherit extraVerifiedConfigs;
+      inherit extraCmakeFlags;
+    }).overrideAttrs
+      (
+        old:
+        removeAttrs args [
+          "verifiedConfig"
+          "extraVerifiedConfigs"
+          "extraCmakeFlags"
+        ]
+      )
+  );
 }
