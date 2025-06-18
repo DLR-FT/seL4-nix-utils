@@ -135,41 +135,39 @@
           #
           ### seL4 verified kernel flavours
           #
-          seL4-kernel-aarch64 = pkgsCross.aarch64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-aarch64 = pkgsCross.aarch64-unknown-none-elf.buildSeL4Kernel {
             verifiedConfig = "AARCH64_verified";
           };
 
-          seL4-kernel-arm-hyp-exynos5 =
-            pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix
-              {
-                verifiedConfig = "ARM_HYP_exynos5_verified";
-              };
+          seL4-kernel-arm-hyp-exynos5 = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
+            verifiedConfig = "ARM_HYP_exynos5_verified";
+          };
 
-          seL4-kernel-arm-hyp = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm-hyp = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
             verifiedConfig = "ARM_HYP_verified";
           };
 
-          seL4-kernel-arm-mcs = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm-mcs = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
             verifiedConfig = "ARM_MCS_verified";
           };
 
-          seL4-kernel-arm-imx8mm = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm-imx8mm = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
             verifiedConfig = "ARM_imx8mm_verified";
           };
 
-          seL4-kernel-arm = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-arm = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
             verifiedConfig = "ARM_verified";
           };
 
-          seL4-kernel-riscv64-mcs = pkgsCross.riscv64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-riscv64-mcs = pkgsCross.riscv64-unknown-none-elf.buildSeL4Kernel {
             verifiedConfig = "RISCV64_MCS_verified";
           };
 
-          seL4-kernel-riscv64-elf = pkgsCross.riscv64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-riscv64-elf = pkgsCross.riscv64-unknown-none-elf.buildSeL4Kernel {
             verifiedConfig = "RISCV64_verified";
           };
 
-          seL4-kernel-x64 = pkgsCross.x86_64-unknown-none-elf.callPackage pkgs/seL4-kernel.nix {
+          seL4-kernel-x64 = pkgsCross.x86_64-unknown-none-elf.buildSeL4Kernel {
             verifiedConfig = "X64_verified";
           };
 
