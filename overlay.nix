@@ -22,6 +22,9 @@ final: prev: {
   # https://android.googlesource.com/tools/repo
   fetchGoogleRepoTool = prev.callPackage pkgs/fetch-google-repo-tool.nix { };
 
+  # L4.verified
+  l4v = prev.callPackage pkgs/l4v.nix { };
+
   # microkit
   microkit-sdk = prev.callPackage pkgs/microkit-sdk.nix { };
 
