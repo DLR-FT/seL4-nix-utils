@@ -23,8 +23,8 @@ let
     repo = "seL4";
     # bespoke commit from microkit README, taken on 2024-07-02
     # https://github.com/seL4/microkit/tree/1.3.0?tab=readme-ov-file#sel4-version
-    rev = "968d8f6f97a37ea315243510348e933b612319f1";
-    hash = "sha256-m4PZj+bDWCgGF+LQDLS/Z4thZKAp070TBt8+fpPl5PI=";
+    rev = "4b97df4c7e24fd0c297e21cae8d997a08b8952b0";
+    hash = "sha256-VFHFuwJR1J+2Fys+UdqDp1WivAthvi8gDsTEdlR3ORg=";
   };
 
   # To debug the required TeX packages:
@@ -52,20 +52,20 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
-  version = "2.0.0";
+  version = "2.0.1";
 
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
     rev = finalAttrs.version;
-    hash = "sha256-bFKD6Sqro2NokTYY25JcyWLYkMWmjdCUOSoeIyuR+YQ=";
+    hash = "sha256-IWnbfU0UdOQj9pntgU9eJSxcHiTBx475dITwkexr23A=";
   };
 
   cargoRoot = "tool/microkit/";
   cargoDeps = rustPlatform.fetchCargoTarball {
     inherit (finalAttrs) src;
     sourceRoot = "source/" + finalAttrs.cargoRoot;
-    hash = "sha256-bGGD5Gz5UffaCzX4ZL7yIJfKj3D7qU+sqdro4COiiGY=";
+    hash = "sha256-wHBGDHppVUqPoDWbxmjRCsA8gCqekOxrEptSL/pe+W8=";
   };
 
   nativeBuildInputs = [
