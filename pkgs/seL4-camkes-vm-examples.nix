@@ -32,7 +32,7 @@ stdenv.mkDerivation rec {
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/camkes-vm-examples-manifest.git";
     rev = "camkes-3.11.0";
-    hash = "sha256-DTQDk3/xBiK78s+tQrXyDOPzXHADjj3cKM872yxIRJU=";
+    hash = "sha256-oCbCNSQmLSOKqsgnQxp3ty34SwL/HUlTDHsm8jJ52ig=";
   };
 
   nativeBuildInputs = [
