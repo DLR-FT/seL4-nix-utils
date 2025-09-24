@@ -94,7 +94,8 @@ let
 
       exec bin/switch_root . "/bin/init" "$@"
     '';
-  } // extraRootfsFiles;
+  }
+  // extraRootfsFiles;
 
   # Function to create a shell script which populates current working dir as specified in
   # `rootfsFiles`

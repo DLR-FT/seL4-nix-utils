@@ -22,8 +22,8 @@ mkDerivation {
   version = "1.0.0.1";
   src = fetchgit {
     url = "https://github.com/seL4/capdl.git";
-    sha256 = "06i3b29l20yi7gdvqsc1a65sjbjavlyps46dj2rwwhk0lb0700b2";
-    rev = "f7ef9ca4f9d3e1a8e86375deaf286a056698b9ce";
+    sha256 = "sha256-1LI9ewSoKzPSuD0DOJWxECbR9Fy7GbwHgTIn/SDEtHg=";
+    rev = "9d4ca9a9c2cbd1aaa759cd7ea59bf7e0f65437bd";
     fetchSubmodules = false;
   };
   postUnpack = "sourceRoot+=/capDL-tool; echo source root reset to $sourceRoot";

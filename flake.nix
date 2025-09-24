@@ -1,9 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    # TODO remove nixpkgs-old, the capDLInjectorOverlay et al. once capDL builds with an up-to-date
-    # nixpkgs
-    nixpkgs-old.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -26,13 +23,7 @@
           inherit system;
           overlays = [
             self.overlays.default
-            capDLInjectorOverlay
           ];
-        };
-
-        pkgsOld = import inputs.nixpkgs-old {
-          inherit system;
-          overlays = [ self.overlays.default ];
         };
 
         treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
@@ -88,7 +79,7 @@
           #
           ### seL4 related tools and dependencies
           #
-          capDL-tool = pkgsOld.capDL-tool;
+          capDL-tool = pkgs.capDL-tool;
 
           # python dependencies for seL4
           # these are not actually part of the nixpkgs, but provided over the default overlay of
@@ -485,11 +476,10 @@
             protobuf
             qemu_full
             ubootTools
-            gcc-arm-embedded-8
 
             # CAmkES
             stack
-            haskell.compiler.ghc902
+            haskell.compiler.ghc94
 
             # both
             python3Packages.camkes-deps # includes seL4-deps
