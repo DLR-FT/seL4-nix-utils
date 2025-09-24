@@ -23,14 +23,14 @@
 
 buildPythonPackage rec {
   pname = "sel4-deps";
-  version = "0.3.1";
+  version = "0.7.0";
 
   dontUnpack = true;
   dontBuild = true;
   format = "other"; # don't actually try to install anything
 
   propagatedBuildInputs = [
-    # taken of sel-deps 0.3.1 on 2024-02-07
+    # taken of sel-deps 0.7.0 on 2025-09-24
     # https://pypi.org/project/sel4-deps/#files
     six
     future

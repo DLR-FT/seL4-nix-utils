@@ -4,14 +4,11 @@ final: prev: {
   # nix run nixpkgs#cabal2nix -- --maintainer wucke13 --subpath capDL-tool --dont-fetch-submodules https://github.com/seL4/capdl.git > pkgs/capdl.nix
   capDL-tool =
     let
-      hsPkgs = final.haskellPackages.override {
+      hsPkgs = final.haskell.packages.ghc94.override {
         overrides = final': prev': {
-          MissingH = final.haskell.lib.overrideCabal prev'.MissingH {
-            version = "1.5.0.1";
-            sha256 = "sha256-yy+kpipgnsa8+i6raubTTG9b+6Uj/tjcDAVbMXZzIjE=";
-            revision = "1";
-            editedCabalFile = "sha256-9mLTXlTu5Va/bxqOxDGXKJhUMmiehE5hGwLpWBN7UaI=";
-          };
+          MissingH = final'.callHackage "MissingH" "1.5.0.1" { };
+          network = final'.callHackage "network" "3.1.4.0" { };
+          base-compat = final'.callHackage "base-compat" "0.12.3" { };
         };
       };
     in
@@ -43,6 +40,18 @@ final: prev: {
       };
     })
   ];
+
+  # FIXME: Fixes i686 embedded compilation of newlib
+  # https://github.com/NixOS/nixpkgs/issues/404741
+  # https://github.com/NixOS/nixpkgs/issues/424403
+  # https://github.com/NixOS/nixpkgs/pull/442561
+  newlib = prev.newlib.overrideAttrs (
+    final': prev': {
+      patches = prev'.patches ++ [
+        ./patches/0002-newlib-Fix-i386-libgloss-support.patch
+      ];
+    }
+  );
 
   python3 =
     let

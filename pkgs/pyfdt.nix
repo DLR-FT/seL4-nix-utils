@@ -2,6 +2,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
+  setuptools,
 }:
 
 buildPythonPackage rec {
@@ -13,6 +14,8 @@ buildPythonPackage rec {
     rev = "${pname}-${version}";
     hash = "sha256-lt/Mcw3j1aTBVOVhDBSYtriDyzeJHcSli69EXLfsgDM=";
   };
+  pyproject = true;
+  build-system = [ setuptools ];
 
   meta = with lib; {
     description = "Python Flattened Device Tree Library";

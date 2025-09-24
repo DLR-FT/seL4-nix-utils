@@ -62,10 +62,10 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   cargoRoot = "tool/microkit/";
-  cargoDeps = rustPlatform.fetchCargoTarball {
+  cargoDeps = rustPlatform.fetchCargoVendor {
     inherit (finalAttrs) src;
     sourceRoot = "source/" + finalAttrs.cargoRoot;
-    hash = "sha256-wHBGDHppVUqPoDWbxmjRCsA8gCqekOxrEptSL/pe+W8=";
+    hash = "sha256-z3zw1Ck7Fwu6Ay6qSsKphw4mi+dkYAEl1SmHGDr0nVc=";
   };
 
   nativeBuildInputs = [

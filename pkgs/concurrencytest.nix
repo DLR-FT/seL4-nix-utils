@@ -3,7 +3,6 @@
   buildPythonPackage,
   fetchPypi,
   setuptools,
-  wheel,
   python-subunit,
   testtools,
 }:
@@ -29,6 +28,9 @@ buildPythonPackage rec {
     # "concurrencytest.ConcurrentTestSuite"
     # "concurrencytest.fork_for_tests"
   ];
+
+  pyproject = true;
+  build-system = [ setuptools ];
 
   meta = with lib; {
     description = "testtools extension for running unittest suites concurrently";

@@ -3,6 +3,7 @@
   buildPythonPackage,
   fetchFromGitHub,
   pip,
+  setuptools,
 }:
 
 buildPythonPackage rec {
@@ -22,6 +23,8 @@ buildPythonPackage rec {
   preBuild = ''
     export HOME="$(mktemp --directory)"
   '';
+  pyproject = true;
+  build-system = [ setuptools ];
 
   propagatedBuildInputs = [ pip ];
 
