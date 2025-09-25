@@ -48,18 +48,17 @@ stdenv.mkDerivation rec {
   ];
 
   # fix /bin/bash et al.
-  postPatch =
-    ''
-      patchShebangs .
-    ''
-    # Patch old musllibc to work with new bintools
-    # TODO remove this once https://github.com/seL4/sel4test-manifest/issues/21 is fixed
-    + ''
-      pushd projects/musllibc
-      patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-1.patch}
-      patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-2.patch}
-      popd
-    '';
+  postPatch = ''
+    patchShebangs .
+  ''
+  # Patch old musllibc to work with new bintools
+  # TODO remove this once https://github.com/seL4/sel4test-manifest/issues/21 is fixed
+  + ''
+    pushd projects/musllibc
+    patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-1.patch}
+    patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-2.patch}
+    popd
+  '';
 
   # Fix for https://github.com/seL4/sel4test/issues/127
   # Gcc compiling for an x86 -elf target treats single forward slashed (`/`) as
@@ -73,17 +72,16 @@ stdenv.mkDerivation rec {
   preConfigure = ''
     cd projects/sel4test
   '';
-  cmakeFlags =
-    [
-      "-GNinja"
-      "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
-      "-DCMAKE_TOOLCHAIN_FILE=../../kernel/gcc.cmake"
-    ]
-    ++ lib.lists.optional (stdenv.hostPlatform.isAarch32) "-DAARCH32=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isAarch64) "-DAARCH64=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
-    ++ extraCmakeFlags;
+  cmakeFlags = [
+    "-GNinja"
+    "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
+    "-DCMAKE_TOOLCHAIN_FILE=../../kernel/gcc.cmake"
+  ]
+  ++ lib.lists.optional (stdenv.hostPlatform.isAarch32) "-DAARCH32=1"
+  ++ lib.lists.optional (stdenv.hostPlatform.isAarch64) "-DAARCH64=1"
+  ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
+  ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
+  ++ extraCmakeFlags;
 
   installPhase = ''
     runHook preInstall

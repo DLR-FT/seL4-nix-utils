@@ -64,26 +64,25 @@ stdenv.mkDerivation rec {
     qemu # qemu-system-aarch64
   ];
 
-  postPatch =
-    ''
-      # fix /bin/bash et al.
-      patchShebangs .
-      substituteInPlace kernel/tools/circular_includes.py \
-        --replace-fail 'file_stack[-1]' 'len(file_stack) > 0 and file_stack[-1]'
+  postPatch = ''
+    # fix /bin/bash et al.
+    patchShebangs .
+    substituteInPlace kernel/tools/circular_includes.py \
+      --replace-fail 'file_stack[-1]' 'len(file_stack) > 0 and file_stack[-1]'
 
-      # avoid from-scratch compilation of capDL-tool
-      cp -- ${capDL-makefile} projects/capdl/capDL-tool/Makefile
-    ''
+    # avoid from-scratch compilation of capDL-tool
+    cp -- ${capDL-makefile} projects/capdl/capDL-tool/Makefile
+  ''
 
-    # required because the musllibc fork of seL4 is so old it won't compile with gcc12
-    # see https://github.com/seL4/musllibc/issues/19#issuecomment-1841713558
-    # and https://www.mail-archive.com/devel@sel4.systems/msg04088.html
-    + ''
-      pushd projects/musllibc
-      patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-1.patch}
-      patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-2.patch}
-      popd
-    '';
+  # required because the musllibc fork of seL4 is so old it won't compile with gcc12
+  # see https://github.com/seL4/musllibc/issues/19#issuecomment-1841713558
+  # and https://www.mail-archive.com/devel@sel4.systems/msg04088.html
+  + ''
+    pushd projects/musllibc
+    patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-1.patch}
+    patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-2.patch}
+    popd
+  '';
 
   hardeningDisable = [ "all" ];
 
@@ -94,18 +93,17 @@ stdenv.mkDerivation rec {
     sed --in-place -- 's|"PYTHONPATH=\([^"]*\)"|"PYTHONPATH=\1:'"$PYTHONPATH"'"|g' ../../projects/camkes-tool/camkes.cmake
   '';
 
-  cmakeFlags =
-    [
-      "-GNinja"
-      "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
-      "-DC_PREPROCESSOR=${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cpp"
-      "-DCMAKE_TOOLCHAIN_FILE=../../kernel/gcc.cmake"
-    ]
-    ++ lib.lists.optional (stdenv.hostPlatform.isAarch32) "-DAARCH32=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isAarch64) "-DAARCH64=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
-    ++ extraCmakeFlags;
+  cmakeFlags = [
+    "-GNinja"
+    "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
+    "-DC_PREPROCESSOR=${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cpp"
+    "-DCMAKE_TOOLCHAIN_FILE=../../kernel/gcc.cmake"
+  ]
+  ++ lib.lists.optional (stdenv.hostPlatform.isAarch32) "-DAARCH32=1"
+  ++ lib.lists.optional (stdenv.hostPlatform.isAarch64) "-DAARCH64=1"
+  ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
+  ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
+  ++ extraCmakeFlags;
 
   installPhase = ''
     runHook preInstall
