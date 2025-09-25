@@ -26,7 +26,8 @@ let
     "RISCV64_MCS_verified"
     "RISCV64_verified"
     "X64_verified"
-  ] ++ extraVerifiedConfigs;
+  ]
+  ++ extraVerifiedConfigs;
 
   brokenVerifiedConfigs = [
     "ARM_HYP_exynos5_verified"
@@ -62,14 +63,13 @@ stdenv.mkDerivation rec {
     patchShebangs .
   '';
 
-  cmakeFlags =
-    [
-      "-GNinja"
-      "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
-      "-DCMAKE_TOOLCHAIN_FILE=../gcc.cmake"
-    ]
-    ++ lib.lists.optional (verifiedConfig != null) "-C../configs/${verifiedConfig}.cmake"
-    ++ extraCmakeFlags;
+  cmakeFlags = [
+    "-GNinja"
+    "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
+    "-DCMAKE_TOOLCHAIN_FILE=../gcc.cmake"
+  ]
+  ++ lib.lists.optional (verifiedConfig != null) "-C../configs/${verifiedConfig}.cmake"
+  ++ extraCmakeFlags;
 
   # TODO remove hotfix for https://github.com/seL4/seL4/issues/1334
   patches = lib.lists.optional (lib.lists.elem verifiedConfig brokenVerifiedConfigs) ../patches/seL4-cmake-install-target-failure.patch;
