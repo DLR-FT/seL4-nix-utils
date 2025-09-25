@@ -6,12 +6,12 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "zynqmp-pmufw";
-  version = "2023.2";
+  version = "2025.1";
   src = fetchFromGitHub {
     owner = "Xilinx";
     repo = "embeddedsw";
     rev = "xilinx_v" + version;
-    hash = "sha256-koBo9gmkWBqA6PaN5eNsnkCQRaeDWeHm/qBN8/ARW+E=";
+    hash = "sha256-PK8u/9zP5mVAmq4CQDRrA0dH0F7rYwJY465+7FzSHjA=";
   };
 
   preConfigure = ''

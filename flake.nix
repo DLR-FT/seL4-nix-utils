@@ -337,12 +337,12 @@
             extraMeta.platforms = [ "aarch64-linux" ];
             extraMakeFlags = [ "RESET_TO_BL31=1" ];
             filesToInstall = [ "build/${platform}/release/bl31.bin" ];
-            version = "xilinx-v2023.2";
+            version = "xilinx-v2025.1";
             src = pkgs.fetchFromGitHub {
               owner = "Xilinx";
               repo = "arm-trusted-firmware";
               rev = version;
-              hash = "sha256-RvdBsskiSgquwnDf0g0dU8P6v4QxK4OqhtkF5K7lfyI=";
+              hash = "sha256-HIqfsenTlAU+e3SmKfHZNLrPDcUZIWF222Ur0BYS7zc=";
             };
           };
 
@@ -383,8 +383,7 @@
               "u-boot.elf"
               "u-boot.img"
             ];
-            version = "xilinx-v2023.2";
-            dontPatch = true; # avoid unapplicable raspberrypi patches
+            version = "xilinx-v2025.1";
 
             # u-boot-xlnx ignores the CONFIG_ARMV8_SWITCH_TO_EL1 macro, and always unconditionally
             # boots into EL1 when doing `go`. This little patch changes that behavior to stay in
@@ -398,7 +397,7 @@
               owner = "Xilinx";
               repo = "u-boot-xlnx";
               rev = version;
-              hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
+              hash = "sha256-RTcd7MR37E4yVGWP3RMruyKBI4tz8ex7mY1f5F2xd00=";
             };
           };
 
@@ -412,13 +411,12 @@
               "u-boot.elf"
               "u-boot.img"
             ];
-            version = "xilinx-v2023.2";
-            dontPatch = true; # avoid unapplicable raspberrypi patches
+            version = "xilinx-v2025.1";
             src = pkgs.fetchFromGitHub {
               owner = "Xilinx";
               repo = "u-boot-xlnx";
               rev = version;
-              hash = "sha256-tSOw7+Pe3/JYIgrPYB6exPzfGrRTuolxXXTux80w/X8=";
+              hash = "sha256-RTcd7MR37E4yVGWP3RMruyKBI4tz8ex7mY1f5F2xd00=";
             };
           };
 
