@@ -47,9 +47,11 @@ final: prev: {
   # https://github.com/NixOS/nixpkgs/pull/442561
   newlib = prev.newlib.overrideAttrs (
     final': prev': {
-      patches = prev'.patches ++ [
-        ./patches/0002-newlib-Fix-i386-libgloss-support.patch
-      ];
+      patches =
+        prev'.patches
+        ++ final.lib.optional (
+          final.stdenv.targetPlatform.parsed.cpu.name == "i686"
+        ) ./patches/0002-newlib-Fix-i386-libgloss-support.patch;
     }
   );
 
