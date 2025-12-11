@@ -17,12 +17,12 @@
 
 stdenv.mkDerivation rec {
   pname = "seL4test";
-  version = "13.0.0";
+  version = "14.0.0";
 
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/sel4test-manifest.git";
     rev = version;
-    hash = "sha256-mEcimqgii4ohiJbXz1pNSqthWObrbnLmqEn8yQpkUKo=";
+    hash = "sha256-RU48CUGA52fbHXOjpKrJIeMTcuOhVtgsRqsaFsxQowc=";
   };
 
   nativeBuildInputs = [
@@ -50,21 +50,16 @@ stdenv.mkDerivation rec {
   # fix /bin/bash et al.
   postPatch = ''
     patchShebangs .
-  ''
-  # Patch old musllibc to work with new bintools
-  # TODO remove this once https://github.com/seL4/sel4test-manifest/issues/21 is fixed
-  + ''
-    pushd projects/musllibc
-    patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-1.patch}
-    patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-2.patch}
-    popd
   '';
 
   # Fix for https://github.com/seL4/sel4test/issues/127
   # Gcc compiling for an x86 -elf target treats single forward slashed (`/`) as
   # beginning of comments, which breaks the alignment tests in
   # projects/sel4test/apps/sel4test-tests/src/arch/x86/tests/alignment_asm.S
-  env.NIX_CFLAGS_COMPILE = lib.strings.optionalString (stdenv.hostPlatform.isx86) "-Wa,--divide";
+  env.NIX_CFLAGS_COMPILE = lib.strings.concatStringsSep " " [
+    (lib.strings.optionalString (stdenv.hostPlatform.isx86) "-Wa,--divide")
+    "-fno-short-enums" # TODO remove once https://github.com/seL4/sel4test/pull/145 is merged
+  ];
 
   # prevent Nix from injecting any flags meant to harden the build
   hardeningDisable = [ "all" ];
