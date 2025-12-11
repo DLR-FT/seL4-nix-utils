@@ -116,7 +116,13 @@ stdenv.mkDerivation (finalAttrs: {
     # upstream issue: https://github.com/seL4/microkit/issues/201
     substituteInPlace build_sdk.py --replace-fail riscv64-unknown-elf \
       ${escapeShellArg (removeSuffix "-" pkgsCross.riscv64-embedded.stdenv.cc.targetPrefix)}
-  '';
+  ''
+  +
+    # TODO remove this once a seL4 release past 13.0.0 is used
+    # Upstream PR: https://github.com/seL4/seL4/pull/1463
+    ''
+      patch -p1 --directory=seL4-src < ${../patches/seL4-qemu-v10.patch}
+    '';
 
   buildPhase = ''
     runHook preInstall
