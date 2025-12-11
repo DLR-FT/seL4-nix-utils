@@ -72,6 +72,11 @@ stdenv.mkDerivation rec {
 
     # avoid from-scratch compilation of capDL-tool
     cp -- ${capDL-makefile} projects/capdl/capDL-tool/Makefile
+
+    # camkes and capdl still depend on `future.utils,` but the future package is not released for
+    # python 3.13, which is the default python distribution in nixpkgs-25.11
+    patch -p1 --directory=projects/camkes-tool < ${../patches/camkes-python-no-future.patch}
+    patch -p1 --directory=projects/capdl < ${../patches/capdl-python-no-future.patch}
   '';
 
   hardeningDisable = [ "all" ];

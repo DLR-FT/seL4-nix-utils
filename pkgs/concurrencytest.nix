@@ -3,7 +3,7 @@
   buildPythonPackage,
   fetchPypi,
   setuptools,
-  python-subunit,
+  subunit,
   testtools,
 }:
 
@@ -17,7 +17,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [
-    python-subunit
+    subunit
     testtools
   ];
 

@@ -2,7 +2,6 @@
   lib,
   buildPythonPackage,
   six,
-  future,
   jinja2,
   lxml,
   ply,
@@ -33,7 +32,6 @@ buildPythonPackage rec {
     # taken of sel-deps 0.7.0 on 2025-09-24
     # https://pypi.org/project/sel4-deps/#files
     six
-    future
     jinja2
     lxml
     ply
