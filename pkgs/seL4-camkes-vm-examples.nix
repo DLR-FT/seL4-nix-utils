@@ -25,13 +25,13 @@ let
   '';
 
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "seL4-camkes-vm-examples.";
-  version = "camkes-3.11.1";
+  version = "3.11.1";
 
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/camkes-vm-examples-manifest.git";
-    rev = "camkes-3.11.1";
+    rev = "camkes-${finalAttrs.version}";
     hash = "sha256-1aDpbcMaxRcGDR/YOPs1qyCMFxQoIPouGt91SuaQEBA=";
   };
 
@@ -53,7 +53,7 @@ stdenv.mkDerivation rec {
     (buildPackages.writeShellScriptBin "git" ''
       # Taken from https://git.musl-libc.org/cgit/musl/tree/tools/version.sh
       if [[ $@ = "git describe --tags --match 'v[0-9]*'" ]]; then
-        echo "${version}"
+        echo "${finalAttrs.version}"
       else
         >&2 echo "Unknown command: $@"
         exit 1
@@ -116,4 +116,4 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
   dontFixup = true;
-}
+})

@@ -14,7 +14,7 @@
   hypothesis,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage {
   pname = "camkes-deps";
   version = "0.7.4";
 

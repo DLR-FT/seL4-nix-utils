@@ -20,7 +20,7 @@
   setuptools,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage {
   pname = "sel4-deps";
   version = "0.7.0";
 
