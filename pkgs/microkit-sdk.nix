@@ -113,10 +113,6 @@ stdenv.mkDerivation (finalAttrs: {
     cp --recursive -- "${seL4-src}" seL4-src
     chmod --recursive -- u+w seL4-src
     patchShebangs seL4-src
-
-    # upstream issue: https://github.com/seL4/microkit/issues/201
-    substituteInPlace build_sdk.py --replace-fail riscv64-unknown-elf \
-      ${escapeShellArg (removeSuffix "-" pkgsCross.riscv64-embedded.stdenv.cc.targetPrefix)}
   ''
   +
     # TODO remove this once a seL4 release past 13.0.0 is used
@@ -127,7 +123,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildPhase = ''
     runHook preBuild
-    python build_sdk.py --sel4=seL4-src --tool-target-triple=${stdenv.hostPlatform.rust.rustcTarget}
+    python build_sdk.py --sel4=seL4-src \
+      --tool-target-triple=${stdenv.hostPlatform.rust.rustcTarget} \
+      --toolchain-prefix-aarch64=${escapeShellArg (removeSuffix "-" pkgsCross.aarch64-embedded.stdenv.cc.targetPrefix)} \
+      --toolchain-prefix-riscv64=${escapeShellArg (removeSuffix "-" pkgsCross.riscv64-embedded.stdenv.cc.targetPrefix)}
     runHook postBuild
   '';
 
