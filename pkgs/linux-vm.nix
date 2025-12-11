@@ -108,7 +108,6 @@ let
         concatStringsSep
         escapeShellArg
         optionalString
-        removePrefix
         ;
 
       escapeRelativePath = path: escapeShellArg ("./" + (lib.strings.removePrefix "/" path));
