@@ -27,12 +27,12 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "seL4-camkes-vm-examples.";
-  version = "camkes-3.11.0";
+  version = "camkes-3.11.1";
 
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/camkes-vm-examples-manifest.git";
-    rev = "camkes-3.11.0";
-    hash = "sha256-oCbCNSQmLSOKqsgnQxp3ty34SwL/HUlTDHsm8jJ52ig=";
+    rev = "camkes-3.11.1";
+    hash = "sha256-1aDpbcMaxRcGDR/YOPs1qyCMFxQoIPouGt91SuaQEBA=";
   };
 
   nativeBuildInputs = [
@@ -72,16 +72,6 @@ stdenv.mkDerivation rec {
 
     # avoid from-scratch compilation of capDL-tool
     cp -- ${capDL-makefile} projects/capdl/capDL-tool/Makefile
-  ''
-
-  # required because the musllibc fork of seL4 is so old it won't compile with gcc12
-  # see https://github.com/seL4/musllibc/issues/19#issuecomment-1841713558
-  # and https://www.mail-archive.com/devel@sel4.systems/msg04088.html
-  + ''
-    pushd projects/musllibc
-    patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-1.patch}
-    patch -p1 < ${../patches/seL4-compile-musl-on-recent-gcc-2.patch}
-    popd
   '';
 
   hardeningDisable = [ "all" ];
@@ -99,7 +89,17 @@ stdenv.mkDerivation rec {
     "-DC_PREPROCESSOR=${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cpp"
     "-DCMAKE_TOOLCHAIN_FILE=../../kernel/gcc.cmake"
   ]
-  ++ lib.lists.optional (stdenv.hostPlatform.isAarch32) "-DAARCH32=1"
+  ++ lib.lists.optionals (stdenv.hostPlatform.isAarch32) [
+    "-DAARCH32=1"
+
+    # On armv7, the TLS register is not correctly discovered, leading to this error:
+    #
+    # CMake Error at /build/source/projects/musllibc/CMakeLists.txt:48 (message):
+    #   Unsupported thread-local-storage (TLS) settings detected: KernelSel4Arch is
+    #   set to aarch32.  KernelArmTLSReg is set to tpidru but only tpidruro is
+    #   supported with this version of musllibc.
+    "-DKernelArmTLSReg=tpidruro"
+  ]
   ++ lib.lists.optional (stdenv.hostPlatform.isAarch64) "-DAARCH64=1"
   ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
   ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
