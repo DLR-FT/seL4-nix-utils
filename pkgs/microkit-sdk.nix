@@ -14,18 +14,20 @@
   qemu,
   rustc,
   texlive,
+
+  # Microkit requires the seL4 source to be compiled. Be careful when changing this, each Microkit
+  # release is targeting a specific seL4 releases!
+  seL4-src ? fetchFromGitHub {
+    owner = "seL4";
+    repo = "seL4";
+    # bespoke commit from microkit developer documentation, taken on 2025-12-11
+    # https://github.com/seL4/microkit/blob/2.1.0/DEVELOPER.md#sel4-version
+    rev = "14.0.0";
+    hash = "sha256-kzRV3qIsfyIFoc2hT6l0cIyR6zLD4yHcPXCAbGAQGsk=";
+  },
 }:
 
 let
-  # TODO make seL4-src overridable
-  seL4-src = fetchFromGitHub {
-    owner = "seL4";
-    repo = "seL4";
-    # bespoke commit from microkit README, taken on 2024-07-02
-    # https://github.com/seL4/microkit/tree/1.3.0?tab=readme-ov-file#sel4-version
-    rev = "4b97df4c7e24fd0c297e21cae8d997a08b8952b0";
-    hash = "sha256-VFHFuwJR1J+2Fys+UdqDp1WivAthvi8gDsTEdlR3ORg=";
-  };
 
   # To debug the required TeX packages:
   #
@@ -52,20 +54,20 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
-  version = "2.0.1";
+  version = "2.1.0";
 
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
     rev = finalAttrs.version;
-    hash = "sha256-IWnbfU0UdOQj9pntgU9eJSxcHiTBx475dITwkexr23A=";
+    hash = "sha256-6v54u4f3ktEoHkmGrijHqfaKyqOIK7HLQTnNCWrmSDI=";
   };
 
-  cargoRoot = "tool/microkit/";
+  # cargoRoot = "tool/microkit/";
   cargoDeps = rustPlatform.fetchCargoVendor {
     inherit (finalAttrs) src;
-    sourceRoot = "source/" + finalAttrs.cargoRoot;
-    hash = "sha256-z3zw1Ck7Fwu6Ay6qSsKphw4mi+dkYAEl1SmHGDr0nVc=";
+    sourceRoot = "source/";
+    hash = "sha256-o1oJYDo9Bqgn0YopAXAnwqGSKrq1o0hzHFK+xG9kksw=";
   };
 
   nativeBuildInputs = [
@@ -78,12 +80,15 @@ stdenv.mkDerivation (finalAttrs: {
     pkgsCross.aarch64-embedded.stdenv.cc.cc
     pkgsCross.riscv64-embedded.stdenv.cc.bintools.bintools
     pkgsCross.riscv64-embedded.stdenv.cc.cc
+    pkgsCross.x86_64-embedded.stdenv.cc.bintools.bintools
+    pkgsCross.x86_64-embedded.stdenv.cc.cc
 
     # microkit-sdk dependencies
     cargo
     cmake
     ninja
     pandoc
+    rustPlatform.bindgenHook
     rustPlatform.cargoSetupHook
     qemu
     rustc
@@ -116,13 +121,7 @@ stdenv.mkDerivation (finalAttrs: {
     # upstream issue: https://github.com/seL4/microkit/issues/201
     substituteInPlace build_sdk.py --replace-fail riscv64-unknown-elf \
       ${escapeShellArg (removeSuffix "-" pkgsCross.riscv64-embedded.stdenv.cc.targetPrefix)}
-  ''
-  +
-    # TODO remove this once a seL4 release past 13.0.0 is used
-    # Upstream PR: https://github.com/seL4/seL4/pull/1463
-    ''
-      patch -p1 --directory=seL4-src < ${../patches/seL4-qemu-v10.patch}
-    '';
+  '';
 
   buildPhase = ''
     runHook preInstall
