@@ -1,7 +1,7 @@
 final: prev: {
   # generated using
   #
-  # nix run nixpkgs#cabal2nix -- --maintainer wucke13 --subpath capDL-tool --dont-fetch-submodules https://github.com/seL4/capdl.git > pkgs/capdl.nix
+  # nix run nixpkgs#cabal2nix -- --maintainer wucke13 --subpath capDL-tool --dont-fetch-submodules https://github.com/seL4/capdl.git --revision 0.6.0 > pkgs/capDL-tool.nix
   capDL-tool =
     let
       hsPkgs = final.haskell.packages.ghc94.override {
