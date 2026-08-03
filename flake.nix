@@ -335,8 +335,8 @@
               src = pkgs.fetchFromGitHub {
                 owner = "riscv-software-src";
                 repo = "opensbi";
-                rev = "be245acfffa297b5ed4e0c7bb473a6bd55231bf8";
-                hash = "sha256-EtG5MgeeAo7Lw0XkvcDonpIhSmb/1Y4GnA2/DB8yCJg=";
+                rev = "v1.9";
+                hash = "sha256-3RXsdo5e494odYtcRMMtAwes2LLniohHlOXEWy6CmrU=";
               };
               env.NIX_CFLAGS_COMPILE = "-march=rv64imafdc_zicsr_zifencei";
             })
