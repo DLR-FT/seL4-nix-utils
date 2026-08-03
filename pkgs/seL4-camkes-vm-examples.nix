@@ -27,12 +27,12 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "seL4-camkes-vm-examples.";
-  version = "3.11.1";
+  version = "3.12.0";
 
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/camkes-vm-examples-manifest.git";
     rev = "camkes-${finalAttrs.version}";
-    hash = "sha256-1aDpbcMaxRcGDR/YOPs1qyCMFxQoIPouGt91SuaQEBA=";
+    hash = "sha256-kixzkrBX3/2gh6mI94YlvWjFUzXmvyACQkX+9Rpiof8=";
   };
 
   nativeBuildInputs = [
