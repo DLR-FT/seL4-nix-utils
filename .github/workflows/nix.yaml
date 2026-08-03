@@ -7,20 +7,6 @@ on:
     branches:
       - main
 jobs:
-  x86_64-linux---checks---formatting:
-    name: formatting
-    runs-on:
-      - ubuntu-latest
-    needs: []
-    steps:
-      - uses: actions/checkout@v7
-      - uses: cachix/install-nix-action@v31
-      - uses: cachix/cachix-action@v17
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#checks.x86_64-linux.formatting --print-build-logs
   x86_64-linux---packages---atf-aarch64-zcu102:
     name: atf-aarch64-zcu102
     runs-on:
@@ -96,21 +82,6 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.guardonce --print-build-logs
-  x86_64-linux---packages---linux-aarch64:
-    name: linux-aarch64
-    runs-on:
-      - ubuntu-latest
-    needs:
-      - x86_64-linux---packages---toolchain-aarch64-linux
-    steps:
-      - uses: actions/checkout@v7
-      - uses: cachix/install-nix-action@v31
-      - uses: cachix/cachix-action@v17
-        with:
-          name: dlr-ft
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Build
-        run: nix build .#packages.x86_64-linux.linux-aarch64 --print-build-logs
   x86_64-linux---packages---microkit-sdk:
     name: microkit-sdk
     runs-on:
@@ -908,6 +879,20 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#devShells.x86_64-linux.microkit --print-build-logs
+  x86_64-linux---checks---formatting:
+    name: formatting
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#checks.x86_64-linux.formatting --print-build-logs
   x86_64-linux---check:
     name: Check on x86_64-linux
     runs-on:
