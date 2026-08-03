@@ -59,13 +59,13 @@ assert if verifiedConfig != null then builtins.elem verifiedConfig knownVerified
 
 stdenv.mkDerivation rec {
   pname = "seL4";
-  version = "14.0.0";
+  version = "15.0.0";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
     rev = version;
-    hash = "sha256-kzRV3qIsfyIFoc2hT6l0cIyR6zLD4yHcPXCAbGAQGsk=";
+    hash = "sha256-Q/YfRYoSlSqzPtdGhS3xHthGVXgPSpn2PMNCZDgdG+g=";
   };
 
   nativeBuildInputs = [
