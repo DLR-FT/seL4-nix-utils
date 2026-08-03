@@ -99,14 +99,13 @@ mut release_workflow = {
 
 let runner_setup = [
   {
-    uses: "actions/checkout@v4"
+    uses: "actions/checkout@v7"
   }
   {
-    uses: "cachix/install-nix-action@v25",
-    with: { nix_path: "nixpkgs=channel:nixos-unstable" }
+    uses: "cachix/install-nix-action@v31",
   }
   {
-    uses: "cachix/cachix-action@v14",
+    uses: "cachix/cachix-action@v17",
     with: {
       name: dlr-ft,
       authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
@@ -172,7 +171,7 @@ for system in ($targets | columns) {
     needs: $checks,
     steps: ($runner_setup | append {
       name: Check,
-      run: "nix flake check . --print-build-logs"
+      run: "nix flake check . --print-build-logs --option allow-import-from-derivation true"
     })
   })
 
@@ -204,4 +203,4 @@ $cachix_workflow | to yaml | save --force .github/workflows/nix.yaml
 $release_workflow | to yaml | save --force .github/workflows/release.yaml
 
 log info "prettify generated yaml"
-nix run nixpkgs#nodePackages.prettier -- -w .github/workflows/
+nix run --inputs-from . nixpkgs#prettier -- -w .github/workflows
