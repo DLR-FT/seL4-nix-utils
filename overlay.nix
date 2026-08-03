@@ -41,18 +41,6 @@ final: prev: {
     })
   ];
 
-  # FIXME: Fixes i686 embedded compilation of newlib
-  # https://github.com/NixOS/nixpkgs/issues/404741
-  # https://github.com/NixOS/nixpkgs/issues/424403
-  # https://github.com/NixOS/nixpkgs/pull/442561
-  newlib = prev.newlib.overrideAttrs (
-    final': prev': {
-      patches =
-        prev'.patches
-        ++ final.lib.lists.optional final.stdenv.targetPlatform.isx86_32 ./patches/0002-newlib-Fix-i386-libgloss-support.patch;
-    }
-  );
-
   python3 =
     let
       self = prev.python3.override {
