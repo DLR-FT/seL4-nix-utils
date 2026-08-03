@@ -17,12 +17,12 @@
 
 stdenv.mkDerivation rec {
   pname = "seL4test";
-  version = "15.0.0";
+  version = "16.0.0";
 
   src = fetchGoogleRepoTool {
     url = "https://github.com/seL4/sel4test-manifest.git";
     rev = version;
-    hash = "sha256-91IJh50dUahNsvGuA8h2Tq99PNZLboHX/eJmE92Ccw8=";
+    hash = "sha256-bGwacvQFIZxsGIYoAeUY00CSTlpRjlQ9MB7sUVgawfw=";
   };
 
   nativeBuildInputs = [
