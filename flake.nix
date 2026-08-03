@@ -205,7 +205,6 @@
             extraCmakeFlags = [ "-DPLATFORM=rpi3" ];
           };
 
-          seL4-test-armv7l = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-test.nix { };
           seL4-test-armv7l-zynq7000 = pkgsCross.armv7l-unknown-none-eabihf.callPackage pkgs/seL4-test.nix {
             extraCmakeFlags = [ "-DPLATFORM=zynq7000" ];
           };
