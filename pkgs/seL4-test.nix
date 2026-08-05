@@ -52,13 +52,14 @@ stdenv.mkDerivation rec {
     patchShebangs .
   '';
 
-  # Fix for https://github.com/seL4/sel4test/issues/127
-  # Gcc compiling for an x86 -elf target treats single forward slashed (`/`) as
-  # beginning of comments, which breaks the alignment tests in
-  # projects/sel4test/apps/sel4test-tests/src/arch/x86/tests/alignment_asm.S
   env.NIX_CFLAGS_COMPILE = lib.strings.concatStringsSep " " [
+    /*
+      Fix for https://github.com/seL4/sel4test/issues/127
+      Gcc compiling for an x86 `-elf` target treats single forward slashed
+      (`/`) as beginning of comments, which breaks the alignment tests in
+      `projects/sel4test/apps/sel4test-tests/src/arch/x86/tests/alignment_asm.S`
+    */
     (lib.strings.optionalString (stdenv.hostPlatform.isx86) "-Wa,--divide")
-    "-fno-short-enums" # TODO remove once https://github.com/seL4/sel4test/pull/145 is merged
   ];
 
   # prevent Nix from injecting any flags meant to harden the build
