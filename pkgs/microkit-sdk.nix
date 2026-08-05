@@ -21,8 +21,8 @@
   seL4-src ? fetchFromGitHub {
     owner = "seL4";
     repo = "seL4";
-    rev = "14.0.0";
-    hash = "sha256-kzRV3qIsfyIFoc2hT6l0cIyR6zLD4yHcPXCAbGAQGsk=";
+    rev = "15.0.0";
+    hash = "sha256-Q/YfRYoSlSqzPtdGhS3xHthGVXgPSpn2PMNCZDgdG+g=";
   },
 }:
 
@@ -73,13 +73,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
-  version = "2.1.0";
+  version = "2.2.0";
 
   src = fetchFromGitHub {
     owner = "seL4";
     repo = "microkit";
     rev = finalAttrs.version;
-    hash = "sha256-6v54u4f3ktEoHkmGrijHqfaKyqOIK7HLQTnNCWrmSDI=";
+    hash = "sha256-WV0xn+vLJy4RdXgqeU2QWW/vWMBsxWFkI17+/uRDfgI=";
   };
 
   cargoDeps = symlinkJoin {
@@ -88,7 +88,7 @@ stdenv.mkDerivation (finalAttrs: {
       (rustPlatform.fetchCargoVendor {
         inherit (finalAttrs) src;
         sourceRoot = "source/";
-        hash = "sha256-o1oJYDo9Bqgn0YopAXAnwqGSKrq1o0hzHFK+xG9kksw=";
+        hash = "sha256-ndD+WaEcaHRaXnr72OEatUCPie7Wvezm37EPXJ8MLp8=";
       })
     ];
     # Add rust-src so that -Zbuild-std works
