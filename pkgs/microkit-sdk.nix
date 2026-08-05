@@ -126,9 +126,9 @@ stdenv.mkDerivation (finalAttrs: {
     '';
 
   buildPhase = ''
-    runHook preInstall
+    runHook preBuild
     python build_sdk.py --sel4=seL4-src --tool-target-triple=${stdenv.hostPlatform.rust.rustcTarget}
-    runHook postInstall
+    runHook postBuild
   '';
 
   installPhase = ''
