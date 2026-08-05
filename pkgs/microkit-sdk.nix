@@ -2,11 +2,11 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  rustPlatform,
   pkgsCross,
-  dtc,
+  rustPlatform,
   cargo,
   cmake,
+  dtc,
   libxml2,
   ninja,
   pandoc,
@@ -84,8 +84,8 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
     ninja
     pandoc
-    rustPlatform.cargoSetupHook
     qemu
+    rustPlatform.cargoSetupHook
     rustc
     tex
 
@@ -95,14 +95,14 @@ stdenv.mkDerivation (finalAttrs: {
 
     (python3Packages.python.withPackages (
       ps: with ps; [
-        mypy
         black
         flake8
-        ply
         jinja2
-        pyyaml
-        pyfdt
         lxml
+        mypy
+        ply
+        pyfdt
+        pyyaml
       ]
     ))
   ];
