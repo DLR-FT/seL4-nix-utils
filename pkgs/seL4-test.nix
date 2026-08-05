@@ -3,7 +3,7 @@
   lib,
   stdenv,
   fetchGoogleRepoTool,
-  buildPackages,
+  pkgsBuildBuild,
   cmake,
   cpio,
   dtc,
@@ -13,6 +13,7 @@
   protobuf,
   python3Packages,
   extraCmakeFlags ? [ ],
+  doCheck ? true,
 }:
 
 stdenv.mkDerivation rec {
@@ -32,11 +33,12 @@ stdenv.mkDerivation rec {
     libxml2 # xmllint
     nanopb.generator # ser/de
     ninja # build tools
+    pkgsBuildBuild.qemu # run the simulation, if available
     protobuf # to generate ser/de stuff
     python3Packages.seL4-deps # python deps for seL4
 
     # fakegit
-    (buildPackages.writeShellScriptBin "git" ''
+    (pkgsBuildBuild.writeShellScriptBin "git" ''
       # Taken from https://git.musl-libc.org/cgit/musl/tree/tools/version.sh
       if [[ $@ = "git describe --tags --match 'v[0-9]*'" ]]; then
         echo "${version}"
@@ -78,6 +80,29 @@ stdenv.mkDerivation rec {
   ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
   ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
   ++ extraCmakeFlags;
+
+  # When cross-compiling, `mkDerivation` automatically overrides `doCheck` to `false`. Therefore
+  # this check can not live in the `checkPhase`, and is therefore moved to `postBuild`.
+  postBuild = lib.strings.optionalString doCheck ''
+    if [[ -x ./simulate ]]
+    then
+      coproc ( ./simulate )
+
+      while IFS= read -r line <&"''${COPROC[0]}"
+      do
+        echo "$line"
+        case "$line" in
+          "Test suite failed."*) exit 1 ;;
+          "Test suite passed."*) 
+            kill "$COPROC_PID" 2>/dev/null
+            break 2
+          ;;
+        esac
+      done
+
+      kill "$COPROC_PID" 2>/dev/null
+    fi
+  '';
 
   installPhase = ''
     runHook preInstall
