@@ -98,6 +98,7 @@ stdenv.mkDerivation (finalAttrs: {
         black
         flake8
         jinja2
+        jsonschema
         lxml
         mypy
         ply
