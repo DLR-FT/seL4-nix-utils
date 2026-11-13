@@ -82,6 +82,20 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build
         run: nix build .#packages.x86_64-linux.guardonce --print-build-logs
+  x86_64-linux---packages---l4v:
+    name: l4v
+    runs-on:
+      - ubuntu-latest
+    needs: []
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: dlr-ft
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build
+        run: nix build .#packages.x86_64-linux.l4v --print-build-logs
   x86_64-linux---packages---microkit-sdk:
     name: microkit-sdk
     runs-on:
