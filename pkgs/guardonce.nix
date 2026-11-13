@@ -1,21 +1,15 @@
 {
   lib,
   buildPythonPackage,
-  fetchFromGitHub,
   pip,
   setuptools,
+  src,
+  version,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage {
   pname = "guardonce";
-  version = "2.4.0";
-
-  src = fetchFromGitHub {
-    owner = "cgmb";
-    repo = pname;
-    rev = "v${version}";
-    hash = "sha256-yTywLxvo6R02svdfHx5iP5njFUTWdhnwNXN6BNIbyR8=";
-  };
+  inherit version src;
 
   # TODO investigate why some test fais in the nose code with
   #  AttributeError: module 'collections' has no attribute 'Sequence'

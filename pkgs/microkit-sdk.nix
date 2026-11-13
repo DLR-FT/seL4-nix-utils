@@ -1,7 +1,6 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
   pkgsCross,
   rustPlatform,
   symlinkJoin,
@@ -18,16 +17,13 @@
 
   # Microkit requires the seL4 source to be compiled. Be careful when changing this, each Microkit
   # release is targeting a specific seL4 releases!
-  seL4-src ? fetchFromGitHub {
-    owner = "seL4";
-    repo = "seL4";
-    rev = "14.0.0";
-    hash = "sha256-kzRV3qIsfyIFoc2hT6l0cIyR6zLD4yHcPXCAbGAQGsk=";
-  },
+  src,
+  seL4-src,
+  version,
+  cargoHash,
 }:
 
 let
-
   # To debug the required TeX packages:
   #
   # nix-shell --pure --packages '(texlive.combine { inherit (texlive) enumitem environ fontaxes isodate roboto pdfcol scheme-medium sfmath substr tcolorbox titlesec; })' --packages pandoc --run "TEXINPUTS=$(nix eval --raw .\#microkit-sdk.src)/docs/style/: pandoc $(nix eval --raw .\#microkit-sdk.src)/docs/manual.md -o manual.pdf"
@@ -66,6 +62,7 @@ let
 
   rustLldFake = buildPackages.runCommand "rust-lld-fake" { } ''
     mkdir --parent -- $out/bin
+    ln --symbolic -- ${lib.meta.getExe' buildPackages.rustc.llvmPackages.lld "lld"} $out/bin/lld
     ln --symbolic -- ${lib.meta.getExe' buildPackages.rustc.llvmPackages.lld "lld"} $out/bin/rust-lld
   '';
 
@@ -73,14 +70,7 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "microkit-sdk";
-  version = "2.1.0";
-
-  src = fetchFromGitHub {
-    owner = "seL4";
-    repo = "microkit";
-    rev = finalAttrs.version;
-    hash = "sha256-6v54u4f3ktEoHkmGrijHqfaKyqOIK7HLQTnNCWrmSDI=";
-  };
+  inherit version src;
 
   cargoDeps = symlinkJoin {
     name = "microkit-cargodeps";
@@ -88,12 +78,12 @@ stdenv.mkDerivation (finalAttrs: {
       (rustPlatform.fetchCargoVendor {
         inherit (finalAttrs) src;
         sourceRoot = "source/";
-        hash = "sha256-o1oJYDo9Bqgn0YopAXAnwqGSKrq1o0hzHFK+xG9kksw=";
+        hash = cargoHash;
       })
     ];
     # Add rust-src so that -Zbuild-std works
     postBuild = ''
-      cp --no-clobber --recursive --symbolic-link ${rustPlatform.rustVendorSrc}/* $out/*/
+      cp --no-clobber --recursive --symbolic-link ${rustPlatform.rustVendorSrc}/* $out/source-registry-0/
     '';
   };
 
@@ -146,19 +136,14 @@ stdenv.mkDerivation (finalAttrs: {
     cp --recursive -- "${seL4-src}" seL4-src
     chmod --recursive -- u+w seL4-src
     patchShebangs seL4-src
-  ''
-  # Fix wrong target definition `target-pointer-width`, it used to be `String`, recent `rustc`
-  # however expects `u16`
-  + ''
-    for file in {initialiser,example/rust}/support/targets/*.json
-    do
-      ${lib.meta.getExe buildPackages.jq} '."target-pointer-width" |= tonumber' "$file" > "$file.tmp"
-      mv -- "$file.tmp" "$file"
-    done
+  '';
+
+  postPatch = ''
+    substituteInPlace build_sdk.py \
+      --replace-fail "-p initialiser" "-Z build-std=core,alloc -p initialiser"
   '';
 
   env.RUSTC_BOOTSTRAP = "1";
-  env.RUSTFLAGS = "-Zunstable-options";
 
   buildPhase = ''
     runHook preBuild
