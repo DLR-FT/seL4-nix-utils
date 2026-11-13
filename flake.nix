@@ -91,6 +91,11 @@
           camkes-deps = pkgs.python3Packages.camkes-deps;
 
           #
+          ### Proofs
+          #
+          l4v = pkgs.l4v;
+
+          #
           ### microkit(-sdk)
           #
           microkit-sdk = pkgs.microkit-sdk;
