@@ -1,50 +1,20 @@
+# Taken from camkes-deps 0.7.4 (https://pypi.org/project/camkes-deps/#files)
 {
-  lib,
-  buildPythonPackage,
-  aenum,
-  jinja2,
-  ordered-set,
-  plyplus,
-  pyelftools,
-  seL4-deps,
-  pycparser,
-  pyfdt,
-  concurrencytest,
-  sortedcontainers,
-  hypothesis,
+  cmake-format,
+  python3Packages,
 }:
+(import ./seL4-deps.nix {
+  inherit cmake-format python3Packages;
+})
+++ [
+  python3Packages.aenum
+  python3Packages.ordered-set
+  # orderedset # broken in nixpkgs; for older source trees, removed in 0.7.5
+  python3Packages.plyplus
+  python3Packages.pycparser
+  python3Packages.concurrencytest
 
-buildPythonPackage {
-  pname = "camkes-deps";
-  version = "0.7.4";
-
-  dontUnpack = true;
-  dontBuild = true;
-  format = "other"; # don't actually try to install anything
-
-  propagatedBuildInputs = [
-    # taken of camkes-deps 0.7.4 on 2025-09-24
-    # https://pypi.org/project/camkes-deps/#files
-    aenum
-    jinja2
-    ordered-set
-    # this package is marked broken in nixpkgs and due for removal anyways
-    #orderedset # For older source trees: remove in 0.7.5
-    plyplus
-    pyelftools
-    seL4-deps
-    pycparser
-    pyfdt
-    concurrencytest
-    # capDL deps
-    sortedcontainers
-    hypothesis
-  ];
-
-  meta = with lib; {
-    description = "Metapackage for downloading build dependencies for CAmkES";
-    homepage = "https://docs.sel4.systems/CAmkES/";
-    license = with licenses; [ bsd2 ];
-    maintainers = with maintainers; [ wucke13 ];
-  };
-}
+  # capDL deps
+  python3Packages.sortedcontainers
+  python3Packages.hypothesis
+]

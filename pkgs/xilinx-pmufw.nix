@@ -1,18 +1,16 @@
-{ stdenv, fetchFromGitHub }:
+{
+  stdenv,
+  src,
+  version,
+}:
 
 # inspired by https://github.com/lucaceresoli/zynqmp-pmufw-builder
 let
   inherit (stdenv.cc) targetPrefix;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "zynqmp-pmufw";
-  version = "2025.1";
-  src = fetchFromGitHub {
-    owner = "Xilinx";
-    repo = "embeddedsw";
-    rev = "xilinx_v" + version;
-    hash = "sha256-PK8u/9zP5mVAmq4CQDRrA0dH0F7rYwJY465+7FzSHjA=";
-  };
+  inherit version src;
 
   preConfigure = ''
     patchShebangs .

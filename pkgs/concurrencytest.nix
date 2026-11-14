@@ -1,20 +1,18 @@
 {
   lib,
   buildPythonPackage,
-  fetchPypi,
   setuptools,
   subunit,
   testtools,
+  src,
+  version,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage {
   pname = "concurrencytest";
-  version = "0.1.2";
+  inherit version src;
 
-  src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-ZKnFtc25lJo3X8xeEUqCGA9qB8waAm05ViMK7PmAwtg=";
-  };
+  pythonRelaxDeps = [ "testtools" ];
 
   propagatedBuildInputs = [
     subunit
@@ -24,9 +22,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [
     "time"
     "unittest"
-    # TODO investigate why this can not be imported
-    # "concurrencytest.ConcurrentTestSuite"
-    # "concurrencytest.fork_for_tests"
+    "concurrencytest"
   ];
 
   pyproject = true;

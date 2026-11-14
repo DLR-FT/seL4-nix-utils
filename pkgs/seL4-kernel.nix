@@ -2,13 +2,15 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
   cmake,
+  cmake-format,
   ninja,
   libxml2,
   dtc,
   cpio,
   python3Packages,
+  src,
+  version,
   verifiedConfig ? null,
   extraVerifiedConfigs ? [ ],
   extraCmakeFlags ? [ ],
@@ -57,16 +59,9 @@ in
 # check that the passed seL4 config is known
 assert if verifiedConfig != null then builtins.elem verifiedConfig knownVerifiedConfigs else true;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "seL4";
-  version = "16.0.0";
-
-  src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = version;
-    hash = "sha256-j2OSvxU95t+4wXoUiv4WC49b68ibq4nY2ICSo/33RWg=";
-  };
+  inherit version src;
 
   nativeBuildInputs = [
     cmake # build tools
@@ -74,8 +69,10 @@ stdenv.mkDerivation rec {
     libxml2 # xmllint
     dtc # device tree compiler
     cpio # cpio archive tool
-    python3Packages.seL4-deps # python build deps
-  ];
+  ]
+  ++ import ./seL4-deps.nix {
+    inherit cmake-format python3Packages;
+  };
 
   # fix /bin/bash et al.
   postPatch = ''
