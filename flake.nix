@@ -157,22 +157,33 @@
       flake-utils,
       treefmt-nix,
       ...
-    }@inputs:
+    }@flakeInputs:
     let
-      # Single source of truth for versions across all derivations
-      versions = {
-        seL4 = "17.0.0";
-        capDL-tool = "1.0.0.1";
-        camkes = "3.13.1";
-        microkit = "2.4.0";
-        microkitCargoHash = "sha256-/0bLPM0SZ90lRHLXEpYWGaJgbBzi1i0Ir338t2S+WhQ=";
-        xilinx-embeddedsw = "2026.2";
-        xilinx-atf = "xilinx-v2026.1";
-        xilinx-uboot = "xilinx-v2026.1";
-        opensbi = "1.9";
-        guardonce = "2.4.0";
-        concurrencytest = "0.1.12";
+      versions = import ./nix/versions.nix {
+        inherit (nixpkgs) lib;
+        inputs = flakeInputs;
       };
+
+      mkOverlay =
+        {
+          inputs ? { },
+          versions ? { },
+        }:
+        let
+          mergedInputs =
+            flakeInputs
+            // inputs
+            // (
+              if inputs ? seL4-src && !(inputs ? microkit-seL4-src) then
+                { microkit-seL4-src = inputs.seL4-src; }
+              else
+                { }
+            );
+        in
+        import ./overlay.nix {
+          inputs = mergedInputs;
+          inherit versions;
+        };
     in
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (
       system:
@@ -190,37 +201,12 @@
           inherit (self.packages.${system}) capDL-tool;
         };
 
-        #
-        ### Custom cross-compilation Environments
-        #
-        pkgsCross =
-          nixpkgs.lib.attrsets.genAttrs
-            [
-              "aarch64-unknown-linux-gnu"
-              "aarch64-unknown-none-elf"
-              "armv7l-unknown-linux-gnueabihf"
-              "armv7l-unknown-none-eabihf"
-              "i686-unknown-none-elf"
-              "microblazeel-none-elf"
-              "riscv32-unknown-none-elf"
-              "riscv64-unknown-linux-gnu"
-              "riscv64-unknown-none-elf"
-              "x86_64-unknown-none-elf"
-            ]
-            (
-              config:
-              import nixpkgs {
-                inherit system;
-                crossSystem = { inherit config; };
-                overlays = [
-                  self.overlays.default
-                  capDLInjectorOverlay
-                ];
-              }
-            );
-
-        manifests = import ./nix/manifests.nix {
-          inherit pkgs inputs;
+        pkgsCross = import ./nix/cross.nix {
+          inherit nixpkgs system;
+          overlays = [
+            self.overlays.default
+            capDLInjectorOverlay
+          ];
         };
 
         packages = import ./nix/packages.nix {
@@ -229,10 +215,9 @@
             system
             pkgs
             pkgsCross
-            inputs
             versions
-            manifests
             ;
+          inputs = flakeInputs;
         };
       in
       {
@@ -262,10 +247,13 @@
       }
     )
     // {
-      # declare overlay with added deps, i. e. the python packages not available in official nixpkgs
-      overlays.default = import ./overlay.nix {
-        inherit inputs versions;
+      lib = {
+        inherit mkOverlay;
+        defaultVersions = versions;
       };
+
+      # declare overlay with added deps, i. e. the python packages not available in official nixpkgs
+      overlays.default = mkOverlay { };
 
       # for CI
       ciJobs =

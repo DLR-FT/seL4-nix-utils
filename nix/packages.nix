@@ -5,12 +5,8 @@
   pkgsCross,
   inputs,
   versions,
-  manifests,
 }:
 
-let
-  inherit (manifests) sel4testWorkspace camkesVmExamplesWorkspace;
-in
 {
   #
   ### Re-export toolchains to cause proper caching
@@ -55,200 +51,146 @@ in
   #
   ### seL4 verified kernel flavours
   #
-  seL4-kernel-aarch64 = pkgsCross.aarch64-unknown-none-elf.buildSeL4Kernel {
+  seL4-kernel-aarch64 = pkgsCross.aarch64-unknown-none-elf.seL4-kernel.override {
     verifiedConfig = "AARCH64_verified";
   };
 
-  seL4-kernel-arm-hyp-exynos5 = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
+  seL4-kernel-arm-hyp-exynos5 = pkgsCross.armv7l-unknown-none-eabihf.seL4-kernel.override {
     verifiedConfig = "ARM_HYP_exynos5_verified";
   };
 
-  seL4-kernel-arm-hyp = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
+  seL4-kernel-arm-hyp = pkgsCross.armv7l-unknown-none-eabihf.seL4-kernel.override {
     verifiedConfig = "ARM_HYP_verified";
   };
 
-  seL4-kernel-arm-mcs = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
+  seL4-kernel-arm-mcs = pkgsCross.armv7l-unknown-none-eabihf.seL4-kernel.override {
     verifiedConfig = "ARM_MCS_verified";
   };
 
-  seL4-kernel-arm-imx8mm = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
+  seL4-kernel-arm-imx8mm = pkgsCross.armv7l-unknown-none-eabihf.seL4-kernel.override {
     verifiedConfig = "ARM_imx8mm_verified";
   };
 
-  seL4-kernel-arm = pkgsCross.armv7l-unknown-none-eabihf.buildSeL4Kernel {
+  seL4-kernel-arm = pkgsCross.armv7l-unknown-none-eabihf.seL4-kernel.override {
     verifiedConfig = "ARM_verified";
   };
 
-  seL4-kernel-riscv64-mcs = pkgsCross.riscv64-unknown-none-elf.buildSeL4Kernel {
+  seL4-kernel-riscv64-mcs = pkgsCross.riscv64-unknown-none-elf.seL4-kernel.override {
     verifiedConfig = "RISCV64_MCS_verified";
   };
 
-  seL4-kernel-riscv64-elf = pkgsCross.riscv64-unknown-none-elf.buildSeL4Kernel {
+  seL4-kernel-riscv64-elf = pkgsCross.riscv64-unknown-none-elf.seL4-kernel.override {
     verifiedConfig = "RISCV64_verified";
   };
 
-  seL4-kernel-x64 = pkgsCross.x86_64-unknown-none-elf.buildSeL4Kernel {
+  seL4-kernel-x64 = pkgsCross.x86_64-unknown-none-elf.seL4-kernel.override {
     verifiedConfig = "X64_verified";
   };
 
   #
   ### seL4 test suite for various platforms
   #
-  seL4-test-aarch64-imx8mq-evk =
-    pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-test.nix
-      {
-        src = sel4testWorkspace;
-        version = versions.seL4;
-        extraCmakeFlags = [ "-DPLATFORM=imx8mq-evk" ];
-      };
+  seL4-test-aarch64-imx8mq-evk = pkgsCross.aarch64-unknown-none-elf.seL4-test.override {
+    extraCmakeFlags = [ "-DPLATFORM=imx8mq-evk" ];
+  };
 
-  seL4-test-aarch64-rpi4-1GB = pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-aarch64-rpi4-1GB = pkgsCross.aarch64-unknown-none-elf.seL4-test.override {
     extraCmakeFlags = [
       "-DPLATFORM=rpi4"
       "-DRPI4_MEMORY=1024" # one of 1024 2048 4096 8192
     ];
   };
 
-  seL4-test-aarch64-rpi4-2GB = pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-aarch64-rpi4-2GB = pkgsCross.aarch64-unknown-none-elf.seL4-test.override {
     extraCmakeFlags = [
       "-DPLATFORM=rpi4"
       "-DRPI4_MEMORY=2048" # one of 1024 2048 4096 8192
     ];
   };
 
-  seL4-test-aarch64-rpi4-4GB = pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-aarch64-rpi4-4GB = pkgsCross.aarch64-unknown-none-elf.seL4-test.override {
     extraCmakeFlags = [
       "-DPLATFORM=rpi4"
       "-DRPI4_MEMORY=4096" # one of 1024 2048 4096 8192
     ];
   };
 
-  seL4-test-aarch64-rpi4-8GB = pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-aarch64-rpi4-8GB = pkgsCross.aarch64-unknown-none-elf.seL4-test.override {
     extraCmakeFlags = [
       "-DPLATFORM=rpi4"
       "-DRPI4_MEMORY=8192" # one of 1024 2048 4096 8192
     ];
   };
 
-  seL4-test-aarch64-zcu102 = pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-aarch64-zcu102 = pkgsCross.aarch64-unknown-none-elf.seL4-test.override {
     extraCmakeFlags = [ "-DPLATFORM=zcu102" ];
   };
 
-  seL4-test-armv7l-rpi3 = pkgsCross.armv7l-unknown-none-eabihf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-armv7l-rpi3 = pkgsCross.armv7l-unknown-none-eabihf.seL4-test.override {
     extraCmakeFlags = [ "-DPLATFORM=rpi3" ];
   };
 
-  seL4-test-armv7l-zynq7000 = pkgsCross.armv7l-unknown-none-eabihf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-armv7l-zynq7000 = pkgsCross.armv7l-unknown-none-eabihf.seL4-test.override {
     extraCmakeFlags = [ "-DPLATFORM=zynq7000" ];
   };
 
-  seL4-test-armv7l-zynq7000-simulate =
-    pkgsCross.armv7l-unknown-none-eabihf.callPackage ../pkgs/seL4-test.nix
-      {
-        src = sel4testWorkspace;
-        version = versions.seL4;
-        extraCmakeFlags = [
-          "-DPLATFORM=zynq7000"
-          "-DSIMULATION=1"
-        ];
-      };
+  seL4-test-armv7l-zynq7000-simulate = pkgsCross.armv7l-unknown-none-eabihf.seL4-test.override {
+    extraCmakeFlags = [
+      "-DPLATFORM=zynq7000"
+      "-DSIMULATION=1"
+    ];
+  };
 
-  # seL4-test-riscv32-spike = (import nixpkgs {
-  #   inherit system;
-  #   crossSystem.config = "riscv32-unknown-linux-gnu";
-  #   overlays = [ self.overlays.default ];
-  # }).callPackage ../pkgs/seL4-test.nix
-  #   { src = sel4testWorkspace; version = versions.seL4; extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
+  seL4-test-riscv32-spike = pkgsCross.riscv32-unknown-none-elf.seL4-test.override {
+    extraCmakeFlags = [ "-DPLATFORM=spike" ];
+  };
 
-  # seL4-test-riscv32-spike-simulate = (import nixpkgs {
-  #   inherit system;
-  #   crossSystem.config = "riscv32-unknown-linux-gnu";
-  #   overlays = [ self.overlays.default ];
-  # }).callPackage ../pkgs/seL4-test.nix
-  #   {
-  #     src = sel4testWorkspace;
-  #     version = versions.seL4;
-  #     extraCmakeFlags = [
-  #       "-DPLATFORM=spike"
-  #       "-DSIMULATION=1"
-  #     ];
-  #   };
+  seL4-test-riscv32-spike-simulate = pkgsCross.riscv32-unknown-none-elf.seL4-test.override {
+    extraCmakeFlags = [
+      "-DPLATFORM=spike"
+      "-DSIMULATION=1"
+    ];
+  };
 
-  # seL4-test-riscv64-spike = (import nixpkgs {
-  #   inherit system;
-  #   crossSystem.config = "riscv64-unknown-linux-musl";
-  #   overlays = [ self.overlays.default ];
-  # }).callPackage ../pkgs/seL4-test.nix
-  #   { src = sel4testWorkspace; version = versions.seL4; extraCmakeFlags = [ "-DPLATFORM=spike" ]; };
+  seL4-test-riscv64-spike = pkgsCross.riscv64-unknown-none-elf.seL4-test.override {
+    extraCmakeFlags = [ "-DPLATFORM=spike" ];
+  };
 
-  # seL4-test-riscv64-spike-simulate = (import nixpkgs {
-  #   inherit system;
-  #   crossSystem.config = "riscv64-unknown-linux-musl";
-  #   overlays = [ self.overlays.default ];
-  # }).callPackage ../pkgs/seL4-test.nix
-  #   {
-  #     src = sel4testWorkspace;
-  #     version = versions.seL4;
-  #     extraCmakeFlags = [
-  #       "-DPLATFORM=spike"
-  #       "-DSIMULATION=1"
-  #     ];
-  #   };
+  seL4-test-riscv64-spike-simulate = pkgsCross.riscv64-unknown-none-elf.seL4-test.override {
+    extraCmakeFlags = [
+      "-DPLATFORM=spike"
+      "-DSIMULATION=1"
+    ];
+  };
 
-  seL4-test-i686-ia32 = pkgsCross.i686-unknown-none-elf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-i686-ia32 = pkgsCross.i686-unknown-none-elf.seL4-test.override {
     extraCmakeFlags = [ "-DPLATFORM=ia32" ];
   };
 
-  seL4-test-i686-ia32-simulate = pkgsCross.i686-unknown-none-elf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-i686-ia32-simulate = pkgsCross.i686-unknown-none-elf.seL4-test.override {
     extraCmakeFlags = [
       "-DPLATFORM=ia32"
       "-DSIMULATION=TRUE"
     ];
   };
 
-  seL4-test-x86_64-x86_64 = pkgsCross.x86_64-unknown-none-elf.callPackage ../pkgs/seL4-test.nix {
-    src = sel4testWorkspace;
-    version = versions.seL4;
+  seL4-test-x86_64-x86_64 = pkgsCross.x86_64-unknown-none-elf.seL4-test.override {
     extraCmakeFlags = [ "-DPLATFORM=x86_64" ];
   };
 
-  seL4-test-x86_64-x86_64-simulate =
-    pkgsCross.x86_64-unknown-none-elf.callPackage ../pkgs/seL4-test.nix
-      {
-        src = sel4testWorkspace;
-        version = versions.seL4;
-        extraCmakeFlags = [
-          "-DPLATFORM=x86_64"
-          "-DSIMULATION=TRUE"
-        ];
-      };
+  seL4-test-x86_64-x86_64-simulate = pkgsCross.x86_64-unknown-none-elf.seL4-test.override {
+    extraCmakeFlags = [
+      "-DPLATFORM=x86_64"
+      "-DSIMULATION=TRUE"
+    ];
+  };
 
   #
   ### seL4 CAmkES VM Examples
   #
   seL4-camkes-vm-examples-aarch64-tx1 =
-    pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-camkes-vm-examples.nix
+    pkgsCross.aarch64-unknown-none-elf.seL4-camkes-vm-examples.override
       {
-        src = camkesVmExamplesWorkspace;
-        version = versions.camkes;
         extraCmakeFlags = [
           "-DPLATFORM=tx1"
           "-DCAMKES_VM_APP=vm_minimal"
@@ -256,10 +198,8 @@ in
       };
 
   seL4-camkes-vm-examples-aarch64-tx2 =
-    pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-camkes-vm-examples.nix
+    pkgsCross.aarch64-unknown-none-elf.seL4-camkes-vm-examples.override
       {
-        src = camkesVmExamplesWorkspace;
-        version = versions.camkes;
         extraCmakeFlags = [
           "-DPLATFORM=tx2"
           "-DCAMKES_VM_APP=vm_minimal"
@@ -267,10 +207,8 @@ in
       };
 
   seL4-camkes-vm-examples-aarch64-qemu-arm-virt =
-    pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-camkes-vm-examples.nix
+    pkgsCross.aarch64-unknown-none-elf.seL4-camkes-vm-examples.override
       {
-        src = camkesVmExamplesWorkspace;
-        version = versions.camkes;
         extraCmakeFlags = [
           "-DPLATFORM=qemu-arm-virt"
           "-DCAMKES_VM_APP=vm_minimal"
@@ -278,10 +216,8 @@ in
       };
 
   seL4-camkes-vm-examples-aarch64-zcu102 =
-    pkgsCross.aarch64-unknown-none-elf.callPackage ../pkgs/seL4-camkes-vm-examples.nix
+    pkgsCross.aarch64-unknown-none-elf.seL4-camkes-vm-examples.override
       {
-        src = camkesVmExamplesWorkspace;
-        version = versions.camkes;
         extraCmakeFlags = [
           "-DPLATFORM=zcu102"
           "-DCAMKES_VM_APP=vm_minimal"
@@ -289,10 +225,8 @@ in
       };
 
   seL4-camkes-vm-examples-armv7l-exynos5422 =
-    pkgsCross.armv7l-unknown-none-eabihf.callPackage ../pkgs/seL4-camkes-vm-examples.nix
+    pkgsCross.armv7l-unknown-none-eabihf.seL4-camkes-vm-examples.override
       {
-        src = camkesVmExamplesWorkspace;
-        version = versions.camkes;
         extraCmakeFlags = [
           "-DPLATFORM=exynos5422"
           "-DCAMKES_VM_APP=vm_minimal"

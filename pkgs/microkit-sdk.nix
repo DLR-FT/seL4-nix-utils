@@ -13,37 +13,40 @@
   pandoc,
   python3Packages,
   qemu,
-  texlive,
+  texliveSmall,
 
   # Microkit requires the seL4 source to be compiled. Be careful when changing this, each Microkit
   # release is targeting a specific seL4 releases!
   src,
   seL4-src,
   version,
-  cargoHash,
+  cargoOutputHashes ? { },
 }:
 
 let
   # To debug the required TeX packages:
   #
-  # nix-shell --pure --packages '(texlive.combine { inherit (texlive) enumitem environ fontaxes isodate roboto pdfcol scheme-medium sfmath substr tcolorbox titlesec; })' --packages pandoc --run "TEXINPUTS=$(nix eval --raw .\#microkit-sdk.src)/docs/style/: pandoc $(nix eval --raw .\#microkit-sdk.src)/docs/manual.md -o manual.pdf"
-  texEnv = (
-    texlive.combine {
-      inherit (texlive)
-        enumitem
-        environ
-        fontaxes
-        isodate
-        pdfcol
-        roboto
-        scheme-medium
-        sfmath
-        substr
-        tcolorbox
-        titlesec
-        ;
-    }
+  # nix-shell --pure --packages 'texliveSmall.withPackages (ps: with ps; [ scheme-medium enumitem environ fontaxes isodate roboto pdfcol sfmath substr tcolorbox titlesec ])' --packages pandoc --run "TEXINPUTS=$(nix eval --raw .\#microkit-sdk.src)/docs/style/: pandoc $(nix eval --raw .\#microkit-sdk.src)/docs/manual.md -o manual.pdf"
+  texEnv = texliveSmall.withPackages (
+    ps: with ps; [
+      scheme-medium
+      enumitem
+      environ
+      fontaxes
+      isodate
+      pdfcol
+      roboto
+      sfmath
+      substr
+      tcolorbox
+      titlesec
+    ]
   );
+
+  vendorBase = rustPlatform.importCargoLock {
+    lockFile = "${src}/Cargo.lock";
+    outputHashes = cargoOutputHashes;
+  };
 
   # With version 2.1.0, Microkit switches to `rust-sel4` based initialization. Unfortunately, this
   # requires nightly features, in particular custom targets. In addition, that implicates that
@@ -68,24 +71,25 @@ let
 
   inherit (lib.strings) escapeShellArg removeSuffix;
 in
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation {
   pname = "microkit-sdk";
   inherit version src;
 
-  cargoDeps = symlinkJoin {
-    name = "microkit-cargodeps";
-    paths = [
-      (rustPlatform.fetchCargoVendor {
-        inherit (finalAttrs) src;
-        sourceRoot = "source/";
-        hash = cargoHash;
-      })
-    ];
-    # Add rust-src so that -Zbuild-std works
-    postBuild = ''
-      cp --no-clobber --recursive --symbolic-link ${rustPlatform.rustVendorSrc}/* $out/source-registry-0/
-    '';
-  };
+  # Merge vendorBase + rustVendorSrc (for -Zbuild-std) via symlinks without lndir collisions,
+  # and rewrite directory to @vendor@ so cargoSetupPostUnpackHook resolves cargoDepsCopy.
+  cargoDeps = buildPackages.runCommand "microkit-cargodeps" { } ''
+    mkdir -p $out/.cargo
+    for d in "${vendorBase}"/*; do
+      ln -s "$d" "$out/$(basename "$d")"
+    done
+    for d in "${rustPlatform.rustVendorSrc}"/*; do
+      name=$(basename "$d")
+      [ -e "$out/$name" ] || ln -s "$d" "$out/$name"
+    done
+    sed 's|directory = "cargo-vendor-dir"|directory = "@vendor@"|' \
+      "${vendorBase}/.cargo/config.toml" > "$out/.cargo/config.toml"
+    grep -q 'directory = "@vendor@"' "$out/.cargo/config.toml"
+  '';
 
   nativeBuildInputs = [
     # cross compiler for seL4 kernel compilation
@@ -133,7 +137,7 @@ stdenv.mkDerivation (finalAttrs: {
   dontUseCmakeConfigure = true; # the build is driven by build_sdk.py, not CMake
 
   prePatch = ''
-    cp --recursive -- "${seL4-src}" seL4-src
+    cp --recursive --reflink=auto -- "${seL4-src}" seL4-src
     chmod --recursive -- u+w seL4-src
     patchShebangs seL4-src
   '';
@@ -178,4 +182,4 @@ stdenv.mkDerivation (finalAttrs: {
     maintainers = with lib.maintainers; [ wucke13 ];
     platforms = with lib.platforms; unix;
   };
-})
+}
