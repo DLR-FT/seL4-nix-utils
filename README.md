@@ -48,6 +48,14 @@ cd result && ./simulate
 nix build github:DLR-FT/seL4-nix-utils#uboot-aarch64-zcu102
 
 
+# Build RustSBI firmware for QEMU virt (RV64)
+nix build .#rustsbi-riscv64-virt
+# The ELF and raw binary are in result/share/rustsbi/
+qemu-system-riscv64 -machine virt -nographic \
+  -bios result/share/rustsbi/rustsbi-prototyper-dynamic.elf \
+  -kernel /path/to/supervisor-kernel.elf
+
+
 # Enter an interactive devshell for the seL4 test suite on the zynq7000, build it
 nix develop github:DLR-FT/seL4-nix-utils#seL4-test-armv7l-zynq7000-simulate
 unpackPhase && cd source # extract source code to new dir, cd there
