@@ -15,9 +15,11 @@
   src,
   version,
   extraCmakeFlags ? [ ],
-  doCheck ? true,
 }:
 
+let
+  seL4Common = import ./seL4-common.nix { inherit lib stdenv; };
+in
 stdenv.mkDerivation (
   {
     pname = "seL4test";
@@ -30,19 +32,7 @@ stdenv.mkDerivation (
       libxml2 # xmllint
       nanopb.generator # ser/de
       ninja # build tools
-      pkgsBuildBuild.qemu # run the simulation, if available
       protobuf # to generate ser/de stuff
-
-      # fakegit
-      (pkgsBuildBuild.writeShellScriptBin "git" ''
-        # Taken from https://git.musl-libc.org/cgit/musl/tree/tools/version.sh
-        if [[ $@ = "git describe --tags --match 'v[0-9]*'" ]]; then
-          echo "${version}"
-        else
-          >&2 echo "Unknown command: $@"
-          exit 1
-        fi
-      '')
     ]
     ++ import ./seL4-deps.nix {
       inherit cmake-format python3Packages;
@@ -69,55 +59,9 @@ stdenv.mkDerivation (
     preConfigure = ''
       cd projects/sel4test
     '';
-    cmakeFlags = [
-      "-GNinja"
-      "-DCROSS_COMPILER_PREFIX=${stdenv.cc.targetPrefix}"
-      "-DCMAKE_TOOLCHAIN_FILE=../../kernel/gcc.cmake"
-    ]
-    ++ lib.lists.optional (stdenv.hostPlatform.isAarch32) "-DAARCH32=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isAarch64) "-DAARCH64=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV64) "-DRISCV64=1"
-    ++ lib.lists.optional (stdenv.hostPlatform.isRiscV32) "-DRISCV32=1"
-    ++ extraCmakeFlags;
+    cmakeFlags = seL4Common.baseCmakeFlags ++ extraCmakeFlags;
 
-    # When cross-compiling, `mkDerivation` automatically overrides `doCheck` to `false`. Therefore
-    # this check can not live in the `checkPhase`, and is therefore moved to `postBuild`.
-    postBuild = lib.strings.optionalString doCheck ''
-      if [[ -x ./simulate ]]
-      then
-        coproc ( ./simulate )
-
-        while IFS= read -r line <&"''${COPROC[0]}"
-        do
-          echo "$line"
-          case "$line" in
-            "Test suite failed."*) exit 1 ;;
-            "Test suite passed."*)
-              kill "$COPROC_PID" 2>/dev/null
-              break 2
-            ;;
-          esac
-        done
-
-        kill "$COPROC_PID" 2>/dev/null
-      fi
-    '';
-
-    installPhase = ''
-      runHook preInstall
-      mkdir --parent -- $out
-      cp --recursive -- images $out/
-      for f in simulate launch_gdb; do
-        if [[ -e "$f" ]]; then
-          cp -- "$f" "$out/$f"
-          substituteInPlace "$out/$f" \
-            --replace-quiet "$PWD" "$out" \
-            --replace-quiet 'default="qemu-system-' "default=\"${pkgsBuildBuild.qemu}/bin/qemu-system-" \
-            --replace-quiet 'default="images/' "default=\"$out/images/"
-        fi
-      done
-      runHook postInstall
-    '';
+    installPhase = seL4Common.mkInstallPhase pkgsBuildBuild.qemu;
     dontFixup = true;
   }
   // lib.optionalAttrs (src ? unpackPhase) { inherit (src) unpackPhase; }

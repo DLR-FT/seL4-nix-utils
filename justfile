@@ -25,9 +25,9 @@ toolchains := ".#toolchain-" + ["aarch64-elf", "aarch64-linux", "armv7l-eabihf",
 
 kernels := ".#seL4-kernel-" + ["aarch64", "arm-hyp-exynos5", "arm-hyp", "arm-mcs", "arm-imx8mm", "arm", "riscv64-mcs", "riscv64-elf", "x64"]
 
-sim_tests := ".#seL4-test-" + ["armv7l-zynq7000-simulate", "i686-ia32-simulate", "x86_64-x86_64-simulate"]
+sim_tests := ".#seL4-test-" + ["armv7l-zynq7000-simulate", "i686-ia32-simulate", "riscv32-spike-simulate", "riscv64-spike-simulate", "x86_64-x86_64-simulate"]
 
-sel4tests := [".#seL4-test-" + ["aarch64-imx8mq-evk", "aarch64-rpi4-1GB", "aarch64-rpi4-2GB", "aarch64-rpi4-4GB", "aarch64-rpi4-8GB", "aarch64-zcu102", "armv7l-rpi3", "armv7l-zynq7000", "i686-ia32", "x86_64-x86_64"], sim_tests]
+sel4tests := [".#seL4-test-" + ["aarch64-imx8mq-evk", "aarch64-rpi4-1GB", "aarch64-rpi4-2GB", "aarch64-rpi4-4GB", "aarch64-rpi4-8GB", "aarch64-zcu102", "armv7l-rpi3", "armv7l-zynq7000", "i686-ia32", "riscv32-spike", "riscv64-spike", "x86_64-x86_64"], sim_tests]
 
 camkes := ".#seL4-camkes-vm-examples-" + ["aarch64-tx1", "aarch64-tx2", "aarch64-qemu-arm-virt", "aarch64-zcu102", "armv7l-exynos5422"]
 
@@ -94,10 +94,10 @@ sim target="seL4-test-x86_64-x86_64-simulate":
 
 # === Tests ===
 
-# Run all simulation tests (executed inside postBuild)
-test-simulate:
-    @printf "%b\n" "{{ c_bold }}{{ c_cyan }}🧪 Running {{ len(sim_tests) }} QEMU simulation tests...{{ c_reset }}"
-    nix build {{ nix_flags }} {{ sim_tests }}
+# Run all QEMU simulation tests (seL4-test + CAmkES VM) via scripts/test_simulate.py
+test-simulate *filters:
+    @printf "%b\n" "{{ c_bold }}{{ c_cyan }}🧪 Running QEMU simulation tests...{{ c_reset }}"
+    python3 scripts/test_simulate.py --verbose --cores {{ cores }} --max-jobs {{ jobs }} {{ filters }}
 
 # Run all checks, manifest audit, and simulation tests (continues past failures)
 test-all:
