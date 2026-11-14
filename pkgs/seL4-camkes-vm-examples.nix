@@ -113,6 +113,11 @@ stdenv.mkDerivation (
     installPhase = ''
       runHook preInstall
       cp --recursive -- . $out/
+      if [[ -e "$out/simulate" ]]; then
+        substituteInPlace "$out/simulate" \
+          --replace-quiet 'default="qemu-system-' "default=\"${buildPackages.qemu}/bin/qemu-system-" \
+          --replace-quiet 'default="images/' "default=\"$out/images/"
+      fi
       runHook postInstall
     '';
     dontFixup = true;

@@ -110,7 +110,10 @@ stdenv.mkDerivation (
       for f in simulate launch_gdb; do
         if [[ -e "$f" ]]; then
           cp -- "$f" "$out/$f"
-          substituteInPlace "$out/$f" --replace-quiet "$PWD" "$out"
+          substituteInPlace "$out/$f" \
+            --replace-quiet "$PWD" "$out" \
+            --replace-quiet 'default="qemu-system-' "default=\"${pkgsBuildBuild.qemu}/bin/qemu-system-" \
+            --replace-quiet 'default="images/' "default=\"$out/images/"
         fi
       done
       runHook postInstall
