@@ -342,6 +342,8 @@
             })
           );
 
+          rustsbi-riscv64-virt = pkgs.callPackage ./pkgs/rustsbi.nix { };
+
           pmufw-mblaze-zcu102 = pkgsCross.microblazeel-none-elf.callPackage ./pkgs/xilinx-pmufw.nix { };
 
           #
